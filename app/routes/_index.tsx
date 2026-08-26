@@ -8,12 +8,10 @@ import type {
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
 import {ProductItem} from '~/components/ProductItem';
-import {MockShopNotice} from '~/components/MockShopNotice';
 import {TrustPoints} from '~/components/TrustPoints';
 import {Faq} from '~/components/Faq';
 import {Reveal} from '~/components/Reveal';
 import {Watermark} from '~/components/Watermark';
-import {Arch} from '~/components/Arch';
 import {Container} from '~/components/ui/Container';
 import {Section} from '~/components/ui/Section';
 import {ButtonLink} from '~/components/ui/Button';
@@ -40,7 +38,6 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
   ]);
 
   return {
-    isShopLinked: Boolean(context.env.PUBLIC_STORE_DOMAIN),
     collections: collections.nodes,
     featuredCollection: collections.nodes[0],
   };
@@ -61,12 +58,6 @@ export default function Homepage() {
 
   return (
     <>
-      {data.isShopLinked ? null : (
-        <Container>
-          <MockShopNotice />
-        </Container>
-      )}
-
       <Hero collections={data.collections} />
       <PromoBanner />
       <TrustPoints />
@@ -99,11 +90,16 @@ function Hero({collections}: {collections: HomeCollectionFragment[]}) {
         <HeroPanel collection={right} blockBg="bg-block-sage" />
       </div>
 
-      <Arch className="pointer-events-none absolute bottom-0 left-1/2 h-[26vw] w-[52vw] max-h-64 max-w-[42rem] -translate-x-1/2 opacity-25" />
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center px-4 sm:bottom-10">
+      {/* The wordmark sits vertically centred across the seam, the way the
+          reference site overlays its own logotype mid-photo rather than
+          pinned to an edge. mix-blend-difference keeps it legible no matter
+          which panel or product tone sits underneath it -- necessary here
+          since, unlike the reference's consistently mid-tone lifestyle
+          photography, plain studio product shots swing from near-black to
+          near-white panel to panel. */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4">
         <Reveal>
-          <span className="display text-center text-[15vw] leading-[0.85] text-ink sm:text-[9vw]">
+          <span className="display mix-blend-difference text-center text-[17vw] leading-[0.85] text-white sm:text-[11vw]">
             {store.name}
           </span>
         </Reveal>

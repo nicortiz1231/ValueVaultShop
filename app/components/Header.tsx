@@ -145,7 +145,7 @@ export function HeaderMenu({
 
   return (
     <nav
-      className="ml-8 hidden items-center gap-7 lg:flex"
+      className="ml-10 hidden items-center gap-8 lg:flex"
       role="navigation"
       aria-label="Main"
     >
@@ -156,8 +156,8 @@ export function HeaderMenu({
           prefetch="intent"
           className={({isActive}) =>
             [
-              'text-[15px] font-medium transition-colors',
-              isActive ? 'text-brand' : 'text-ink-muted hover:text-ink',
+              'py-[18px] text-[13px] font-normal leading-[1.5] transition-colors',
+              isActive ? 'text-brand' : 'text-ink hover:text-brand',
             ].join(' ')
           }
         >
