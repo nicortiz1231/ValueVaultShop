@@ -59,8 +59,12 @@ export function PageLayout({
 
 function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
   return (
-    <Aside type="cart" heading="CART">
-      <Suspense fallback={<p>Loading cart ...</p>}>
+    <Aside type="cart" heading="Your cart">
+      <Suspense
+        fallback={
+          <p className="px-5 py-8 text-sm text-ink-muted">Loading cart…</p>
+        }
+      >
         <Await resolve={cart}>
           {(cart) => {
             return <CartMain cart={cart} layout="aside" />;
@@ -74,24 +78,28 @@ function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
 function SearchAside() {
   const queriesDatalistId = useId();
   return (
-    <Aside type="search" heading="SEARCH">
-      <div className="predictive-search">
-        <br />
+    <Aside type="search" heading="Search">
+      <div className="px-5 py-5">
         <SearchFormPredictive>
           {({fetchResults, goToSearch, inputRef}) => (
-            <>
+            <div className="flex gap-2">
               <input
                 name="q"
                 onChange={fetchResults}
                 onFocus={fetchResults}
-                placeholder="Search"
+                placeholder="Search products…"
                 ref={inputRef}
                 type="search"
                 list={queriesDatalistId}
+                className="h-11 min-w-0 flex-1 rounded-pill border border-line-strong bg-paper px-4 text-[15px] text-ink placeholder:text-ink-subtle"
               />
-              &nbsp;
-              <button onClick={goToSearch}>Search</button>
-            </>
+              <button
+                onClick={goToSearch}
+                className="h-11 shrink-0 rounded-pill bg-sage px-5 text-sm font-semibold text-white transition-colors hover:bg-sage-deep"
+              >
+                Search
+              </button>
+            </div>
           )}
         </SearchFormPredictive>
 
@@ -100,7 +108,11 @@ function SearchAside() {
             const {articles, collections, pages, products, queries} = items;
 
             if (state === 'loading' && term.current) {
-              return <div>Loading...</div>;
+              return (
+                <p className="py-8 text-center text-sm text-ink-muted">
+                  Searching…
+                </p>
+              );
             }
 
             if (!total) {
@@ -137,11 +149,9 @@ function SearchAside() {
                   <Link
                     onClick={closeSearch}
                     to={`${SEARCH_ENDPOINT}?q=${term.current}`}
+                    className="mt-5 block rounded-pill border border-line-strong bg-paper py-3 text-center text-sm font-semibold text-ink transition-colors hover:bg-cream-deep"
                   >
-                    <p>
-                      View all results for <q>{term.current}</q>
-                      &nbsp; →
-                    </p>
+                    View all results for &ldquo;{term.current}&rdquo;
                   </Link>
                 ) : null}
               </>
@@ -163,13 +173,15 @@ function MobileMenuAside({
   return (
     header.menu &&
     header.shop.primaryDomain?.url && (
-      <Aside type="mobile" heading="MENU">
-        <HeaderMenu
-          menu={header.menu}
-          viewport="mobile"
-          primaryDomainUrl={header.shop.primaryDomain.url}
-          publicStoreDomain={publicStoreDomain}
-        />
+      <Aside type="mobile" heading="Menu">
+        <div className="px-5">
+          <HeaderMenu
+            menu={header.menu}
+            viewport="mobile"
+            primaryDomainUrl={header.shop.primaryDomain.url}
+            publicStoreDomain={publicStoreDomain}
+          />
+        </div>
       </Aside>
     )
   );

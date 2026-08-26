@@ -1,5 +1,5 @@
 {
-  "name": "hydrogen-scaffold",
+  "name": "valuevaultshop",
   "private": true,
   "sideEffects": false,
   "version": "2026.4.6",
@@ -63,5 +63,6 @@
   },
   "browserslist": [
     "defaults"
-  ]
+  ],
+  "description": "Value Vault \u2014 Shopify Hydrogen storefront"
 }

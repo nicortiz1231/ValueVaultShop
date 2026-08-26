@@ -4,10 +4,20 @@ import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
+import {Container} from '~/components/ui/Container';
+import {TrustPoints} from '~/components/TrustPoints';
+import {store} from '~/lib/store-config';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
+  const collection = data?.collection;
+  return [
+    {title: collection ? `${collection.title} | ${store.name}` : store.name},
+    {
+      name: 'description',
+      content: collection?.description?.slice(0, 155) ?? store.description,
+    },
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -68,22 +78,54 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
 
+  const count = collection.products.nodes.length;
+
   return (
-    <div className="collection">
-      <h1>{collection.title}</h1>
-      <p className="collection-description">{collection.description}</p>
-      <PaginatedResourceSection<ProductItemFragment>
-        connection={collection.products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
+    <>
+      <Container className="py-10 sm:py-14">
+        <header className="max-w-2xl">
+          <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+            {collection.title}
+          </h1>
+          {collection.description && (
+            <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
+              {collection.description}
+            </p>
+          )}
+        </header>
+
+        {count === 0 ? (
+          <p className="mt-12 text-base text-ink-muted">
+            There is nothing in this collection just yet. Try{' '}
+            <a
+              href="/collections/all"
+              className="text-sage-deep underline underline-offset-4"
+            >
+              browsing everything
+            </a>{' '}
+            instead.
+          </p>
+        ) : (
+          <div className="mt-10">
+            <PaginatedResourceSection<ProductItemFragment>
+              connection={collection.products}
+              resourcesClassName="grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-x-5 lg:grid-cols-4"
+            >
+              {({node: product, index}) => (
+                <ProductItem
+                  key={product.id}
+                  product={product}
+                  loading={index < 8 ? 'eager' : undefined}
+                />
+              )}
+            </PaginatedResourceSection>
+          </div>
         )}
-      </PaginatedResourceSection>
+      </Container>
+
+      {/* Repeat the guarantees at the bottom of a browse session, where the
+          shopper is deciding whether to commit to an unfamiliar store. */}
+      <TrustPoints />
       <Analytics.CollectionView
         data={{
           collection: {
@@ -92,7 +134,7 @@ export default function Collection() {
           },
         }}
       />
-    </div>
+    </>
   );
 }
 

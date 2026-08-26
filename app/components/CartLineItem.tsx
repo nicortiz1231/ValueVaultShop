@@ -34,54 +34,72 @@ export function CartLineItem({
   const lineItemChildren = childrenMap[id];
   const childrenLabelId = `cart-line-children-${id}`;
 
+  // Meaningful options only -- Shopify reports a lone "Title: Default Title"
+  // on single-variant products, which is noise in the cart.
+  const options = selectedOptions.filter(
+    (option) => option.value !== 'Default Title',
+  );
+
   return (
-    <li key={id} className="cart-line">
-      <div className="cart-line-inner">
+    <li key={id} className="py-4">
+      <div className="flex gap-4">
         {image && (
-          <Image
-            alt={title}
-            aspectRatio="1/1"
-            data={image}
-            height={100}
-            loading="lazy"
-            width={100}
-          />
+          <Link
+            to={lineItemUrl}
+            prefetch="intent"
+            onClick={() => layout === 'aside' && close()}
+            className="shrink-0 overflow-hidden rounded-lg border border-line bg-paper"
+          >
+            <Image
+              alt={title}
+              aspectRatio="1/1"
+              data={image}
+              height={88}
+              loading="lazy"
+              width={88}
+              className="h-22 w-22 object-cover"
+            />
+          </Link>
         )}
 
-        <div>
+        <div className="flex min-w-0 flex-1 flex-col">
           <Link
             prefetch="intent"
             to={lineItemUrl}
-            onClick={() => {
-              if (layout === 'aside') {
-                close();
-              }
-            }}
+            onClick={() => layout === 'aside' && close()}
+            className="text-[15px] font-medium leading-snug text-ink hover:text-sage-deep"
           >
-            <p>
-              <strong>{product.title}</strong>
-            </p>
+            {product.title}
           </Link>
-          <ProductPrice price={line?.cost?.totalAmount} />
-          <ul>
-            {selectedOptions.map((option) => (
-              <li key={option.name}>
-                <small>
+
+          {options.length > 0 && (
+            <ul className="mt-1 flex flex-wrap gap-x-3 text-[13px] text-ink-muted">
+              {options.map((option) => (
+                <li key={option.name}>
                   {option.name}: {option.value}
-                </small>
-              </li>
-            ))}
-          </ul>
-          <CartLineQuantity line={line} />
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="mt-auto flex items-end justify-between gap-3 pt-3">
+            <CartLineQuantity line={line} />
+            <span className="text-[15px] font-semibold text-ink">
+              <ProductPrice price={line?.cost?.totalAmount} />
+            </span>
+          </div>
         </div>
       </div>
 
       {lineItemChildren ? (
-        <div>
+        <div className="mt-3 pl-6">
           <p id={childrenLabelId} className="sr-only">
             Line items with {product.title}
           </p>
-          <ul aria-labelledby={childrenLabelId} className="cart-line-children">
+          <ul
+            aria-labelledby={childrenLabelId}
+            className="divide-y divide-line border-l-2 border-line pl-4"
+          >
             {lineItemChildren.map((childLine) => (
               <CartLineItem
                 childrenMap={childrenMap}
@@ -108,31 +126,41 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
+  const stepper =
+    'flex h-8 w-8 items-center justify-center text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-35';
+
   return (
-    <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-        <button
-          aria-label="Decrease quantity"
-          disabled={quantity <= 1 || !!isOptimistic}
-          name="decrease-quantity"
-          value={prevQuantity}
-        >
-          <span>&#8722; </span>
-        </button>
-      </CartLineUpdateButton>
-      &nbsp;
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
-        <button
-          aria-label="Increase quantity"
-          name="increase-quantity"
-          value={nextQuantity}
-          disabled={!!isOptimistic}
-        >
-          <span>&#43;</span>
-        </button>
-      </CartLineUpdateButton>
-      &nbsp;
+    <div className="flex items-center gap-3">
+      <div className="flex items-center rounded-pill border border-line-strong bg-paper">
+        <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+          <button
+            aria-label="Decrease quantity"
+            disabled={quantity <= 1 || !!isOptimistic}
+            name="decrease-quantity"
+            value={prevQuantity}
+            className={stepper}
+          >
+            &#8722;
+          </button>
+        </CartLineUpdateButton>
+
+        <span className="min-w-6 text-center text-sm font-semibold tabular-nums text-ink">
+          {quantity}
+        </span>
+
+        <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+          <button
+            aria-label="Increase quantity"
+            name="increase-quantity"
+            value={nextQuantity}
+            disabled={!!isOptimistic}
+            className={stepper}
+          >
+            &#43;
+          </button>
+        </CartLineUpdateButton>
+      </div>
+
       <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
     </div>
   );
@@ -157,7 +185,11 @@ function CartLineRemoveButton({
       action={CartForm.ACTIONS.LinesRemove}
       inputs={{lineIds}}
     >
-      <button disabled={disabled} type="submit">
+      <button
+        disabled={disabled}
+        type="submit"
+        className="text-[13px] text-ink-subtle underline underline-offset-4 transition-colors hover:text-clay disabled:opacity-40"
+      >
         Remove
       </button>
     </CartForm>

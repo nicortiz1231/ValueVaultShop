@@ -3,6 +3,8 @@ import type {CartLayout} from '~/components/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useEffect, useId, useRef, useState} from 'react';
 import {useFetcher} from 'react-router';
+import {ShieldIcon} from './Icons';
+import {returns} from '~/lib/store-config';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -10,20 +12,30 @@ type CartSummaryProps = {
 };
 
 export function CartSummary({cart, layout}: CartSummaryProps) {
-  const className =
-    layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
   const summaryId = useId();
   const discountsHeadingId = useId();
   const discountCodeInputId = useId();
   const giftCardHeadingId = useId();
   const giftCardInputId = useId();
 
+  const isAside = layout === 'aside';
+
   return (
-    <div aria-labelledby={summaryId} className={className}>
-      <h4 id={summaryId}>Totals</h4>
-      <dl role="group" className="cart-subtotal">
-        <dt>Subtotal</dt>
-        <dd>
+    <div
+      aria-labelledby={summaryId}
+      className={
+        isAside
+          ? 'shrink-0 border-t border-line bg-cream px-5 py-5'
+          : 'rounded-card border border-line bg-paper p-6 lg:sticky lg:top-28'
+      }
+    >
+      <h4 id={summaryId} className="sr-only">
+        Order summary
+      </h4>
+
+      <dl role="group" className="flex items-baseline justify-between">
+        <dt className="text-[15px] font-semibold text-ink">Subtotal</dt>
+        <dd className="text-lg font-bold text-ink">
           {cart?.cost?.subtotalAmount?.amount ? (
             <Money data={cart?.cost?.subtotalAmount} />
           ) : (
@@ -31,17 +43,31 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           )}
         </dd>
       </dl>
-      <CartDiscounts
-        discountCodes={cart?.discountCodes}
-        discountsHeadingId={discountsHeadingId}
-        discountCodeInputId={discountCodeInputId}
-      />
-      <CartGiftCard
-        giftCardCodes={cart?.appliedGiftCards}
-        giftCardHeadingId={giftCardHeadingId}
-        giftCardInputId={giftCardInputId}
-      />
+
+      <p className="mt-1.5 text-[13px] text-ink-muted">
+        Shipping and taxes calculated at checkout.
+      </p>
+
+      <div className="mt-4 space-y-3 border-t border-line pt-4">
+        <CartDiscounts
+          discountCodes={cart?.discountCodes}
+          discountsHeadingId={discountsHeadingId}
+          discountCodeInputId={discountCodeInputId}
+        />
+        <CartGiftCard
+          giftCardCodes={cart?.appliedGiftCards}
+          giftCardHeadingId={giftCardHeadingId}
+          giftCardInputId={giftCardInputId}
+        />
+      </div>
+
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
+
+      {/* Reassurance at the exact moment of highest hesitation. */}
+      <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[13px] text-ink-muted">
+        <ShieldIcon className="h-4 w-4 text-sage" />
+        Secure Shopify checkout · {returns.windowDays}-day returns
+      </p>
     </div>
   );
 }
@@ -50,12 +76,13 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
-      </a>
-      <br />
-    </div>
+    <a
+      href={checkoutUrl}
+      target="_self"
+      className="mt-5 inline-flex h-13 w-full items-center justify-center rounded-pill bg-sage px-6 text-base font-semibold text-white transition-colors hover:bg-sage-deep"
+    >
+      Continue to checkout
+    </a>
   );
 }
 
@@ -101,16 +128,22 @@ function CartDiscounts({
           <label htmlFor={discountCodeInputId} className="sr-only">
             Discount code
           </label>
-          <input
-            id={discountCodeInputId}
-            type="text"
-            name="discountCode"
-            placeholder="Discount code"
-          />
-          &nbsp;
-          <button type="submit" aria-label="Apply discount code">
-            Apply
-          </button>
+          <div className="flex gap-2">
+            <input
+              id={discountCodeInputId}
+              type="text"
+              name="discountCode"
+              placeholder="Discount code"
+              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-paper px-4 text-sm text-ink placeholder:text-ink-subtle"
+            />
+            <button
+              type="submit"
+              aria-label="Apply discount code"
+              className="h-10 shrink-0 rounded-pill border border-line-strong bg-paper px-4 text-sm font-semibold text-ink transition-colors hover:bg-cream-deep"
+            >
+              Apply
+            </button>
+          </div>
         </div>
       </UpdateDiscountForm>
     </section>
@@ -225,21 +258,24 @@ function CartGiftCard({
           <label htmlFor={giftCardInputId} className="sr-only">
             Gift card code
           </label>
-          <input
-            id={giftCardInputId}
-            type="text"
-            name="giftCardCode"
-            placeholder="Gift card code"
-            ref={giftCardCodeInput}
-          />
-          &nbsp;
-          <button
-            type="submit"
-            disabled={giftCardAddFetcher.state !== 'idle'}
-            aria-label="Apply gift card code"
-          >
-            Apply
-          </button>
+          <div className="flex gap-2">
+            <input
+              id={giftCardInputId}
+              type="text"
+              name="giftCardCode"
+              placeholder="Gift card code"
+              ref={giftCardCodeInput}
+              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-paper px-4 text-sm text-ink placeholder:text-ink-subtle"
+            />
+            <button
+              type="submit"
+              disabled={giftCardAddFetcher.state !== 'idle'}
+              aria-label="Apply gift card code"
+              className="h-10 shrink-0 rounded-pill border border-line-strong bg-paper px-4 text-sm font-semibold text-ink transition-colors hover:bg-cream-deep disabled:opacity-50"
+            >
+              Apply
+            </button>
+          </div>
         </div>
       </AddGiftCardForm>
     </section>

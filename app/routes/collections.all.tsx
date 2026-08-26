@@ -3,6 +3,8 @@ import {useLoaderData} from 'react-router';
 import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
+import {Container} from '~/components/ui/Container';
+import {TrustPoints} from '~/components/TrustPoints';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
@@ -51,21 +53,36 @@ export default function Collection() {
   const {products} = useLoaderData<typeof loader>();
 
   return (
-    <div className="collection">
-      <h1>Products</h1>
-      <PaginatedResourceSection<CollectionItemFragment>
-        connection={products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
-        )}
-      </PaginatedResourceSection>
-    </div>
+    <>
+      <Container className="py-10 sm:py-14">
+        <header className="max-w-2xl">
+          <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+            Everything we stock
+          </h1>
+          <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
+            Every product here was picked by hand. If we would not use it
+            ourselves, it does not make the shelf.
+          </p>
+        </header>
+
+        <div className="mt-10">
+          <PaginatedResourceSection<CollectionItemFragment>
+            connection={products}
+            resourcesClassName="grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-x-5 lg:grid-cols-4"
+          >
+            {({node: product, index}) => (
+              <ProductItem
+                key={product.id}
+                product={product}
+                loading={index < 8 ? 'eager' : undefined}
+              />
+            )}
+          </PaginatedResourceSection>
+        </div>
+      </Container>
+
+      <TrustPoints />
+    </>
   );
 }
 
