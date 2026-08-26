@@ -165,14 +165,16 @@ function PromoBand({collection}: {collection?: FeaturedCollectionFragment}) {
           />
         )}
 
-        {/* Pane centred horizontally, CTA sitting below it on the photo
-            rather than inside it -- the reference site's own arrangement. */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-10 p-5 sm:px-16 sm:py-12">
-          <Reveal className="w-full max-w-6xl rounded-[2rem] bg-ink/50 p-8 shadow-lift sm:p-14">
-            <p className="display text-[2rem] leading-[1.05] text-bg sm:text-5xl">
+        {/* Copy sits directly on the photograph -- no panel behind it.
+            Set in dark ink because the product photography is light and
+            high-key; if a dark-background photo is ever featured here the
+            text will need a scrim or a light colour to stay legible. */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 px-5 text-center sm:px-16">
+          <Reveal className="max-w-4xl">
+            <p className="display text-[2.25rem] leading-[1.05] text-ink sm:text-6xl">
               Everyday essentials for home, kitchen, pets &amp; family
             </p>
-            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-bg/80 sm:text-base">
+            <p className="mx-auto mt-5 max-w-xl text-[15px] font-medium leading-relaxed text-ink sm:text-lg">
               Quality picks for every room and every budget — with fast US
               shipping on our best sellers.
             </p>
