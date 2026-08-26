@@ -21,11 +21,26 @@ const sizes: Record<Size, string> = {
   lg: 'h-14 px-8 text-base',
 };
 
-function classes(variant: Variant, size: Size, full: boolean, extra: string) {
+/** Pill everywhere by default; `sharp` is the squared-off promo CTA. */
+type Shape = 'pill' | 'sharp';
+
+const shapes: Record<Shape, string> = {
+  pill: 'rounded-pill',
+  sharp: 'rounded-[4px]',
+};
+
+function classes(
+  variant: Variant,
+  size: Size,
+  shape: Shape,
+  full: boolean,
+  extra: string,
+) {
   return [
-    'relative inline-flex items-center justify-center gap-2 rounded-pill font-semibold',
+    'relative inline-flex items-center justify-center gap-2 font-semibold',
     'transition-[background-color,box-shadow,border-color,transform] duration-200',
     'active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60',
+    shapes[shape],
     variants[variant],
     sizes[size],
     full ? 'w-full' : '',
@@ -67,6 +82,7 @@ function useMagnetic<T extends HTMLElement>() {
 type SharedProps = {
   variant?: Variant;
   size?: Size;
+  shape?: Shape;
   full?: boolean;
   magnetic?: boolean;
   className?: string;
@@ -76,6 +92,7 @@ type SharedProps = {
 export function Button({
   variant = 'primary',
   size = 'md',
+  shape = 'pill',
   full = false,
   magnetic = false,
   className = '',
@@ -90,7 +107,7 @@ export function Button({
       onMouseMove={magnetic ? onMouseMove : undefined}
       onMouseLeave={magnetic ? onMouseLeave : undefined}
       className={[
-        classes(variant, size, full, className),
+        classes(variant, size, shape, full, className),
         magnetic ? 'transition-transform duration-200 ease-out' : '',
       ].join(' ')}
       {...props}
@@ -104,6 +121,7 @@ export function ButtonLink({
   to,
   variant = 'primary',
   size = 'md',
+  shape = 'pill',
   full = false,
   magnetic = false,
   className = '',
@@ -120,7 +138,7 @@ export function ButtonLink({
       onMouseLeave={magnetic ? onMouseLeave : undefined}
       to={to}
       className={[
-        classes(variant, size, full, className),
+        classes(variant, size, shape, full, className),
         magnetic ? 'transition-transform duration-200 ease-out' : '',
       ].join(' ')}
       {...props}

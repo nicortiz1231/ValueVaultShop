@@ -165,8 +165,10 @@ function PromoBand({collection}: {collection?: FeaturedCollectionFragment}) {
           />
         )}
 
-        <div className="absolute inset-0 flex items-center p-5 sm:px-16 sm:py-12">
-          <Reveal className="max-w-6xl rounded-[2rem] bg-ink/50 p-8 shadow-lift sm:p-14">
+        {/* Pane centred horizontally, CTA sitting below it on the photo
+            rather than inside it -- the reference site's own arrangement. */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-10 p-5 sm:px-16 sm:py-12">
+          <Reveal className="w-full max-w-6xl rounded-[2rem] bg-ink/50 p-8 shadow-lift sm:p-14">
             <p className="display text-[2rem] leading-[1.05] text-bg sm:text-5xl">
               Everyday essentials for home, kitchen, pets &amp; family
             </p>
@@ -174,17 +176,18 @@ function PromoBand({collection}: {collection?: FeaturedCollectionFragment}) {
               Quality picks for every room and every budget — with fast US
               shipping on our best sellers.
             </p>
-            <ButtonLink
-              to="/collections/all"
-              size="lg"
-              variant="accent"
-              data-cursor="Shop"
-              className="mt-7"
-            >
-              Shop best sellers
-              <ArrowIcon className="h-[18px] w-[18px]" />
-            </ButtonLink>
           </Reveal>
+
+          <ButtonLink
+            to="/collections/all"
+            size="lg"
+            variant="accent"
+            shape="sharp"
+            data-cursor="Shop"
+            className="min-w-[13rem]"
+          >
+            Shop best sellers
+          </ButtonLink>
         </div>
       </div>
     </section>
