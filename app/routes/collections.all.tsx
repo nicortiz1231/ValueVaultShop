@@ -3,6 +3,7 @@ import {useLoaderData} from 'react-router';
 import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
+import {Reveal} from '~/components/Reveal';
 import {Container} from '~/components/ui/Container';
 import {TrustPoints} from '~/components/TrustPoints';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
@@ -72,11 +73,12 @@ export default function Collection() {
             resourcesClassName="grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-x-5 lg:grid-cols-4"
           >
             {({node: product, index}) => (
-              <ProductItem
-                key={product.id}
-                product={product}
-                loading={index < 8 ? 'eager' : undefined}
-              />
+              <Reveal key={product.id} as="div" delay={(index % 4) * 60}>
+                <ProductItem
+                  product={product}
+                  loading={index < 8 ? 'eager' : undefined}
+                />
+              </Reveal>
             )}
           </PaginatedResourceSection>
         </div>
