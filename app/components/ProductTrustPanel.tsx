@@ -35,13 +35,13 @@ export function ProductTrustPanel() {
   ];
 
   return (
-    <ul className="mt-6 divide-y divide-line overflow-hidden rounded-card border border-line bg-cream">
+    <ul className="mt-6 divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
       {rows.map(({icon: Icon, text}) => (
         <li
           key={text}
-          className="flex items-center gap-3 px-4 py-3 text-sm text-ink-muted"
+          className="flex items-center gap-3 px-4 py-3 text-sm text-ash"
         >
-          <Icon className="h-[18px] w-[18px] shrink-0 text-sage" />
+          <Icon className="h-[18px] w-[18px] shrink-0 text-lime" />
           <span>{text}</span>
         </li>
       ))}

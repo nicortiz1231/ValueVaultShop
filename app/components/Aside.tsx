@@ -87,19 +87,19 @@ export function Aside({
       <aside
         className={[
           'absolute right-0 top-0 flex h-full w-full max-w-[26rem] flex-col',
-          'bg-cream shadow-lift transition-transform duration-300 ease-out',
+          'bg-surface shadow-card transition-transform duration-300 ease-out',
           expanded ? 'translate-x-0' : 'translate-x-full',
         ].join(' ')}
       >
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-line px-5">
-          <h3 id={id} className="text-lg font-bold tracking-tight text-ink">
+          <h3 id={id} className="text-lg font-bold tracking-tight text-chalk">
             {heading}
           </h3>
           <button
             onClick={close}
             aria-label="Close"
             tabIndex={expanded ? 0 : -1}
-            className="-mr-2 rounded-full p-2 text-ink-muted transition-colors hover:bg-cream-deep hover:text-ink"
+            className="-mr-2 rounded-full p-2 text-ash transition-colors hover:bg-surface-2 hover:text-chalk"
           >
             <CloseIcon />
           </button>

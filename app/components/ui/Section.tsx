@@ -1,10 +1,13 @@
+import {Reveal} from '~/components/Reveal';
 import {Container} from './Container';
 
 /**
- * A titled homepage section. Centralising the heading rhythm here is what keeps
- * the page feeling composed rather than like a stack of unrelated widgets.
+ * A titled homepage section, with its heading wired into the scroll-reveal
+ * system so sections animate in as the shopper scrolls rather than all
+ * existing statically on load.
  */
 export function Section({
+  eyebrow,
   title,
   intro,
   action,
@@ -12,6 +15,7 @@ export function Section({
   className = '',
   id,
 }: {
+  eyebrow?: string;
   title?: string;
   intro?: string;
   action?: React.ReactNode;
@@ -20,24 +24,32 @@ export function Section({
   id?: string;
 }) {
   return (
-    <section id={id} className={`py-14 sm:py-20 ${className}`}>
+    <section id={id} className={`py-20 sm:py-28 ${className}`}>
       <Container>
         {(title || action) && (
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4 sm:mb-11">
+          <Reveal
+            as="div"
+            className="mb-10 flex flex-wrap items-end justify-between gap-6 sm:mb-14"
+          >
             <div className="max-w-xl">
+              {eyebrow && (
+                <span className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-lime">
+                  {eyebrow}
+                </span>
+              )}
               {title && (
-                <h2 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+                <h2 className="display text-3xl text-chalk sm:text-4xl lg:text-[2.75rem]">
                   {title}
                 </h2>
               )}
               {intro && (
-                <p className="mt-2.5 text-base leading-relaxed text-ink-muted">
+                <p className="mt-3.5 text-base leading-relaxed text-ash">
                   {intro}
                 </p>
               )}
             </div>
             {action}
-          </div>
+          </Reveal>
         )}
         {children}
       </Container>

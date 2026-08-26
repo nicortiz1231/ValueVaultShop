@@ -6,6 +6,7 @@ import type {
   RecommendedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
+import {ArrowIcon} from './Icons';
 
 type AnyProduct =
   | CollectionItemFragment
@@ -16,7 +17,7 @@ type AnyProduct =
  * Works out whether a product is genuinely discounted.
  *
  * Only returns a discount when Shopify actually carries a higher compare-at
- * price — the card never manufactures a "was" price, because invented anchor
+ * price -- the card never manufactures a "was" price, because invented anchor
  * pricing is one of the tells shoppers use to spot a fake store.
  */
 function useDiscount(product: AnyProduct) {
@@ -57,7 +58,7 @@ export function ProductItem({
       to={variantUrl}
       className={`group flex flex-col ${className}`}
     >
-      <div className="relative overflow-hidden rounded-card border border-line bg-paper">
+      <div className="glass relative overflow-hidden rounded-card transition-all duration-300 group-hover:border-line-strong group-hover:shadow-card">
         {image ? (
           <Image
             alt={image.altText || product.title}
@@ -65,30 +66,34 @@ export function ProductItem({
             data={image}
             loading={loading}
             sizes="(min-width: 1024px) 300px, (min-width: 640px) 45vw, 90vw"
-            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
           />
         ) : (
-          <div className="aspect-square w-full bg-cream-deep" />
+          <div className="aspect-square w-full bg-surface-2" />
         )}
 
         {percentOff > 0 && (
-          <span className="absolute left-3 top-3 rounded-pill bg-clay px-2.5 py-1 text-[11px] font-bold tracking-tight text-white">
-            {percentOff}% off
+          <span className="absolute left-3 top-3 rounded-pill bg-flare px-2.5 py-1 text-[11px] font-bold tracking-tight text-chalk">
+            −{percentOff}%
           </span>
         )}
+
+        <span className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-lime text-canvas opacity-0 shadow-glow transition-all duration-300 group-hover:opacity-100 group-hover:rotate-45">
+          <ArrowIcon className="h-4 w-4 -rotate-45" />
+        </span>
       </div>
 
       <div className="flex flex-1 flex-col px-0.5 pt-3.5">
-        <h3 className="line-clamp-2-fixed text-[15px] font-medium leading-snug text-ink transition-colors group-hover:text-sage-deep">
+        <h3 className="line-clamp-2-fixed text-[15px] font-medium leading-snug text-chalk transition-colors group-hover:text-lime">
           {product.title}
         </h3>
 
         <div className="mt-auto flex items-baseline gap-2 pt-2">
-          <span className="text-[15px] font-bold text-ink">
+          <span className="text-[15px] font-bold text-chalk">
             <Money data={price} />
           </span>
           {compareAt && (
-            <span className="text-[13px] text-ink-subtle line-through">
+            <span className="text-[13px] text-dim line-through">
               <Money data={compareAt} />
             </span>
           )}

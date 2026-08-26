@@ -61,7 +61,7 @@ export default function Page() {
 
   return (
     <Container width="narrow" className="py-12 sm:py-16">
-      <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+      <h1 className="display text-3xl text-chalk sm:text-4xl">
         {page.title}
       </h1>
       <div
@@ -71,13 +71,13 @@ export default function Page() {
 
       {/* Anyone deep enough to read About or Contact is weighing whether to
           trust the shop, so give them a way to reach a person from here. */}
-      <div className="mt-12 rounded-card border border-line bg-paper p-6">
-        <h2 className="text-[16px] font-semibold text-ink">Still have a question?</h2>
-        <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
+      <div className="mt-12 rounded-card border border-line bg-surface p-6">
+        <h2 className="text-[16px] font-semibold text-chalk">Still have a question?</h2>
+        <p className="mt-2 text-[15px] leading-relaxed text-ash">
           Email{' '}
           <a
             href={`mailto:${support.email}`}
-            className="text-sage-deep underline underline-offset-4"
+            className="text-lime underline underline-offset-4"
           >
             {support.email}
           </a>{' '}

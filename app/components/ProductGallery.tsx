@@ -43,13 +43,13 @@ export function ProductGallery({
 
   if (!active) {
     return (
-      <div className="aspect-square w-full rounded-card border border-line bg-cream-deep" />
+      <div className="aspect-square w-full rounded-card border border-line bg-surface-2" />
     );
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="overflow-hidden rounded-card border border-line bg-paper">
+      <div className="overflow-hidden rounded-card border border-line bg-surface">
         <Image
           alt={active.altText || title}
           aspectRatio="1/1"
@@ -75,7 +75,7 @@ export function ProductGallery({
                   className={[
                     'h-18 w-18 overflow-hidden rounded-lg border-2 transition-colors',
                     isActive
-                      ? 'border-sage'
+                      ? 'border-lime'
                       : 'border-line hover:border-line-strong',
                   ].join(' ')}
                 >

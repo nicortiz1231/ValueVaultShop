@@ -99,11 +99,11 @@ function CartEmpty({layout}: {layout?: CartMainProps['layout']}) {
 
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-cream-deep text-ink-subtle">
+      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-2 text-dim">
         <CartIcon className="h-7 w-7" />
       </span>
-      <h3 className="mt-5 text-lg font-bold text-ink">Your cart is empty</h3>
-      <p className="mt-2 max-w-xs text-sm leading-relaxed text-ink-muted">
+      <h3 className="mt-5 text-lg font-bold text-chalk">Your cart is empty</h3>
+      <p className="mt-2 max-w-xs text-sm leading-relaxed text-ash">
         Nothing in here yet. Everything ships with {returns.windowDays}-day
         returns, so there is no risk in trying something.
       </p>
@@ -111,7 +111,7 @@ function CartEmpty({layout}: {layout?: CartMainProps['layout']}) {
         to="/collections/all"
         onClick={() => layout === 'aside' && close()}
         prefetch="viewport"
-        className="mt-6 inline-flex h-11 items-center rounded-pill bg-sage px-6 text-sm font-semibold text-white transition-colors hover:bg-sage-deep"
+        className="mt-6 inline-flex h-11 items-center rounded-pill bg-lime px-6 text-sm font-semibold text-canvas transition-colors hover:bg-lime-deep"
       >
         Start shopping
       </Link>

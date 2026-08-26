@@ -44,7 +44,7 @@ export default function SearchPage() {
 
   return (
     <Container className="py-12 sm:py-16">
-      <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+      <h1 className="display text-3xl text-chalk sm:text-4xl">
         {term ? `Results for “${term}”` : 'Search'}
       </h1>
 
@@ -58,11 +58,11 @@ export default function SearchPage() {
                 placeholder="Search products…"
                 ref={inputRef}
                 type="search"
-                className="h-12 min-w-0 flex-1 rounded-pill border border-line-strong bg-paper px-5 text-[15px] text-ink placeholder:text-ink-subtle"
+                className="h-12 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-5 text-[15px] text-chalk placeholder:text-dim"
               />
               <button
                 type="submit"
-                className="h-12 shrink-0 rounded-pill bg-sage px-6 text-sm font-semibold text-white transition-colors hover:bg-sage-deep"
+                className="h-12 shrink-0 rounded-pill bg-lime px-6 text-sm font-semibold text-canvas transition-colors hover:bg-lime-deep"
               >
                 Search
               </button>
@@ -72,7 +72,7 @@ export default function SearchPage() {
       </div>
 
       {error && (
-        <p className="mt-6 rounded-card border border-clay/30 bg-clay-tint px-4 py-3 text-sm text-clay">
+        <p className="mt-6 rounded-card border border-flare/30 bg-flare/15 px-4 py-3 text-sm text-flare">
           {error}
         </p>
       )}

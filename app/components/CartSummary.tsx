@@ -25,8 +25,8 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       aria-labelledby={summaryId}
       className={
         isAside
-          ? 'shrink-0 border-t border-line bg-cream px-5 py-5'
-          : 'rounded-card border border-line bg-paper p-6 lg:sticky lg:top-28'
+          ? 'shrink-0 border-t border-line bg-surface px-5 py-5'
+          : 'rounded-card border border-line bg-surface p-6 lg:sticky lg:top-28'
       }
     >
       <h4 id={summaryId} className="sr-only">
@@ -34,8 +34,8 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       </h4>
 
       <dl role="group" className="flex items-baseline justify-between">
-        <dt className="text-[15px] font-semibold text-ink">Subtotal</dt>
-        <dd className="text-lg font-bold text-ink">
+        <dt className="text-[15px] font-semibold text-chalk">Subtotal</dt>
+        <dd className="text-lg font-bold text-chalk">
           {cart?.cost?.subtotalAmount?.amount ? (
             <Money data={cart?.cost?.subtotalAmount} />
           ) : (
@@ -44,7 +44,7 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
         </dd>
       </dl>
 
-      <p className="mt-1.5 text-[13px] text-ink-muted">
+      <p className="mt-1.5 text-[13px] text-ash">
         Shipping and taxes calculated at checkout.
       </p>
 
@@ -64,8 +64,8 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
 
       {/* Reassurance at the exact moment of highest hesitation. */}
-      <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[13px] text-ink-muted">
-        <ShieldIcon className="h-4 w-4 text-sage" />
+      <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[13px] text-ash">
+        <ShieldIcon className="h-4 w-4 text-lime" />
         Secure Shopify checkout · {returns.windowDays}-day returns
       </p>
     </div>
@@ -79,7 +79,7 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
     <a
       href={checkoutUrl}
       target="_self"
-      className="mt-5 inline-flex h-13 w-full items-center justify-center rounded-pill bg-sage px-6 text-base font-semibold text-white transition-colors hover:bg-sage-deep"
+      className="mt-5 inline-flex h-13 w-full items-center justify-center rounded-pill bg-lime px-6 text-base font-semibold text-canvas transition-colors hover:bg-lime-deep"
     >
       Continue to checkout
     </a>
@@ -134,12 +134,12 @@ function CartDiscounts({
               type="text"
               name="discountCode"
               placeholder="Discount code"
-              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-paper px-4 text-sm text-ink placeholder:text-ink-subtle"
+              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-4 text-sm text-chalk placeholder:text-dim"
             />
             <button
               type="submit"
               aria-label="Apply discount code"
-              className="h-10 shrink-0 rounded-pill border border-line-strong bg-paper px-4 text-sm font-semibold text-ink transition-colors hover:bg-cream-deep"
+              className="h-10 shrink-0 rounded-pill border border-line-strong bg-surface px-4 text-sm font-semibold text-chalk transition-colors hover:bg-surface-2"
             >
               Apply
             </button>
@@ -265,13 +265,13 @@ function CartGiftCard({
               name="giftCardCode"
               placeholder="Gift card code"
               ref={giftCardCodeInput}
-              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-paper px-4 text-sm text-ink placeholder:text-ink-subtle"
+              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-4 text-sm text-chalk placeholder:text-dim"
             />
             <button
               type="submit"
               disabled={giftCardAddFetcher.state !== 'idle'}
               aria-label="Apply gift card code"
-              className="h-10 shrink-0 rounded-pill border border-line-strong bg-paper px-4 text-sm font-semibold text-ink transition-colors hover:bg-cream-deep disabled:opacity-50"
+              className="h-10 shrink-0 rounded-pill border border-line-strong bg-surface px-4 text-sm font-semibold text-chalk transition-colors hover:bg-surface-2 disabled:opacity-50"
             >
               Apply
             </button>

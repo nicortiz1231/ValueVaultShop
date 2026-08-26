@@ -32,23 +32,24 @@ export function Footer({
   publicStoreDomain,
 }: FooterProps) {
   return (
-    <footer className="mt-auto border-t border-line bg-paper">
-      <Container>
+    <footer className="relative mt-auto overflow-hidden border-t border-line bg-void">
+      <div
+        className="bloom bottom-[-20%] left-1/2 h-[28rem] w-[28rem] -translate-x-1/2 opacity-40"
+        aria-hidden="true"
+      />
+      <Container className="relative">
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-14 sm:grid-cols-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:py-16">
-          {/* Brand + the two facts most worth repeating at the bottom */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <div className="flex items-center gap-2.5">
               <span
                 aria-hidden="true"
-                className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-sage text-[15px] font-bold text-white"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-lime text-[15px] font-black text-canvas shadow-glow"
               >
                 V
               </span>
-              <span className="text-[19px] font-bold tracking-tight text-ink">
-                {store.name}
-              </span>
+              <span className="display text-[19px] text-chalk">{store.name}</span>
             </div>
-            <p className="mt-3.5 max-w-xs text-sm leading-relaxed text-ink-muted">
+            <p className="mt-3.5 max-w-xs text-sm leading-relaxed text-ash">
               {store.description}
             </p>
           </div>
@@ -93,38 +94,34 @@ export function Footer({
           </FooterColumn>
         </div>
 
-        {/* Contact block — a real, reachable address is the strongest single
-            trust signal a small store has, so it gets its own band. */}
         <div className="flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-line py-7 text-sm">
-          <span className="font-semibold text-ink">Questions?</span>
+          <span className="font-semibold text-chalk">Questions?</span>
           <a
             href={`mailto:${support.email}`}
-            className="text-sage-deep underline underline-offset-4 hover:text-ink"
+            className="text-lime underline underline-offset-4 hover:text-chalk"
           >
             {support.email}
           </a>
           {support.phone && (
             <a
               href={`tel:${support.phone.replace(/[^\d+]/g, '')}`}
-              className="text-sage-deep underline underline-offset-4 hover:text-ink"
+              className="text-lime underline underline-offset-4 hover:text-chalk"
             >
               {support.phone}
             </a>
           )}
-          <span className="text-ink-muted">
-            We reply {support.responseTime}.
-          </span>
+          <span className="text-dim">We reply {support.responseTime}.</span>
           {support.address && (
-            <span className="text-ink-muted">{support.address}</span>
+            <span className="text-dim">{support.address}</span>
           )}
         </div>
 
         <div className="flex flex-col gap-5 border-t border-line py-7 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-ink-muted">
+            <p className="text-sm text-dim">
               © {new Date().getFullYear()} {store.name}. All rights reserved.
             </p>
-            <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-ink-subtle">
+            <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-dim">
               <ShieldIcon className="h-4 w-4" />
               Checkout secured by Shopify · {returns.windowDays}-day returns ·
               Ships in {shipping.processingTime}
@@ -135,7 +132,7 @@ export function Footer({
             {paymentMethods.map((method) => (
               <li
                 key={method}
-                className="rounded-md border border-line bg-cream px-2 py-1 text-[11px] font-semibold tracking-tight text-ink-muted"
+                className="rounded-md border border-line bg-surface px-2 py-1 text-[11px] font-semibold tracking-tight text-dim"
               >
                 {method}
               </li>
@@ -186,7 +183,7 @@ function PolicyLinks({
             href={item.url}
             rel="noopener noreferrer"
             target="_blank"
-            className="text-sm text-ink-muted transition-colors hover:text-ink"
+            className="text-sm text-ash transition-colors hover:text-chalk"
           >
             {item.title}
           </a>
@@ -205,7 +202,7 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h3 className="text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
+      <h3 className="text-[13px] font-bold uppercase tracking-[0.08em] text-dim">
         {title}
       </h3>
       <nav className="mt-4 flex flex-col gap-2.5">{children}</nav>
@@ -219,7 +216,7 @@ function FooterLink({to, children}: {to: string; children: React.ReactNode}) {
     <Component
       to={to}
       prefetch="intent"
-      className="text-sm text-ink-muted transition-colors hover:text-ink"
+      className="text-sm text-ash transition-colors hover:text-chalk"
     >
       {children}
     </Component>

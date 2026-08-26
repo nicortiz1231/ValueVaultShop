@@ -28,7 +28,7 @@ export function ProductPrice({
   return (
     <div aria-label="Price" className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5" role="group">
       {price ? (
-        <span className={`${priceClass} font-bold tracking-tight text-ink`}>
+        <span className={`${priceClass} font-bold tracking-tight text-chalk`}>
           <Money data={price} />
         </span>
       ) : (
@@ -37,10 +37,10 @@ export function ProductPrice({
 
       {onSale && compareAtPrice && (
         <>
-          <s className="text-base text-ink-subtle">
+          <s className="text-base text-dim">
             <Money data={compareAtPrice} />
           </s>
-          <span className="rounded-pill bg-clay-tint px-2.5 py-1 text-[12px] font-bold text-clay">
+          <span className="rounded-pill bg-flare/15 px-2.5 py-1 text-[12px] font-bold text-flare">
             Save {percentOff}%
           </span>
         </>

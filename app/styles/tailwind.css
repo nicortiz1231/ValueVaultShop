@@ -1,180 +1,246 @@
 /**
- * Value Vault design system — Tailwind v4, configured CSS-first.
- * https://tailwindcss.com/docs/theme
+ * Value Vault design system — "Midnight & Citrus".
  *
- * Direction: "warm & homey". Cream paper, soft black ink, sage accent.
- * The goal is for a first-time visitor arriving from TikTok to read the
- * store as a real small business within about three seconds.
+ * Near-black canvas, electric lime accent, glass surfaces. Dark UI is doing
+ * real work here beyond looking good: supplier product photography reads far
+ * more expensive floated on black than it does on white, and the lime gives
+ * the store one loud, consistent signature colour that people remember.
+ *
+ * Tailwind v4, configured CSS-first: https://tailwindcss.com/docs/theme
  */
 
 @import 'tailwindcss';
 
 @theme {
-  /* Surfaces — warm off-whites rather than pure #fff, which reads clinical */
-  --color-cream: #faf7f2;
-  --color-cream-deep: #f3ede4;
-  --color-paper: #ffffff;
+  /* Canvas — layered near-blacks rather than one flat colour, so sections
+     can separate from each other without needing borders everywhere. */
+  --color-void: #08080a;
+  --color-canvas: #0a0a0c;
+  --color-surface: #121216;
+  --color-surface-2: #17171d;
+  --color-surface-3: #1f1f27;
 
-  /* Ink — soft black, never pure #000, which reads harsh on cream */
-  --color-ink: #2a2622;
-  --color-ink-muted: #6b635a;
-  --color-ink-subtle: #9a9088;
+  /* Text */
+  --color-chalk: #f7f7f8;
+  --color-ash: #a3a3ae;
+  --color-dim: #6c6c7a;
 
-  /* Accent — sage. Calm, domestic, not a "buy now" red */
-  --color-sage: #5f7a61;
-  --color-sage-deep: #4a6350;
-  --color-sage-tint: #edf1ec;
+  /* Accent — electric lime. Used for exactly one thing per screen: the
+     action we want taken. Its power comes entirely from scarcity. */
+  --color-lime: #ccff00;
+  --color-lime-deep: #a9d600;
+  --color-lime-dim: #7e9e12;
 
-  /* Clay — used sparingly for sale prices and savings */
-  --color-clay: #b8623f;
-  --color-clay-tint: #fbf0ea;
+  /* Secondary — warm coral, reserved for sale pricing and savings so a
+     discount never competes with the primary action. */
+  --color-flare: #ff6b4a;
+  --color-flare-dim: #b8442a;
 
-  /* Lines */
-  --color-line: #e8e1d8;
-  --color-line-strong: #d8cec1;
+  /* Hairlines — alpha, so they sit correctly on any surface layer */
+  --color-line: oklch(1 0 0 / 8%);
+  --color-line-strong: oklch(1 0 0 / 15%);
+  --color-glass: oklch(1 0 0 / 4%);
 
-  /* Type — Figtree is a friendly geometric sans; rounded without being cute */
-  --font-sans: 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
-    sans-serif;
+  /* Type — Bricolage Grotesque for display (variable, characterful, current),
+     Inter Tight for everything a shopper actually has to read. */
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-  /* Softer corner radii than Tailwind's defaults, to match the warm direction */
-  --radius-card: 0.875rem;
+  --radius-card: 1.25rem;
+  --radius-xl2: 1.75rem;
   --radius-pill: 999px;
 
-  /* Shadows are warm-tinted, not neutral grey */
-  --shadow-soft: 0 1px 2px rgba(42, 38, 34, 0.04),
-    0 8px 24px -12px rgba(42, 38, 34, 0.12);
-  --shadow-lift: 0 2px 4px rgba(42, 38, 34, 0.05),
-    0 16px 32px -16px rgba(42, 38, 34, 0.18);
+  /* Depth. On dark, glow reads as elevation the way shadow does on light. */
+  --shadow-card: 0 24px 60px -24px oklch(0 0 0 / 90%);
+  --shadow-glow: 0 0 48px -8px oklch(0.93 0.24 118 / 35%);
+  --shadow-glow-soft: 0 0 80px -20px oklch(0.93 0.24 118 / 25%);
 
-  /* Layout */
   --spacing-header: 4.5rem;
+
+  /* Springy easing — the difference between "animated" and "alive" */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;
+    background-color: var(--color-canvas);
   }
 
   body {
-    background-color: var(--color-cream);
-    color: var(--color-ink);
+    background-color: var(--color-canvas);
+    color: var(--color-chalk);
     font-family: var(--font-sans);
+    overflow-x: hidden;
   }
 
-  /* The scaffold's reset.css rounds every image; scope that off so cards
-     and hero art can control their own corners. */
+  /* The scaffold's reset rounds every image; components own their own corners. */
   img {
     border-radius: 0;
   }
 
-  /* Visible, on-brand focus ring for keyboard users */
-  :focus-visible {
-    outline: 2px solid var(--color-sage);
-    outline-offset: 2px;
-    border-radius: 4px;
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-canvas);
   }
 
-  ::selection {
-    background: var(--color-sage-tint);
-    color: var(--color-ink);
+  :focus-visible {
+    outline: 2px solid var(--color-lime);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* Dark, unobtrusive scrollbar — a white default scrollbar on a black page
+     is one of the loudest "unfinished" tells there is. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-canvas);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-surface-3);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-dim);
   }
 }
 
 @layer components {
-  /**
-   * Shared styling for Shopify-authored HTML -- page bodies and policy text.
-   * These come out of the Shopify admin as bare tags with no classes, so the
-   * only way to style them is a container rule like this one.
-   */
+  /* Frosted panel used for cards, the header and the drawer. */
+  .glass {
+    background: var(--color-glass);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid var(--color-line);
+  }
+
+  /* Display type: tight, confident, optically corrected at large sizes. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 0.94;
+    text-wrap: balance;
+  }
+
+  /* Shopify-authored HTML (page bodies, policy text) arrives as bare tags. */
   .rich-text {
-    color: var(--color-ink-muted);
+    color: var(--color-ash);
     font-size: 1rem;
     line-height: 1.75;
 
-    h2,
-    h3,
-    h4 {
-      color: var(--color-ink);
+    h2, h3, h4 {
+      color: var(--color-chalk);
+      font-family: var(--font-display);
       font-weight: 700;
-      letter-spacing: -0.01em;
-      margin-top: 2rem;
+      letter-spacing: -0.02em;
+      margin-top: 2.25rem;
       margin-bottom: 0.75rem;
     }
-
-    h2 {
-      font-size: 1.375rem;
-    }
-
-    h3 {
-      font-size: 1.125rem;
-    }
-
-    p {
-      margin-bottom: 1rem;
-    }
-
-    ul,
-    ol {
-      margin-bottom: 1rem;
-      padding-left: 1.35rem;
-    }
-
-    ul {
-      list-style: disc;
-    }
-
-    ol {
-      list-style: decimal;
-    }
-
-    li {
-      margin-bottom: 0.4rem;
-    }
-
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.2rem; }
+    p { margin-bottom: 1rem; }
+    ul, ol { margin-bottom: 1rem; padding-left: 1.35rem; }
+    ul { list-style: disc; }
+    ol { list-style: decimal; }
+    li { margin-bottom: 0.4rem; }
     a {
-      color: var(--color-sage-deep);
+      color: var(--color-lime);
       text-decoration: underline;
       text-underline-offset: 3px;
     }
-
-    strong {
-      color: var(--color-ink);
-      font-weight: 600;
-    }
-
-    img {
-      border-radius: var(--radius-card);
-      max-width: 100%;
-    }
-
-    hr {
-      border: 0;
-      border-top: 1px solid var(--color-line);
-      margin: 2rem 0;
-    }
+    strong { color: var(--color-chalk); font-weight: 600; }
+    img { border-radius: var(--radius-card); max-width: 100%; }
+    hr { border: 0; border-top: 1px solid var(--color-line); margin: 2rem 0; }
   }
 }
 
 @layer utilities {
-  /* Clamp a product title to two lines so cards stay on a common baseline */
   .line-clamp-2-fixed {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Scroll-reveal. Elements start displaced and settle when they enter the
+     viewport — see components/Reveal.tsx, which toggles [data-revealed]. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s var(--ease-out-quart),
+      transform 0.7s var(--ease-out-quart);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+  .reveal[data-revealed='true'] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Continuous horizontal ticker, used by the marquee bar. */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee var(--marquee-duration, 40s) linear infinite;
+  }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-14px) rotate(1.5deg); }
+  }
+  .animate-float {
+    animation: float-slow 7s ease-in-out infinite;
+  }
+
+  /* Subtle film grain. Kills the plasticky flatness of large dark areas. */
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+
+  /* Radial lime bloom used behind hero and section headings. */
+  .bloom {
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(90px);
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      oklch(0.93 0.24 118 / 22%) 0%,
+      transparent 70%
+    );
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+  html { scroll-behavior: auto; }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 
-  *,
-  *::before,
-  *::after {
+  .animate-marquee,
+  .animate-float {
+    animation: none !important;
+  }
+
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }

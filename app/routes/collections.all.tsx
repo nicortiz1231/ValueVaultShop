@@ -57,10 +57,10 @@ export default function Collection() {
     <>
       <Container className="py-10 sm:py-14">
         <header className="max-w-2xl">
-          <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+          <h1 className="display text-3xl text-chalk sm:text-4xl">
             Everything we stock
           </h1>
-          <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
+          <p className="mt-3.5 text-base leading-relaxed text-ash">
             Every product here was picked by hand. If we would not use it
             ourselves, it does not make the shelf.
           </p>

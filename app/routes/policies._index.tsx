@@ -39,23 +39,23 @@ export default function Policies() {
 
   return (
     <Container width="narrow" className="py-12 sm:py-16">
-      <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+      <h1 className="display text-3xl text-chalk sm:text-4xl">
         Policies
       </h1>
-      <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
+      <p className="mt-3.5 text-base leading-relaxed text-ash">
         The terms we hold ourselves to, in full.
       </p>
 
-      <ul className="mt-8 divide-y divide-line overflow-hidden rounded-card border border-line bg-paper">
+      <ul className="mt-8 divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
         {policies.map((policy) => (
           <li key={policy.id}>
             <Link
               to={`/policies/${policy.handle}`}
               prefetch="intent"
-              className="flex items-center justify-between gap-4 px-5 py-4 text-[15px] font-medium text-ink transition-colors hover:bg-cream"
+              className="flex items-center justify-between gap-4 px-5 py-4 text-[15px] font-medium text-chalk transition-colors hover:bg-surface"
             >
               {policy.title}
-              <ArrowIcon className="h-[18px] w-[18px] text-sage" />
+              <ArrowIcon className="h-[18px] w-[18px] text-lime" />
             </Link>
           </li>
         ))}

@@ -147,6 +147,22 @@ export function StarIcon({className, filled}: IconProps & {filled?: boolean}) {
   );
 }
 
+export function LightningIcon({className}: IconProps) {
+  return (
+    <Svg className={className} filled>
+      <path d="M13 2 4 13.5h6L10 22l9-11.5h-6z" />
+    </Svg>
+  );
+}
+
+export function SparkleIcon({className}: IconProps) {
+  return (
+    <Svg className={className} filled>
+      <path d="M12 2l1.8 5.9L19.5 10l-5.7 2.1L12 18l-1.8-5.9L4.5 10l5.7-2.1z" />
+    </Svg>
+  );
+}
+
 export function LeafIcon({className}: IconProps) {
   return (
     <Svg className={className}>

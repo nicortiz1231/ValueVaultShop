@@ -19,6 +19,14 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
+    // Bricolage Grotesque + Inter Tight load from Google Fonts (see
+    // app/root.tsx links()). The default policy only allows cdn.shopify.com
+    // for styles and has no font-src override, so both the stylesheet host
+    // and the font-file host need to be added explicitly or the browser
+    // silently drops the whole @font-face and every page falls back to the
+    // system font.
+    styleSrc: ["https://fonts.googleapis.com"],
+    fontSrc: ["'self'", "https://fonts.gstatic.com"],
   });
 
   const body = await renderToReadableStream(

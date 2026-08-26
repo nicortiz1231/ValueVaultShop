@@ -58,10 +58,10 @@ export default function Collections() {
   return (
     <Container className="py-10 sm:py-14">
       <header className="max-w-2xl">
-        <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+        <h1 className="display text-3xl text-chalk sm:text-4xl">
           Collections
         </h1>
-        <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
+        <p className="mt-3.5 text-base leading-relaxed text-ash">
           Browse by room, or see everything at once.
         </p>
       </header>
@@ -96,9 +96,9 @@ function CollectionItem({
       key={collection.id}
       to={`/collections/${collection.handle}`}
       prefetch="intent"
-      className="group overflow-hidden rounded-card border border-line bg-paper transition-shadow hover:shadow-lift"
+      className="group overflow-hidden rounded-card border border-line bg-surface transition-shadow hover:shadow-card"
     >
-      <div className="overflow-hidden bg-cream-deep">
+      <div className="overflow-hidden bg-surface-2">
         {collection?.image ? (
           <Image
             alt={collection.image.altText || collection.title}
@@ -112,9 +112,9 @@ function CollectionItem({
           <div className="aspect-[4/3] w-full" />
         )}
       </div>
-      <h2 className="flex items-center gap-1.5 p-4 text-[15px] font-semibold text-ink">
+      <h2 className="flex items-center gap-1.5 p-4 text-[15px] font-semibold text-chalk">
         {collection.title}
-        <ArrowIcon className="h-4 w-4 text-sage opacity-0 transition-opacity group-hover:opacity-100" />
+        <ArrowIcon className="h-4 w-4 text-lime opacity-0 transition-opacity group-hover:opacity-100" />
       </h2>
     </Link>
   );

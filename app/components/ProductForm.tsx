@@ -14,10 +14,10 @@ function optionClasses(selected: boolean, available: boolean, exists: boolean) {
     'inline-flex min-w-11 items-center justify-center rounded-pill border px-4 py-2.5',
     'text-sm font-medium transition-colors',
     selected
-      ? 'border-sage bg-sage text-white'
-      : 'border-line-strong bg-paper text-ink hover:border-ink-muted',
+      ? 'border-lime bg-lime text-canvas'
+      : 'border-line-strong bg-surface text-chalk hover:border-dim',
     !available || !exists
-      ? 'cursor-not-allowed text-ink-subtle line-through opacity-50'
+      ? 'cursor-not-allowed text-dim line-through opacity-50'
       : '',
   ]
     .filter(Boolean)
@@ -42,7 +42,7 @@ export function ProductForm({
 
         return (
           <div className="mb-6" key={option.name}>
-            <h3 className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+            <h3 className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.08em] text-ash">
               {option.name}
             </h3>
             <div className="flex flex-wrap gap-2">

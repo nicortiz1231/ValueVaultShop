@@ -62,7 +62,7 @@ function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
     <Aside type="cart" heading="Your cart">
       <Suspense
         fallback={
-          <p className="px-5 py-8 text-sm text-ink-muted">Loading cart…</p>
+          <p className="px-5 py-8 text-sm text-ash">Loading cart…</p>
         }
       >
         <Await resolve={cart}>
@@ -91,11 +91,11 @@ function SearchAside() {
                 ref={inputRef}
                 type="search"
                 list={queriesDatalistId}
-                className="h-11 min-w-0 flex-1 rounded-pill border border-line-strong bg-paper px-4 text-[15px] text-ink placeholder:text-ink-subtle"
+                className="h-11 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-4 text-[15px] text-chalk placeholder:text-dim"
               />
               <button
                 onClick={goToSearch}
-                className="h-11 shrink-0 rounded-pill bg-sage px-5 text-sm font-semibold text-white transition-colors hover:bg-sage-deep"
+                className="h-11 shrink-0 rounded-pill bg-lime px-5 text-sm font-semibold text-canvas transition-colors hover:bg-lime-deep"
               >
                 Search
               </button>
@@ -109,7 +109,7 @@ function SearchAside() {
 
             if (state === 'loading' && term.current) {
               return (
-                <p className="py-8 text-center text-sm text-ink-muted">
+                <p className="py-8 text-center text-sm text-ash">
                   Searching…
                 </p>
               );
@@ -149,7 +149,7 @@ function SearchAside() {
                   <Link
                     onClick={closeSearch}
                     to={`${SEARCH_ENDPOINT}?q=${term.current}`}
-                    className="mt-5 block rounded-pill border border-line-strong bg-paper py-3 text-center text-sm font-semibold text-ink transition-colors hover:bg-cream-deep"
+                    className="mt-5 block rounded-pill border border-line-strong bg-surface py-3 text-center text-sm font-semibold text-chalk transition-colors hover:bg-surface-2"
                   >
                     View all results for &ldquo;{term.current}&rdquo;
                   </Link>

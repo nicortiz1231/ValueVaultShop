@@ -110,16 +110,16 @@ export default function Product() {
 
   return (
     <Container className="py-8 sm:py-12">
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-ink-muted">
-        <Link to="/" className="hover:text-ink">
+      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-ash">
+        <Link to="/" className="hover:text-chalk">
           Home
         </Link>
-        <span className="px-2 text-ink-subtle">/</span>
-        <Link to="/collections/all" className="hover:text-ink">
+        <span className="px-2 text-dim">/</span>
+        <Link to="/collections/all" className="hover:text-chalk">
           Shop
         </Link>
-        <span className="px-2 text-ink-subtle">/</span>
-        <span className="text-ink">{title}</span>
+        <span className="px-2 text-dim">/</span>
+        <span className="text-chalk">{title}</span>
       </nav>
 
       <div className="grid gap-9 lg:grid-cols-2 lg:gap-14">
@@ -133,12 +133,12 @@ export default function Product() {
             description — on mobile it simply flows underneath the gallery. */}
         <div className="lg:sticky lg:top-28 lg:self-start">
           {product.vendor && (
-            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-ink-subtle">
+            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-dim">
               {product.vendor}
             </p>
           )}
 
-          <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-ink sm:text-[2.25rem]">
+          <h1 className="display mt-2 text-3xl leading-tight text-chalk sm:text-[2.25rem]">
             {title}
           </h1>
 
@@ -155,7 +155,7 @@ export default function Product() {
 
           <p
             className={`mt-3 flex items-center gap-1.5 text-sm font-medium ${
-              inStock ? 'text-sage-deep' : 'text-ink-subtle'
+              inStock ? 'text-lime' : 'text-dim'
             }`}
           >
             {inStock && <CheckIcon className="h-4 w-4" />}
@@ -173,9 +173,9 @@ export default function Product() {
 
           {descriptionHtml && (
             <div className="mt-8 border-t border-line pt-7">
-              <h2 className="text-[15px] font-bold text-ink">Details</h2>
+              <h2 className="text-[15px] font-bold text-chalk">Details</h2>
               <div
-                className="prose-product mt-3 text-[15px] leading-relaxed text-ink-muted [&_a]:text-sage-deep [&_a]:underline [&_li]:my-1 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5"
+                className="prose-product mt-3 text-[15px] leading-relaxed text-ash [&_a]:text-lime [&_a]:underline [&_li]:my-1 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5"
                 dangerouslySetInnerHTML={{__html: descriptionHtml}}
               />
             </div>
