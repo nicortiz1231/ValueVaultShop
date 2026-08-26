@@ -156,7 +156,7 @@ export function HeaderMenu({
           prefetch="intent"
           className={({isActive}) =>
             [
-              'py-[18px] text-[13px] font-normal leading-[1.5] transition-colors',
+              'text-[13px] font-normal leading-[1.5] transition-colors',
               isActive ? 'text-brand' : 'text-ink hover:text-brand',
             ].join(' ')
           }

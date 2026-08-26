@@ -62,8 +62,11 @@
   --shadow-card: 0 2px 4px oklch(0.2 0.05 40 / 4%), 0 20px 40px -20px oklch(0.2 0.05 40 / 16%);
   --shadow-lift: 0 8px 16px -8px oklch(0.2 0.05 40 / 20%), 0 24px 48px -20px oklch(0.2 0.05 40 / 20%);
 
-  --spacing-header: 4.25rem;
-  --spacing-announce: 2.25rem;
+  /* Pixel-matched against the reference site's own header, measured
+     directly off its rendered DOM (not estimated from a screenshot):
+     announcement bar 30px, white nav row 53px. */
+  --spacing-header: 53px;
+  --spacing-announce: 30px;
 
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
