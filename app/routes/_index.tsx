@@ -197,24 +197,26 @@ function PromoBand({collection}: {collection?: FeaturedCollectionFragment}) {
  * empty or deleted one.
  */
 function CategoryStrip({collections}: {collections: HomeCollectionFragment[]}) {
-  const tiles = collections.slice(0, 4);
+  const tiles = collections.slice(0, 5);
   if (!tiles.length) return null;
 
   return (
-    <section className="border-t border-line">
-      <div className="grid grid-cols-2 sm:grid-cols-4">
+    <section className="bg-bg">
+      {/* Thin gap between tiles (not flush, not a wide gutter) -- the gap
+          colour is just the section's own background showing through. */}
+      <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-5">
         {tiles.map((collection, i) => (
           <Reveal key={collection.id} delay={i * 60} as="div">
             <Link
               to={`/collections/${collection.handle}`}
               prefetch="intent"
               data-cursor="Shop"
-              className="group relative block aspect-[3/4] overflow-hidden"
+              className="group relative block aspect-[4/5] overflow-hidden"
             >
               {collection.image ? (
                 <Image
                   data={collection.image}
-                  sizes="(min-width: 1024px) 25vw, 50vw"
+                  sizes="(min-width: 1024px) 20vw, 50vw"
                   alt={collection.image.altText || collection.title}
                   className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
@@ -380,7 +382,7 @@ const HOME_COLLECTIONS_QUERY = `#graphql
   }
   query HomeCollections($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    collections(first: 5, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...HomeCollection
         ...FeaturedCollection
