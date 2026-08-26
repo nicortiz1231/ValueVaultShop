@@ -3,15 +3,11 @@ import {Image, Money} from '@shopify/hydrogen';
 import type {
   ProductItemFragment,
   CollectionItemFragment,
-  RecommendedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {ArrowIcon} from './Icons';
 
-type AnyProduct =
-  | CollectionItemFragment
-  | ProductItemFragment
-  | RecommendedProductFragment;
+type AnyProduct = CollectionItemFragment | ProductItemFragment;
 
 /**
  * Works out whether a product is genuinely discounted.

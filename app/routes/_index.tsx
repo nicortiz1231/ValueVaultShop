@@ -1,19 +1,16 @@
 import {Await, useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/_index';
-import {Suspense} from 'react';
-import {Image} from '@shopify/hydrogen';
+import {Suspense, useRef} from 'react';
+import {Image, Money} from '@shopify/hydrogen';
 import type {
   HomeCollectionFragment,
-  RecommendedProductsQuery,
+  NewArrivalsQuery,
 } from 'storefrontapi.generated';
-import {ProductItem} from '~/components/ProductItem';
 import {TrustPoints} from '~/components/TrustPoints';
 import {Faq} from '~/components/Faq';
 import {Reveal} from '~/components/Reveal';
-import {Watermark} from '~/components/Watermark';
 import {Container} from '~/components/ui/Container';
 import {Section} from '~/components/ui/Section';
-import {ButtonLink} from '~/components/ui/Button';
 import {ArrowIcon, CheckIcon} from '~/components/Icons';
 import {returns, shipping, store} from '~/lib/store-config';
 
@@ -42,14 +39,14 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
 }
 
 function loadDeferredData({context}: Route.LoaderArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
+  const newArrivals = context.storefront
+    .query(NEW_ARRIVALS_QUERY)
     .catch((error: Error) => {
       console.error(error);
       return null;
     });
 
-  return {recommendedProducts};
+  return {newArrivals};
 }
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
@@ -58,9 +55,8 @@ export default function Homepage() {
     <>
       <Hero collections={data.collections} />
       <CategoryStrip collections={data.collections} />
+      <NewArrivals products={data.newArrivals} />
       <TrustPoints />
-      <Watermark />
-      <TrendingProducts products={data.recommendedProducts} />
       <StorePromise />
       <FaqSection />
     </>
@@ -185,68 +181,203 @@ function CategoryStrip({collections}: {collections: HomeCollectionFragment[]}) {
   );
 }
 
-function TrendingProducts({
-  products,
-}: {
-  products: Promise<RecommendedProductsQuery | null>;
-}) {
+/**
+ * New Arrivals carousel.
+ *
+ * Mirrors the reference site's own section: left-aligned title with a
+ * "Shop New Arrivals" link opposite, then a horizontally scrollable row of
+ * cards that deliberately lets the next card peek in at the right edge so
+ * it reads as scrollable without needing an affordance to say so.
+ *
+ * Products are sorted by CREATED_AT descending, so "new" here is a fact
+ * about the catalogue rather than a label someone has to remember to set.
+ */
+function NewArrivals({products}: {products: Promise<NewArrivalsQuery | null>}) {
+  const trackRef = useRef<HTMLUListElement>(null);
+
+  const scrollByCard = (direction: 1 | -1) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const card = track.querySelector('li');
+    const step = card ? card.getBoundingClientRect().width + 16 : 320;
+    track.scrollBy({left: step * direction, behavior: 'smooth'});
+  };
+
   return (
-    <Section
-      className="border-y border-line bg-surface"
-      eyebrow="Popular"
-      title="Trending now"
-      intro="What people are actually buying this week."
-      action={
-        <Link
-          to="/collections/all"
-          prefetch="intent"
-          className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-brand hover:text-brand-deep"
-        >
-          Shop all
-          <ArrowIcon className="h-[18px] w-[18px]" />
-        </Link>
-      }
-    >
-      <Suspense fallback={<ProductGridSkeleton />}>
+    <section className="bg-surface py-16 sm:py-24">
+      <Container>
+        <Reveal className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <h2 className="display text-[2.25rem] text-ink sm:text-5xl">
+            New Arrivals
+          </h2>
+          <Link
+            to="/collections/all"
+            prefetch="intent"
+            className="inline-flex items-center gap-1.5 text-[15px] font-medium text-ink transition-colors hover:text-brand"
+          >
+            Shop New Arrivals
+            <ArrowIcon className="h-[18px] w-[18px]" />
+          </Link>
+        </Reveal>
+      </Container>
+
+      <Suspense fallback={<NewArrivalsSkeleton />}>
         <Await resolve={products} errorElement={null}>
-          {(response) =>
-            response?.products?.nodes?.length ? (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-5 lg:grid-cols-4">
-                {response.products.nodes.map((product, i) => (
-                  <Reveal key={product.id} delay={(i % 4) * 70} as="div">
-                    <ProductItem
-                      product={product}
-                      loading={i < 4 ? 'eager' : 'lazy'}
-                    />
-                  </Reveal>
-                ))}
+          {(response) => {
+            const nodes = response?.products?.nodes ?? [];
+            if (!nodes.length) return null;
+
+            return (
+              <div className="relative">
+                <Container>
+                  <ul
+                    ref={trackRef}
+                    className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  >
+                    {nodes.map((product) => (
+                      <li
+                        key={product.id}
+                        className="w-[70%] shrink-0 snap-start sm:w-[44%] lg:w-[calc(25%-0.75rem)]"
+                      >
+                        <NewArrivalCard product={product} />
+                      </li>
+                    ))}
+                  </ul>
+                </Container>
+
+                {/* Desktop-only nudge control. The row is scrollable by
+                    trackpad/touch regardless, so this is an affordance
+                    rather than the only way to move it. */}
+                <button
+                  type="button"
+                  onClick={() => scrollByCard(1)}
+                  aria-label="Show more new arrivals"
+                  className="absolute right-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-line bg-surface text-ink shadow-card transition-colors hover:bg-bg lg:flex"
+                >
+                  <ArrowIcon className="h-5 w-5" />
+                </button>
               </div>
-            ) : null
-          }
+            );
+          }}
         </Await>
       </Suspense>
-    </Section>
+    </section>
   );
 }
 
-function ProductGridSkeleton() {
+function NewArrivalCard({
+  product,
+}: {
+  product: NewArrivalsQuery['products']['nodes'][number];
+}) {
+  const image = product.featuredImage;
+
+  // Badges.
+  //
+  // "New" is true by construction: this section queries CREATED_AT desc, so
+  // everything in it genuinely is among the newest products in the catalogue.
+  //
+  // Beyond that, only tags explicitly namespaced `badge:` are shown --
+  // e.g. a Shopify tag `badge:Waterproof` renders as "Waterproof". Raw tags
+  // are internal taxonomy (mock.shop returns things like `key=oxygen`,
+  // `accessories`, `men`) and rendering them verbatim is noise, so opting in
+  // by prefix keeps the shelf clean and gives the store one obvious lever.
+  const badges = [
+    'New',
+    ...(product.tags ?? [])
+      .filter((tag) => tag.toLowerCase().startsWith('badge:'))
+      .map((tag) => tag.slice('badge:'.length).trim())
+      .filter(Boolean),
+  ].slice(0, 2);
+
+  // Colour swatches come from the real Color option, when the product has one.
+  const swatches = (
+    product.options?.find((option) => /colou?r/i.test(option.name))
+      ?.optionValues ?? []
+  )
+    .filter((value) => value.swatch?.color)
+    .slice(0, 4);
+
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-5 lg:grid-cols-4">
-      {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((key) => (
-        <div key={key} className="animate-pulse">
-          <div className="aspect-square rounded-card bg-bg-deep" />
-          <div className="mt-3.5 h-4 w-4/5 rounded bg-bg-deep" />
-          <div className="mt-2 h-4 w-1/3 rounded bg-bg-deep" />
+    <Link
+      to={`/products/${product.handle}`}
+      prefetch="intent"
+      data-cursor="View"
+      className="group flex h-full flex-col overflow-hidden rounded-xl bg-bg"
+    >
+      <div className="relative aspect-[4/5] overflow-hidden">
+        {image ? (
+          <Image
+            data={image}
+            sizes="(min-width: 1024px) 25vw, 70vw"
+            alt={image.altText || product.title}
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="h-full w-full bg-bg-deep" />
+        )}
+
+        {badges.length > 0 && (
+          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+            {badges.map((badge) => (
+              <span
+                key={badge}
+                className="rounded-md bg-surface px-2 py-1 text-[11px] font-medium text-ink shadow-sm"
+              >
+                {badge}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2 p-4">
+        {swatches.length > 0 && (
+          <div className="flex items-center gap-1.5">
+            {swatches.map((value) => (
+              <span
+                key={value.name}
+                title={value.name}
+                className="h-4 w-4 rounded-full border border-line-strong"
+                style={{backgroundColor: value.swatch!.color!}}
+              />
+            ))}
+          </div>
+        )}
+
+        <h3 className="text-[15px] font-medium leading-snug text-ink">
+          {product.title}
+        </h3>
+
+        <div className="flex items-baseline gap-2">
+          <span className="text-[15px] font-semibold text-ink">
+            <Money data={product.priceRange.minVariantPrice} />
+          </span>
         </div>
-      ))}
-    </div>
+      </div>
+    </Link>
   );
 }
 
-/**
- * The store's promise, in its own words -- taken from the About page so the
- * two never contradict each other.
- */
+function NewArrivalsSkeleton() {
+  return (
+    <Container>
+      <ul className="flex gap-4 overflow-hidden">
+        {['a', 'b', 'c', 'd'].map((key) => (
+          <li
+            key={key}
+            className="w-[70%] shrink-0 animate-pulse sm:w-[44%] lg:w-[calc(25%-0.75rem)]"
+          >
+            <div className="aspect-[4/5] rounded-xl bg-bg-deep" />
+            <div className="mt-3 h-4 w-4/5 rounded bg-bg-deep" />
+            <div className="mt-2 h-4 w-1/3 rounded bg-bg-deep" />
+          </li>
+        ))}
+      </ul>
+    </Container>
+  );
+}
+
 function StorePromise() {
   const promises = [
     {
@@ -328,11 +459,12 @@ const HOME_COLLECTIONS_QUERY = `#graphql
   }
 ` as const;
 
-const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
+const NEW_ARRIVALS_QUERY = `#graphql
+  fragment NewArrivalProduct on Product {
     id
     title
     handle
+    tags
     priceRange {
       minVariantPrice {
         amount
@@ -352,12 +484,21 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       width
       height
     }
+    options {
+      name
+      optionValues {
+        name
+        swatch {
+          color
+        }
+      }
+    }
   }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
+  query NewArrivals ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 8, sortKey: BEST_SELLING) {
+    products(first: 12, sortKey: CREATED_AT, reverse: true) {
       nodes {
-        ...RecommendedProduct
+        ...NewArrivalProduct
       }
     }
   }
