@@ -8,6 +8,13 @@
  * silently overrode every `text-*` color utility applied to a link sitewide,
  * and an unlayered `body { font-family }` overrode the Inter Tight body font
  * from tailwind.css. Both were real, live bugs. Keep this in @layer base.
+ *
+ * A bare `section { padding: 2rem 0 }` used to live here too. It silently
+ * added 32px of top/bottom padding to every <section> on the site,
+ * including full-bleed ones like the homepage Hero that need to sit flush
+ * against the bars above them -- visible as an unwanted gap between the
+ * header and the hero photo. Removed; every section that needs padding now
+ * sets it explicitly (Section.tsx, or inline on the section itself).
  */
 @layer base {
   body {
@@ -70,13 +77,6 @@
 
   pre {
     white-space: pre-wrap;
-  }
-
-  section {
-    padding: 1rem 0;
-    @media (min-width: 768px) {
-      padding: 2rem 0;
-    }
   }
 
   fieldset {
