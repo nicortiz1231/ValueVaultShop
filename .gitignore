@@ -6,6 +6,7 @@ dist
 build
 .cache
 .react-router
+tsconfig.tsbuildinfo
 
 # Environment / secrets -- never commit these
 .env
