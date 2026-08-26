@@ -201,7 +201,7 @@ function CategoryStrip({collections}: {collections: HomeCollectionFragment[]}) {
   if (!tiles.length) return null;
 
   return (
-    <section className="bg-bg">
+    <section className="bg-bg pt-1">
       {/* Thin gap between tiles (not flush, not a wide gutter) -- the gap
           colour is just the section's own background showing through. */}
       <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-5">
