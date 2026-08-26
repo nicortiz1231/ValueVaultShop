@@ -155,7 +155,7 @@ function PromoBand({collection}: {collection?: FeaturedCollectionFragment}) {
     <section className="relative overflow-hidden">
       {/* Hero-scale, not a short banner strip -- the reference site's own
           promo photo fills almost the entire viewport below its nav. */}
-      <div className="relative min-h-[80vh] sm:min-h-[88vh]">
+      <div className="relative min-h-screen">
         {image && (
           <Image
             data={image}
@@ -165,8 +165,8 @@ function PromoBand({collection}: {collection?: FeaturedCollectionFragment}) {
           />
         )}
 
-        <div className="absolute inset-0 flex items-center p-5 sm:p-12">
-          <Reveal className="max-w-2xl rounded-[2rem] bg-ink/85 p-8 shadow-lift backdrop-blur-sm sm:p-14">
+        <div className="absolute inset-0 flex items-center p-5 sm:px-16 sm:py-12">
+          <Reveal className="max-w-6xl rounded-[2rem] bg-ink/85 p-8 shadow-lift backdrop-blur-sm sm:p-14">
             <p className="display text-[2rem] leading-[1.05] text-bg sm:text-5xl">
               Everyday essentials for home, kitchen, pets &amp; family
             </p>
