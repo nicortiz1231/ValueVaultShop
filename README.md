@@ -44,6 +44,13 @@ npx shopify hydrogen env pull  # writes real tokens into .env
 | `npm run lint` | ESLint |
 | `npm run codegen` | Regenerate GraphQL types from queries |
 
+## Going live
+
+The storefront currently runs against `mock.shop`, which is why the demo
+products are apparel. See **[GOING-LIVE.md](./GOING-LIVE.md)** for the steps to
+connect the real catalogue, the trust gaps worth closing first, and the
+pre-launch checklist.
+
 ## Secrets
 
 This repository is **public**. `.env` is gitignored and must never be committed —
