@@ -3,7 +3,6 @@ import type {Route} from './+types/_index';
 import {Suspense} from 'react';
 import {Image} from '@shopify/hydrogen';
 import type {
-  FeaturedCollectionFragment,
   HomeCollectionFragment,
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
@@ -39,7 +38,6 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
 
   return {
     collections: collections.nodes,
-    featuredCollection: collections.nodes[0],
   };
 }
 
@@ -59,7 +57,6 @@ export default function Homepage() {
   return (
     <>
       <Hero collections={data.collections} />
-      <PromoBand collection={data.featuredCollection} />
       <CategoryStrip collections={data.collections} />
       <TrustPoints />
       <Watermark />
@@ -139,60 +136,6 @@ function HeroPanel({
         </span>
       )}
     </Link>
-  );
-}
-
-/**
- * Photo-backed promo band -- the reference site's own "10% OFF / FREE
- * EARRINGS" banner structure (full-bleed photo, translucent overlay panel,
- * bold headline, CTA pill), carrying Value Vault's real homepage copy
- * (matching valuevaultshop.net) instead of an invented discount.
- */
-function PromoBand({collection}: {collection?: FeaturedCollectionFragment}) {
-  const image = collection?.image;
-
-  return (
-    <section className="relative overflow-hidden">
-      {/* Hero-scale, not a short banner strip -- the reference site's own
-          promo photo fills almost the entire viewport below its nav. */}
-      <div className="relative min-h-screen">
-        {image && (
-          <Image
-            data={image}
-            sizes="100vw"
-            alt={image.altText || collection!.title}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        )}
-
-        {/* Copy sits directly on the photograph -- no panel behind it.
-            Set in dark ink because the product photography is light and
-            high-key; if a dark-background photo is ever featured here the
-            text will need a scrim or a light colour to stay legible. */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 px-5 text-center sm:px-16">
-          <Reveal className="max-w-4xl">
-            <p className="display text-[2.25rem] leading-[1.05] text-ink sm:text-6xl">
-              Everyday essentials for home, kitchen, pets &amp; family
-            </p>
-            <p className="mx-auto mt-5 max-w-xl text-[15px] font-medium leading-relaxed text-ink sm:text-lg">
-              Quality picks for every room and every budget — with fast US
-              shipping on our best sellers.
-            </p>
-          </Reveal>
-
-          <ButtonLink
-            to="/collections/all"
-            size="lg"
-            variant="accent"
-            shape="sharp"
-            data-cursor="Shop"
-            className="min-w-[13rem]"
-          >
-            Shop best sellers
-          </ButtonLink>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -375,24 +318,11 @@ const HOME_COLLECTIONS_QUERY = `#graphql
       height
     }
   }
-  fragment FeaturedCollection on Collection {
-    id
-    title
-    handle
-    image {
-      id
-      url
-      altText
-      width
-      height
-    }
-  }
   query HomeCollections($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
     collections(first: 5, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...HomeCollection
-        ...FeaturedCollection
       }
     }
   }
