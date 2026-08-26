@@ -1,0 +1,30 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+build
+.cache
+.react-router
+
+# Environment / secrets -- never commit these
+.env
+.env.*
+!.env.example
+
+# Shopify / Oxygen
+.shopify
+.oxygen
+
+# Generated GraphQL types are committed intentionally
+# (storefrontapi.generated.d.ts, customer-accountapi.generated.d.ts)
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Editor / OS
+.DS_Store
+.idea
+*.swp
