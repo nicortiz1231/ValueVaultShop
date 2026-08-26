@@ -19,6 +19,19 @@
   --color-bg-deep: #f1e6d3;
   --color-surface: #ffffff;
 
+  /* Product-card surface.
+   *
+   * Set to EXACTLY the backdrop colour of the product photography, so a
+   * contained product image dissolves into the card with no visible edge --
+   * that seamless single-surface look is the defining trait of the
+   * reference site's cards, and it only works on an exact match (3 points
+   * of difference already shows as a faint rectangle).
+   *
+   * TODO(steven): retune this to the real Value Vault product photos when
+   * the store is linked. #f3f3f3 matches mock.shop's demo photography; most
+   * dropship photos are pure white, in which case set this to #ffffff. */
+  --color-card: #f3f3f3;
+
   /* Ink -- warm near-black, never pure black */
   --color-ink: #241c15;
   --color-ink-muted: #6b5d4f;

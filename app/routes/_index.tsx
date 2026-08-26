@@ -298,19 +298,22 @@ function NewArrivalCard({
     .filter((value) => value.swatch?.color)
     .slice(0, 4);
 
+  // `no-underline` below guards against reset.css's global `a:hover` rule:
+  // the whole card is a single anchor, so without it every line of copy
+  // inside the card underlines together on hover.
   return (
     <Link
       to={`/products/${product.handle}`}
       prefetch="intent"
       data-cursor="View"
-      className="group flex h-full flex-col rounded-xl bg-bg p-4 transition-shadow duration-300 hover:shadow-card sm:p-5"
+      className="group flex h-full flex-col rounded-lg bg-card p-4 no-underline transition-shadow duration-300 hover:shadow-card hover:no-underline sm:p-5"
     >
       {badges.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {badges.map((badge) => (
             <span
               key={badge}
-              className="rounded-md bg-surface px-2.5 py-1 text-[12px] font-medium text-ink"
+              className="rounded bg-surface px-2.5 py-1 text-[12px] font-medium text-ink"
             >
               {badge}
             </span>
@@ -318,13 +321,10 @@ function NewArrivalCard({
         </div>
       )}
 
-      {/* The product sits in a near-white panel rather than directly on the
-          cream. The reference gets a seamless single-surface card because its
-          photography is exported on exactly its own card colour; ours arrives
-          on #f3f3f3 studio grey, so blending it into cream (multiply) turns
-          the backdrop tan. A white panel is within ~5% of that grey, which
-          reads as seamless, and stays clean for any future photo background. */}
-      <div className="relative my-5 aspect-square w-full overflow-hidden rounded-lg bg-surface sm:my-6">
+      {/* One continuous card surface -- the product sits directly on it with
+          no inner panel, matching the reference. This only reads as seamless
+          because --color-card is tuned to the photography's own backdrop. */}
+      <div className="relative my-5 aspect-[4/5] w-full sm:my-7">
         {image ? (
           <Image
             data={image}
@@ -333,7 +333,7 @@ function NewArrivalCard({
             className="h-full w-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
-          <div className="h-full w-full bg-bg-deep" />
+          <div className="h-full w-full rounded bg-bg-deep" />
         )}
       </div>
 
@@ -344,18 +344,18 @@ function NewArrivalCard({
               <span
                 key={value.name}
                 title={value.name}
-                className="h-4 w-4 rounded-full border border-line-strong"
+                className="h-[18px] w-[18px] rounded-full border border-line-strong"
                 style={{backgroundColor: value.swatch!.color!}}
               />
             ))}
           </div>
         )}
 
-        <h3 className="text-[15px] font-medium leading-snug text-ink">
+        <h3 className="text-[15px] font-normal leading-snug text-ink">
           {product.title}
         </h3>
 
-        <span className="text-[15px] font-semibold text-ink">
+        <span className="text-[15px] font-normal text-ink">
           <Money data={product.priceRange.minVariantPrice} />
         </span>
       </div>
