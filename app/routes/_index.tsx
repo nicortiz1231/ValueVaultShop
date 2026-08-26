@@ -60,9 +60,9 @@ export default function Homepage() {
     <>
       <Hero collections={data.collections} />
       <PromoBand collection={data.featuredCollection} />
+      <CategoryStrip collections={data.collections} />
       <TrustPoints />
       <Watermark />
-      <CategoryStrip collections={data.collections} />
       <TrendingProducts products={data.recommendedProducts} />
       <StorePromise />
       <FaqSection />
