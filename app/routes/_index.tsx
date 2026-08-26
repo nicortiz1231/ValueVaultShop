@@ -16,7 +16,7 @@ import {Container} from '~/components/ui/Container';
 import {Section} from '~/components/ui/Section';
 import {ButtonLink} from '~/components/ui/Button';
 import {ArrowIcon, CheckIcon} from '~/components/Icons';
-import {categories, returns, shipping, store} from '~/lib/store-config';
+import {returns, shipping, store} from '~/lib/store-config';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -59,10 +59,10 @@ export default function Homepage() {
   return (
     <>
       <Hero collections={data.collections} />
-      <PromoBanner />
+      <PromoBand collection={data.featuredCollection} />
       <TrustPoints />
       <Watermark />
-      <CategoryPromo collections={data.collections} />
+      <CategoryStrip collections={data.collections} />
       <TrendingProducts products={data.recommendedProducts} />
       <StorePromise />
       <FaqSection />
@@ -143,98 +143,93 @@ function HeroPanel({
 }
 
 /**
- * Bold colour-block claim strip -- the structural role Kaleido's "10% off /
- * free earrings" banner plays, with real facts standing in for a promo code.
+ * Photo-backed promo band -- the reference site's own "10% OFF / FREE
+ * EARRINGS" banner structure (full-bleed photo, translucent overlay panel,
+ * bold headline, CTA pill), carrying Value Vault's real homepage copy
+ * (matching valuevaultshop.net) instead of an invented discount.
  */
-function PromoBanner() {
-  const claims = [
-    {
-      big: returns.freeReturnShipping ? `${returns.windowDays}-DAY` : `${returns.windowDays}-DAY`,
-      small: returns.freeReturnShipping ? 'Free returns, we pay postage' : 'Returns window',
-    },
-    {big: 'Fast', small: `Dispatched in ${shipping.processingTime}`},
-    {big: 'Secure', small: 'Checkout handled by Shopify'},
-  ];
+function PromoBand({collection}: {collection?: FeaturedCollectionFragment}) {
+  const image = collection?.image;
 
   return (
-    <section className="bg-block-butter">
-      <Container>
-        <div className="grid grid-cols-1 divide-y divide-ink/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {claims.map((claim) => (
-            <div
-              key={claim.small}
-              className="flex flex-col items-center justify-center gap-1.5 py-9 text-center sm:py-14"
+    <section className="relative overflow-hidden">
+      <div className="relative aspect-[4/5] sm:aspect-[21/9]">
+        {image && (
+          <Image
+            data={image}
+            sizes="100vw"
+            alt={image.altText || collection!.title}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
+
+        <div className="absolute inset-0 flex items-center p-5 sm:p-12">
+          <Reveal className="max-w-xl rounded-[2rem] bg-ink/85 p-8 shadow-lift backdrop-blur-sm sm:p-12">
+            <p className="display text-[2rem] leading-[1.05] text-bg sm:text-5xl">
+              Everyday essentials for home, kitchen, pets &amp; family
+            </p>
+            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-bg/80 sm:text-base">
+              Quality picks for every room and every budget — with fast US
+              shipping on our best sellers.
+            </p>
+            <ButtonLink
+              to="/collections/all"
+              size="lg"
+              variant="accent"
+              data-cursor="Shop"
+              className="mt-7"
             >
-              <span className="display text-4xl text-ink sm:text-5xl">
-                {claim.big}
-              </span>
-              <span className="max-w-[16rem] text-[12px] font-bold uppercase tracking-[0.12em] text-ink-muted">
-                {claim.small}
-              </span>
-            </div>
-          ))}
+              Shop best sellers
+              <ArrowIcon className="h-[18px] w-[18px]" />
+            </ButtonLink>
+          </Reveal>
         </div>
-      </Container>
+      </div>
     </section>
   );
 }
 
 /**
- * Two large lifestyle-scale tiles in place of a dense category grid --
- * Kaleido's "Made To Stack" / "Gym Ready Looks" pattern. Fewer, bigger
- * choices reads as curated; a wall of small squares reads as inventory.
+ * Full-bleed category tile row -- matches the reference site's own
+ * Earrings/Necklaces/Rings/... strip directly beneath its promo band: equal
+ * tiles, edge to edge, a single name label per tile and nothing else. Driven
+ * by whatever collections actually exist, so a tile can never point at an
+ * empty or deleted one.
  */
-function CategoryPromo({collections}: {collections: HomeCollectionFragment[]}) {
-  const tiles = collections.slice(0, 2);
-  if (tiles.length < 2) return null;
-
-  const blocks = ['bg-block-sky', 'bg-block-clay'];
-  const blurbFor = (handle: string) =>
-    categories.find((category) => category.handle === handle)?.blurb;
+function CategoryStrip({collections}: {collections: HomeCollectionFragment[]}) {
+  const tiles = collections.slice(0, 4);
+  if (!tiles.length) return null;
 
   return (
-    <Section eyebrow="Shop by room" title="Pick a starting point">
-      <div className="grid gap-5 sm:grid-cols-2">
+    <section className="border-t border-line">
+      <div className="grid grid-cols-2 sm:grid-cols-4">
         {tiles.map((collection, i) => (
-          <Reveal key={collection.id} delay={i * 100} as="div">
+          <Reveal key={collection.id} delay={i * 60} as="div">
             <Link
               to={`/collections/${collection.handle}`}
               prefetch="intent"
               data-cursor="Shop"
-              className={`group relative block aspect-[4/5] overflow-hidden rounded-card sm:aspect-[3/4] ${blocks[i]}`}
+              className="group relative block aspect-[3/4] overflow-hidden"
             >
-              {collection.image && (
+              {collection.image ? (
                 <Image
                   data={collection.image}
-                  sizes="(min-width: 1024px) 600px, 90vw"
+                  sizes="(min-width: 1024px) 25vw, 50vw"
                   alt={collection.image.altText || collection.title}
-                  className="h-full w-full object-cover mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
+              ) : (
+                <div className="h-full w-full bg-bg-deep" />
               )}
-
-              {/* Headline sits high on the tile, CTA pill spans low -- the
-                  reference site's own promo-tile pattern, rather than a
-                  small floating icon badge. */}
-              <div className="absolute inset-x-6 top-6">
-                <p className="display text-3xl leading-[0.95] text-ink sm:text-4xl">
-                  {collection.title}
-                </p>
-                <p className="mt-2 max-w-[16rem] text-[13px] font-medium text-ink-muted">
-                  {blurbFor(collection.handle) ?? 'Shop the collection'}
-                </p>
-              </div>
-
-              <div className="absolute inset-x-6 bottom-6">
-                <span className="flex items-center justify-center gap-2 rounded-pill bg-ink py-3.5 text-sm font-semibold text-bg transition-colors duration-300 group-hover:bg-brand">
-                  Shop {collection.title}
-                  <ArrowIcon className="h-4 w-4" />
-                </span>
-              </div>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent" />
+              <span className="absolute bottom-4 left-4 text-[15px] font-semibold text-bg sm:text-base">
+                {collection.title}
+              </span>
             </Link>
           </Reveal>
         ))}
       </div>
-    </Section>
+    </section>
   );
 }
 

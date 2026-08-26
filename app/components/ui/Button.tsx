@@ -1,7 +1,7 @@
 import {useRef} from 'react';
 import {Link} from 'react-router';
 
-type Variant = 'primary' | 'secondary' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'accent';
 type Size = 'md' | 'lg';
 
 const variants: Record<Variant, string> = {
@@ -10,6 +10,10 @@ const variants: Record<Variant, string> = {
   secondary:
     'bg-surface border border-line text-ink hover:border-line-strong hover:bg-white/[0.06]',
   ghost: 'bg-transparent text-ink hover:bg-white/[0.06]',
+  // For a CTA sitting on top of a photo/dark overlay, where the brand
+  // terracotta doesn't have enough presence -- e.g. the homepage promo band.
+  accent:
+    'bg-block-butter-deep text-ink shadow-card hover:shadow-lift hover:bg-block-butter disabled:bg-ink-soft disabled:shadow-none',
 };
 
 const sizes: Record<Size, string> = {
