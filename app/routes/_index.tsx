@@ -166,7 +166,7 @@ function PromoBand({collection}: {collection?: FeaturedCollectionFragment}) {
         )}
 
         <div className="absolute inset-0 flex items-center p-5 sm:px-16 sm:py-12">
-          <Reveal className="max-w-6xl rounded-[2rem] bg-ink/85 p-8 shadow-lift backdrop-blur-sm sm:p-14">
+          <Reveal className="max-w-6xl rounded-[2rem] bg-ink/50 p-8 shadow-lift sm:p-14">
             <p className="display text-[2rem] leading-[1.05] text-bg sm:text-5xl">
               Everyday essentials for home, kitchen, pets &amp; family
             </p>
