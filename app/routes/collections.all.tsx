@@ -6,9 +6,10 @@ import {ProductItem} from '~/components/ProductItem';
 import {Container} from '~/components/ui/Container';
 import {TrustPoints} from '~/components/TrustPoints';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
+import {store} from '~/lib/store-config';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Products`}];
+  return [{title: `Everything we stock | ${store.name}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {

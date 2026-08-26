@@ -12,9 +12,11 @@ import type {
   RegularSearchQuery,
   PredictiveSearchQuery,
 } from 'storefrontapi.generated';
+import {Container} from '~/components/ui/Container';
+import {store} from '~/lib/store-config';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{title: `Search | ${store.name}`}];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {
@@ -41,39 +43,58 @@ export default function SearchPage() {
   if (type === 'predictive') return null;
 
   return (
-    <div className="search">
-      <h1>Search</h1>
-      <SearchForm>
-        {({inputRef}) => (
-          <>
-            <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
-              ref={inputRef}
-              type="search"
-            />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
-        )}
-      </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
-        <SearchResults.Empty />
-      ) : (
-        <SearchResults result={result} term={term}>
-          {({articles, pages, products, term}) => (
-            <div>
-              <SearchResults.Products products={products} term={term} />
-              <SearchResults.Pages pages={pages} term={term} />
-              <SearchResults.Articles articles={articles} term={term} />
+    <Container className="py-12 sm:py-16">
+      <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+        {term ? `Results for “${term}”` : 'Search'}
+      </h1>
+
+      <div className="mt-6 max-w-lg">
+        <SearchForm>
+          {({inputRef}) => (
+            <div className="flex gap-2">
+              <input
+                defaultValue={term}
+                name="q"
+                placeholder="Search products…"
+                ref={inputRef}
+                type="search"
+                className="h-12 min-w-0 flex-1 rounded-pill border border-line-strong bg-paper px-5 text-[15px] text-ink placeholder:text-ink-subtle"
+              />
+              <button
+                type="submit"
+                className="h-12 shrink-0 rounded-pill bg-sage px-6 text-sm font-semibold text-white transition-colors hover:bg-sage-deep"
+              >
+                Search
+              </button>
             </div>
           )}
-        </SearchResults>
+        </SearchForm>
+      </div>
+
+      {error && (
+        <p className="mt-6 rounded-card border border-clay/30 bg-clay-tint px-4 py-3 text-sm text-clay">
+          {error}
+        </p>
       )}
+
+      <div className="mt-10">
+        {!term || !result?.total ? (
+          <SearchResults.Empty />
+        ) : (
+          <SearchResults result={result} term={term}>
+            {({articles, pages, products, term}) => (
+              <div className="flex flex-col gap-12">
+                <SearchResults.Products products={products} term={term} />
+                <SearchResults.Pages pages={pages} term={term} />
+                <SearchResults.Articles articles={articles} term={term} />
+              </div>
+            )}
+          </SearchResults>
+        )}
+      </div>
+
       <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
-    </div>
+    </Container>
   );
 }
 

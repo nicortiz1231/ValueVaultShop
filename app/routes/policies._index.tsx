@@ -1,6 +1,19 @@
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/policies._index';
 import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
+import {Container} from '~/components/ui/Container';
+import {ArrowIcon} from '~/components/Icons';
+import {store} from '~/lib/store-config';
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    {title: `Policies | ${store.name}`},
+    {
+      name: 'description',
+      content: `Shipping, refund, privacy and terms for ${store.name}.`,
+    },
+  ];
+};
 
 export async function loader({context}: Route.LoaderArgs) {
   const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY);
@@ -25,16 +38,29 @@ export default function Policies() {
   const {policies} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policies">
-      <h1>Policies</h1>
-      <div>
+    <Container width="narrow" className="py-12 sm:py-16">
+      <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+        Policies
+      </h1>
+      <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
+        The terms we hold ourselves to, in full.
+      </p>
+
+      <ul className="mt-8 divide-y divide-line overflow-hidden rounded-card border border-line bg-paper">
         {policies.map((policy) => (
-          <fieldset key={policy.id}>
-            <Link to={`/policies/${policy.handle}`}>{policy.title}</Link>
-          </fieldset>
+          <li key={policy.id}>
+            <Link
+              to={`/policies/${policy.handle}`}
+              prefetch="intent"
+              className="flex items-center justify-between gap-4 px-5 py-4 text-[15px] font-medium text-ink transition-colors hover:bg-cream"
+            >
+              {policy.title}
+              <ArrowIcon className="h-[18px] w-[18px] text-sage" />
+            </Link>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </Container>
   );
 }
 

@@ -5,6 +5,14 @@ import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {Container} from '~/components/ui/Container';
 import {ArrowIcon} from '~/components/Icons';
+import {store} from '~/lib/store-config';
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    {title: `Collections | ${store.name}`},
+    {name: 'description', content: store.description},
+  ];
+};
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte

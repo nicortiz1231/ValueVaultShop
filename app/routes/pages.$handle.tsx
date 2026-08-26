@@ -1,9 +1,11 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {Container} from '~/components/ui/Container';
+import {store, support} from '~/lib/store-config';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.page.title ?? ''}`}];
+  return [{title: `${data?.page.title ?? ''} | ${store.name}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -58,12 +60,31 @@ export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <div className="page">
-      <header>
-        <h1>{page.title}</h1>
-      </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
-    </div>
+    <Container width="narrow" className="py-12 sm:py-16">
+      <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+        {page.title}
+      </h1>
+      <div
+        className="rich-text mt-7"
+        dangerouslySetInnerHTML={{__html: page.body}}
+      />
+
+      {/* Anyone deep enough to read About or Contact is weighing whether to
+          trust the shop, so give them a way to reach a person from here. */}
+      <div className="mt-12 rounded-card border border-line bg-paper p-6">
+        <h2 className="text-[16px] font-semibold text-ink">Still have a question?</h2>
+        <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
+          Email{' '}
+          <a
+            href={`mailto:${support.email}`}
+            className="text-sage-deep underline underline-offset-4"
+          >
+            {support.email}
+          </a>{' '}
+          and a person will get back to you {support.responseTime}.
+        </p>
+      </div>
+    </Container>
   );
 }
 

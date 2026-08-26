@@ -4,9 +4,10 @@ import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 import {Container} from '~/components/ui/Container';
+import {store} from '~/lib/store-config';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Cart`}];
+  return [{title: `Your cart | ${store.name}`}];
 };
 
 export const headers: HeadersFunction = ({actionHeaders}) => actionHeaders;
