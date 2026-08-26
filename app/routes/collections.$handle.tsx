@@ -120,6 +120,11 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
         ...MoneyProductItem
       }
     }
+    compareAtPriceRange {
+      minVariantPrice {
+        ...MoneyProductItem
+      }
+    }
   }
 ` as const;
 

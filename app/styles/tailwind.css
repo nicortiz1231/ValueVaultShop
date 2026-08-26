@@ -1,6 +1,106 @@
 /**
- * Configure Tailwind v4 in this file using CSS variables and directives:
- * https://tailwindcss.com/docs/v4-beta#css-first-configuration
+ * Value Vault design system — Tailwind v4, configured CSS-first.
+ * https://tailwindcss.com/docs/theme
+ *
+ * Direction: "warm & homey". Cream paper, soft black ink, sage accent.
+ * The goal is for a first-time visitor arriving from TikTok to read the
+ * store as a real small business within about three seconds.
  */
 
 @import 'tailwindcss';
+
+@theme {
+  /* Surfaces — warm off-whites rather than pure #fff, which reads clinical */
+  --color-cream: #faf7f2;
+  --color-cream-deep: #f3ede4;
+  --color-paper: #ffffff;
+
+  /* Ink — soft black, never pure #000, which reads harsh on cream */
+  --color-ink: #2a2622;
+  --color-ink-muted: #6b635a;
+  --color-ink-subtle: #9a9088;
+
+  /* Accent — sage. Calm, domestic, not a "buy now" red */
+  --color-sage: #5f7a61;
+  --color-sage-deep: #4a6350;
+  --color-sage-tint: #edf1ec;
+
+  /* Clay — used sparingly for sale prices and savings */
+  --color-clay: #b8623f;
+  --color-clay-tint: #fbf0ea;
+
+  /* Lines */
+  --color-line: #e8e1d8;
+  --color-line-strong: #d8cec1;
+
+  /* Type — Figtree is a friendly geometric sans; rounded without being cute */
+  --font-sans: 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+
+  /* Softer corner radii than Tailwind's defaults, to match the warm direction */
+  --radius-card: 0.875rem;
+  --radius-pill: 999px;
+
+  /* Shadows are warm-tinted, not neutral grey */
+  --shadow-soft: 0 1px 2px rgba(42, 38, 34, 0.04),
+    0 8px 24px -12px rgba(42, 38, 34, 0.12);
+  --shadow-lift: 0 2px 4px rgba(42, 38, 34, 0.05),
+    0 16px 32px -16px rgba(42, 38, 34, 0.18);
+
+  /* Layout */
+  --spacing-header: 4.5rem;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  /* The scaffold's reset.css rounds every image; scope that off so cards
+     and hero art can control their own corners. */
+  img {
+    border-radius: 0;
+  }
+
+  /* Visible, on-brand focus ring for keyboard users */
+  :focus-visible {
+    outline: 2px solid var(--color-sage);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--color-sage-tint);
+    color: var(--color-ink);
+  }
+}
+
+@layer utilities {
+  /* Clamp a product title to two lines so cards stay on a common baseline */
+  .line-clamp-2-fixed {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

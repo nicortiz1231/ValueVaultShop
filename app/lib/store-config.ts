@@ -1,0 +1,158 @@
+/**
+ * Every factual claim the storefront makes about Value Vault lives here.
+ *
+ * Rule of thumb: if it is a promise to a customer, it belongs in this file and
+ * nowhere else. That keeps the marketing copy and the policy pages from
+ * drifting apart, which is one of the fastest ways for a store to look
+ * untrustworthy.
+ *
+ * Anything set to `null` is deliberately not rendered. Do not replace a `null`
+ * with a plausible-sounding guess — an unanswered phone number or an address
+ * that does not exist does more damage than an omission.
+ */
+
+export const store = {
+  name: 'Value Vault',
+  tagline: 'Useful things, fair prices, no fuss.',
+  description:
+    'Everyday essentials for home, kitchen, pets and family — curated, honestly priced, and backed by a 30-day return policy.',
+  domain: 'valuevaultshop.net',
+} as const;
+
+/**
+ * Support details.
+ *
+ * TODO(steven): `email` is currently a personal Gmail address, which is the
+ * single weakest trust signal on the site — cold visitors read a free mailbox
+ * as "this is not a real business". Setting up support@valuevaultshop.net
+ * costs nothing on most domain hosts and is the highest-value fix available.
+ *
+ * TODO(steven): add `phone` and `address` once there is a number that gets
+ * answered and an address you are willing to publish. Both render only when
+ * set, so leaving them null is safe.
+ */
+export const support = {
+  email: 'stevenortiz90@gmail.com',
+  phone: null as string | null,
+  address: null as string | null,
+  /** Stated response time. Keep this one conservative and beatable. */
+  responseTime: 'within 24 hours',
+} as const;
+
+/**
+ * Shipping facts, mirrored from /policies/shipping-policy.
+ *
+ * TODO(steven): `deliveryEstimate` is the one number the policy page does not
+ * currently state. Cold traffic assumes the worst when a store is vague about
+ * delivery. A specific honest window — even a long one — converts better than
+ * silence, so fill this in and update the policy page to match.
+ */
+export const shipping = {
+  processingTime: '1–3 business days',
+  deliveryEstimate: null as string | null,
+  tracking: true,
+  /** Set to a number (in USD) once free shipping is actually offered. */
+  freeShippingThreshold: null as number | null,
+} as const;
+
+/** Returns, mirrored from /policies/refund-policy. */
+export const returns = {
+  windowDays: 30,
+  /** Value Vault pays return postage — a genuinely strong signal, so say it. */
+  freeReturnShipping: true,
+  refundTimeframe: '10 business days',
+} as const;
+
+/**
+ * Reviews are intentionally switched off.
+ *
+ * The review UI is built and ready, but rendering invented ratings is exactly
+ * what makes a store read as a scam. Install a review app (Judge.me, Loox,
+ * Okendo), wire `app/lib/reviews.ts` to it, and flip this to `true` once real
+ * customer reviews exist.
+ */
+export const reviews = {
+  enabled: false,
+} as const;
+
+/**
+ * Payment methods shown in the footer.
+ *
+ * TODO(steven): confirm this list against Shopify admin → Settings → Payments
+ * before launch. These are the defaults that ship with Shopify Payments, but
+ * advertising a method you do not actually accept is a broken promise at the
+ * worst possible moment — the checkout button.
+ */
+export const paymentMethods = [
+  'Visa',
+  'Mastercard',
+  'Amex',
+  'Discover',
+  'Shop Pay',
+  'Apple Pay',
+  'Google Pay',
+] as const;
+
+/** Top-level navigation, used when the Shopify menu has not loaded. */
+export const navigation = [
+  {title: 'Shop all', url: '/collections/all'},
+  {title: 'Kitchen', url: '/collections/kitchen-accessories'},
+  {title: 'Home', url: '/collections/home-accessories'},
+  {title: 'Pets', url: '/collections/pet-accessories'},
+  {title: 'Kids & Baby', url: '/collections/kids-babies'},
+  {title: 'About', url: '/pages/about-us'},
+] as const;
+
+/**
+ * The four category tiles on the homepage.
+ * `handle` must match a real Shopify collection handle.
+ */
+export const categories = [
+  {
+    title: 'Kitchen',
+    handle: 'kitchen-accessories',
+    blurb: 'Tools that earn their drawer space',
+  },
+  {
+    title: 'Home',
+    handle: 'home-accessories',
+    blurb: 'Small upgrades for everyday rooms',
+  },
+  {
+    title: 'Pets',
+    handle: 'pet-accessories',
+    blurb: 'For the other members of the household',
+  },
+  {
+    title: 'Kids & Baby',
+    handle: 'kids-babies',
+    blurb: 'Practical things for busy parents',
+  },
+] as const;
+
+/**
+ * Homepage FAQ. These answer the questions a first-time visitor from social
+ * actually has — "is this real, when does it arrive, can I send it back".
+ * Every answer here must stay true to the policy pages.
+ */
+export const faqs = [
+  {
+    question: 'Is Value Vault a real store?',
+    answer:
+      'Yes. Value Vault is a small independent shop run by a real team. Checkout is handled by Shopify, so your card details go straight to Shopify’s payment processor and are never stored by us. Every order gets a confirmation email and a tracking number.',
+  },
+  {
+    question: 'When will my order arrive?',
+    answer:
+      'Orders are processed and shipped within 1–3 business days. You will get a tracking link by email as soon as your parcel leaves the warehouse, so you can follow it the whole way.',
+  },
+  {
+    question: 'What if I do not like it?',
+    answer:
+      'You have 30 days from delivery to request a return, and we pay the return postage — we send you a prepaid label. Once your return arrives, your refund goes back to your original payment method within 10 business days.',
+  },
+  {
+    question: 'How do I get help with an order?',
+    answer: `Email us and a person will get back to you ${support.responseTime}. If something has gone wrong with your order, tell us the order number and we will sort it out.`,
+  },
+] as const;

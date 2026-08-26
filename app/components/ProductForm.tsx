@@ -8,6 +8,22 @@ import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
 
+/** Shared pill styling for both the anchor and button variant controls. */
+function optionClasses(selected: boolean, available: boolean, exists: boolean) {
+  return [
+    'inline-flex min-w-11 items-center justify-center rounded-pill border px-4 py-2.5',
+    'text-sm font-medium transition-colors',
+    selected
+      ? 'border-sage bg-sage text-white'
+      : 'border-line-strong bg-paper text-ink hover:border-ink-muted',
+    !available || !exists
+      ? 'cursor-not-allowed text-ink-subtle line-through opacity-50'
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
 export function ProductForm({
   productOptions,
   selectedVariant,
@@ -17,16 +33,19 @@ export function ProductForm({
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
+
   return (
-    <div className="product-form">
+    <div>
       {productOptions.map((option) => {
-        // If there is only a single value in the option values, don't display the option
+        // A single-value option is not a choice, so don't make the shopper look at it.
         if (option.optionValues.length === 1) return null;
 
         return (
-          <div className="product-options" key={option.name}>
-            <h5>{option.name}</h5>
-            <div className="product-options-grid">
+          <div className="mb-6" key={option.name}>
+            <h3 className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.08em] text-ink-muted">
+              {option.name}
+            </h3>
+            <div className="flex flex-wrap gap-2">
               {option.optionValues.map((value) => {
                 const {
                   name,
@@ -39,73 +58,53 @@ export function ProductForm({
                   swatch,
                 } = value;
 
+                // Combined-listing children live at their own URL, so they must
+                // be real anchors for SEO.
                 if (isDifferentProduct) {
-                  // SEO
-                  // When the variant is a combined listing child product
-                  // that leads to a different url, we need to render it
-                  // as an anchor tag
                   return (
                     <Link
-                      className="product-options-item"
                       key={option.name + name}
                       prefetch="intent"
                       preventScrollReset
                       replace
                       to={`/products/${handle}?${variantUriQuery}`}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
+                      className={optionClasses(selected, available, exists)}
                     >
                       <ProductOptionSwatch swatch={swatch} name={name} />
                     </Link>
                   );
-                } else {
-                  // SEO
-                  // When the variant is an update to the search param,
-                  // render it as a button with javascript navigating to
-                  // the variant so that SEO bots do not index these as
-                  // duplicated links
-                  return (
-                    <button
-                      type="button"
-                      className={`product-options-item${
-                        exists && !selected ? ' link' : ''
-                      }`}
-                      key={option.name + name}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
-                      disabled={!exists}
-                      onClick={() => {
-                        if (!selected) {
-                          void navigate(`?${variantUriQuery}`, {
-                            replace: true,
-                            preventScrollReset: true,
-                          });
-                        }
-                      }}
-                    >
-                      <ProductOptionSwatch swatch={swatch} name={name} />
-                    </button>
-                  );
                 }
+
+                // Same-product variants are search-param updates. Rendering them
+                // as buttons keeps bots from indexing duplicate URLs.
+                return (
+                  <button
+                    type="button"
+                    key={option.name + name}
+                    disabled={!exists}
+                    aria-pressed={selected}
+                    className={optionClasses(selected, available, exists)}
+                    onClick={() => {
+                      if (!selected) {
+                        void navigate(`?${variantUriQuery}`, {
+                          replace: true,
+                          preventScrollReset: true,
+                        });
+                      }
+                    }}
+                  >
+                    <ProductOptionSwatch swatch={swatch} name={name} />
+                  </button>
+                );
               })}
             </div>
-            <br />
           </div>
         );
       })}
+
       <AddToCartButton
         disabled={!selectedVariant || !selectedVariant.availableForSale}
-        onClick={() => {
-          open('cart');
-        }}
+        onClick={() => open('cart')}
         lines={
           selectedVariant
             ? [
@@ -134,17 +133,18 @@ function ProductOptionSwatch({
   const image = swatch?.image?.previewImage?.url;
   const color = swatch?.color;
 
-  if (!image && !color) return name;
+  if (!image && !color) return <>{name}</>;
 
   return (
-    <div
+    <span
       aria-label={name}
-      className="product-option-label-swatch"
-      style={{
-        backgroundColor: color || 'transparent',
-      }}
+      title={name}
+      className="block h-6 w-6 overflow-hidden rounded-full border border-line"
+      style={{backgroundColor: color || 'transparent'}}
     >
-      {!!image && <img src={image} alt={name} />}
-    </div>
+      {!!image && (
+        <img src={image} alt={name} className="h-full w-full object-cover" />
+      )}
+    </span>
   );
 }

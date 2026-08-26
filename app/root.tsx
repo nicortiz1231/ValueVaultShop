@@ -62,6 +62,19 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
+    // Figtree carries the "warm & homey" direction. Preconnecting to both
+    // Google Fonts hosts keeps the webfont off the critical path on the mobile
+    // connections most of this store's traffic arrives on.
+    {rel: 'preconnect', href: 'https://fonts.googleapis.com'},
+    {
+      rel: 'preconnect',
+      href: 'https://fonts.gstatic.com',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap',
+    },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
 }
@@ -197,14 +210,39 @@ export function ErrorBoundary() {
     errorMessage = error.message;
   }
 
+  const isNotFound = errorStatus === 404;
+
   return (
-    <div className="route-error">
-      <h1>Oops</h1>
-      <h2>{errorStatus}</h2>
-      {errorMessage && (
-        <fieldset>
-          <pre>{errorMessage}</pre>
-        </fieldset>
+    <div className="mx-auto flex min-h-[60vh] w-full max-w-lg flex-col items-center justify-center px-5 text-center">
+      <p className="text-[13px] font-bold uppercase tracking-[0.1em] text-ink-subtle">
+        Error {errorStatus}
+      </p>
+      <h1 className="mt-3 text-3xl font-bold tracking-tight text-ink">
+        {isNotFound ? 'We could not find that page' : 'Something went wrong'}
+      </h1>
+      <p className="mt-3 text-base leading-relaxed text-ink-muted">
+        {isNotFound
+          ? 'The link may be out of date, or the product may have sold out.'
+          : 'This one is on us. Try again in a moment, or email us and we will help.'}
+      </p>
+      <div className="mt-7 flex flex-wrap justify-center gap-3">
+        <a
+          href="/collections/all"
+          className="inline-flex h-11 items-center rounded-pill bg-sage px-5 text-sm font-semibold text-white hover:bg-sage-deep"
+        >
+          Continue shopping
+        </a>
+        <a
+          href="/"
+          className="inline-flex h-11 items-center rounded-pill border border-line-strong bg-paper px-5 text-sm font-semibold text-ink hover:bg-cream-deep"
+        >
+          Back to home
+        </a>
+      </div>
+      {errorMessage && !isNotFound && (
+        <pre className="mt-8 max-w-full overflow-x-auto rounded-card border border-line bg-paper p-4 text-left text-xs text-ink-muted">
+          {errorMessage}
+        </pre>
       )}
     </div>
   );

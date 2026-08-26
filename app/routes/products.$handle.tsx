@@ -8,17 +8,28 @@ import {
   getAdjacentAndFirstAvailableVariants,
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
+import {Link} from 'react-router';
 import {ProductPrice} from '~/components/ProductPrice';
-import {ProductImage} from '~/components/ProductImage';
+import {ProductGallery} from '~/components/ProductGallery';
 import {ProductForm} from '~/components/ProductForm';
+import {ProductTrustPanel} from '~/components/ProductTrustPanel';
+import {StarRating} from '~/components/StarRating';
+import {Container} from '~/components/ui/Container';
+import {CheckIcon} from '~/components/Icons';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {store} from '~/lib/store-config';
 
 export const meta: Route.MetaFunction = ({data}) => {
+  const product = data?.product;
   return [
-    {title: `Hydrogen | ${data?.product.title ?? ''}`},
+    {title: product ? `${product.title} | ${store.name}` : store.name},
+    {
+      name: 'description',
+      content: product?.description?.slice(0, 155) ?? store.description,
+    },
     {
       rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
+      href: `/products/${product?.handle}`,
     },
   ];
 };
@@ -96,30 +107,83 @@ export default function Product() {
   });
 
   const {title, descriptionHtml} = product;
+  const inStock = Boolean(selectedVariant?.availableForSale);
 
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
-      <div className="product-main">
-        <h1>{title}</h1>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
+    <Container className="py-8 sm:py-12">
+      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-ink-muted">
+        <Link to="/" className="hover:text-ink">
+          Home
+        </Link>
+        <span className="px-2 text-ink-subtle">/</span>
+        <Link to="/collections/all" className="hover:text-ink">
+          Shop
+        </Link>
+        <span className="px-2 text-ink-subtle">/</span>
+        <span className="text-ink">{title}</span>
+      </nav>
+
+      <div className="grid gap-9 lg:grid-cols-2 lg:gap-14">
+        <ProductGallery
+          images={product.images?.nodes ?? []}
+          selectedImage={selectedVariant?.image}
+          title={title}
         />
-        <br />
-        <ProductForm
-          productOptions={productOptions}
-          selectedVariant={selectedVariant}
-        />
-        <br />
-        <br />
-        <p>
-          <strong>Description</strong>
-        </p>
-        <br />
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
+
+        {/* Sticky on desktop so the buy box stays reachable through a long
+            description — on mobile it simply flows underneath the gallery. */}
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          {product.vendor && (
+            <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-ink-subtle">
+              {product.vendor}
+            </p>
+          )}
+
+          <h1 className="mt-2 text-3xl font-bold leading-tight tracking-tight text-ink sm:text-[2.25rem]">
+            {title}
+          </h1>
+
+          {/* Renders only once real reviews exist -- see store-config. */}
+          <StarRating className="mt-3" />
+
+          <div className="mt-4">
+            <ProductPrice
+              price={selectedVariant?.price}
+              compareAtPrice={selectedVariant?.compareAtPrice}
+              size="lg"
+            />
+          </div>
+
+          <p
+            className={`mt-3 flex items-center gap-1.5 text-sm font-medium ${
+              inStock ? 'text-sage-deep' : 'text-ink-subtle'
+            }`}
+          >
+            {inStock && <CheckIcon className="h-4 w-4" />}
+            {inStock ? 'In stock, ready to ship' : 'Currently sold out'}
+          </p>
+
+          <div className="mt-7">
+            <ProductForm
+              productOptions={productOptions}
+              selectedVariant={selectedVariant}
+            />
+          </div>
+
+          <ProductTrustPanel />
+
+          {descriptionHtml && (
+            <div className="mt-8 border-t border-line pt-7">
+              <h2 className="text-[15px] font-bold text-ink">Details</h2>
+              <div
+                className="prose-product mt-3 text-[15px] leading-relaxed text-ink-muted [&_a]:text-sage-deep [&_a]:underline [&_li]:my-1 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5"
+                dangerouslySetInnerHTML={{__html: descriptionHtml}}
+              />
+            </div>
+          )}
+        </div>
       </div>
+
       <Analytics.ProductView
         data={{
           products: [
@@ -135,7 +199,7 @@ export default function Product() {
           ],
         }}
       />
-    </div>
+    </Container>
   );
 }
 
@@ -184,6 +248,15 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    images(first: 8) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
+    }
     encodedVariantExistence
     encodedVariantAvailability
     options {
