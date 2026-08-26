@@ -33,21 +33,21 @@ function toInternalUrl(
   return isInternal ? new URL(url).pathname : url;
 }
 
+/**
+ * The wordmark. Set in the italic display serif rather than a boxed icon +
+ * name lockup -- the closest thing this store has to Kaleido's script
+ * logotype, and it doubles as the source for the oversized watermark motif
+ * reused through the page (see components/Watermark.tsx).
+ */
 export function Logo({className = ''}: {className?: string}) {
   return (
     <Link
       to="/"
       prefetch="intent"
-      className={`group flex items-center gap-2.5 ${className}`}
+      className={`display text-[26px] italic text-ink ${className}`}
       aria-label={`${store.name} — home`}
     >
-      <span
-        aria-hidden="true"
-        className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-lime text-[15px] font-black text-canvas shadow-glow transition-transform duration-300 ease-out group-hover:rotate-[-8deg] group-hover:scale-105"
-      >
-        V
-      </span>
-      <span className="display text-[19px] text-chalk">{store.name}</span>
+      {store.name}
     </Link>
   );
 }
@@ -61,12 +61,12 @@ export function Header({
   const {open} = useAside();
 
   return (
-    <header className="glass sticky top-0 z-30 border-x-0 border-t-0">
+    <header className="sticky top-0 z-30 border-b border-line bg-bg/95 backdrop-blur-sm">
       <Container>
         <div className="flex h-header items-center gap-4">
           <button
             type="button"
-            className="-ml-2 rounded-full p-2 text-chalk transition-colors hover:bg-white/[0.06] lg:hidden"
+            className="-ml-2 rounded-full p-2 text-ink transition-colors hover:bg-ink/5 lg:hidden"
             onClick={() => open('mobile')}
             aria-label="Open menu"
           >
@@ -124,7 +124,7 @@ export function HeaderMenu({
           end
           prefetch="intent"
           onClick={close}
-          className="border-b border-line py-4 text-xl font-semibold text-chalk"
+          className="border-b border-line py-4 text-xl font-medium text-ink"
         >
           Home
         </NavLink>
@@ -134,7 +134,7 @@ export function HeaderMenu({
             to={item.url}
             prefetch="intent"
             onClick={close}
-            className="border-b border-line py-4 text-xl font-semibold text-chalk"
+            className="border-b border-line py-4 text-xl font-medium text-ink"
           >
             {item.title}
           </NavLink>
@@ -145,7 +145,7 @@ export function HeaderMenu({
 
   return (
     <nav
-      className="ml-6 hidden items-center gap-1 lg:flex"
+      className="ml-8 hidden items-center gap-7 lg:flex"
       role="navigation"
       aria-label="Main"
     >
@@ -156,10 +156,8 @@ export function HeaderMenu({
           prefetch="intent"
           className={({isActive}) =>
             [
-              'rounded-pill px-4 py-2 text-[14px] font-semibold tracking-tight transition-colors',
-              isActive
-                ? 'bg-white/[0.08] text-chalk'
-                : 'text-ash hover:bg-white/[0.06] hover:text-chalk',
+              'text-[13px] font-semibold uppercase tracking-[0.08em] transition-colors',
+              isActive ? 'text-brand' : 'text-ink-muted hover:text-ink',
             ].join(' ')
           }
         >
@@ -175,8 +173,7 @@ function HeaderCtas({
   cart,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
   const {open} = useAside();
-  const iconBtn =
-    'rounded-full p-2.5 text-chalk transition-colors hover:bg-white/[0.06]';
+  const iconBtn = 'rounded-full p-2.5 text-ink transition-colors hover:bg-ink/5';
 
   return (
     <nav className="ml-auto flex items-center gap-1" role="navigation">
@@ -216,7 +213,7 @@ function CartBadge({count}: {count: number}) {
   return (
     <button
       type="button"
-      className="relative rounded-full p-2.5 text-chalk transition-colors hover:bg-white/[0.06]"
+      className="relative rounded-full p-2.5 text-ink transition-colors hover:bg-ink/5"
       onClick={() => {
         open('cart');
         publish('cart_viewed', {
@@ -230,7 +227,7 @@ function CartBadge({count}: {count: number}) {
     >
       <CartIcon />
       {count > 0 && (
-        <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-lime px-1 text-[11px] font-bold leading-none text-canvas">
+        <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold leading-none text-bg">
           {count}
         </span>
       )}

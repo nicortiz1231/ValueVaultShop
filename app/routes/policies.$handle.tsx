@@ -51,12 +51,12 @@ export default function Policy() {
       <Link
         to="/policies"
         prefetch="intent"
-        className="text-sm text-ash transition-colors hover:text-chalk"
+        className="text-sm text-ink-muted transition-colors hover:text-ink"
       >
         ← Back to policies
       </Link>
 
-      <h1 className="display mt-5 text-3xl text-chalk sm:text-4xl">
+      <h1 className="display mt-5 text-3xl text-ink sm:text-4xl">
         {policy.title}
       </h1>
       <div

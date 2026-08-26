@@ -85,22 +85,22 @@ export default function Collection() {
     <>
       <Container className="py-10 sm:py-14">
         <header className="max-w-2xl">
-          <h1 className="display text-3xl text-chalk sm:text-4xl">
+          <h1 className="display text-3xl text-ink sm:text-4xl">
             {collection.title}
           </h1>
           {collection.description && (
-            <p className="mt-3.5 text-base leading-relaxed text-ash">
+            <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
               {collection.description}
             </p>
           )}
         </header>
 
         {count === 0 ? (
-          <p className="mt-12 text-base text-ash">
+          <p className="mt-12 text-base text-ink-muted">
             There is nothing in this collection just yet. Try{' '}
             <a
               href="/collections/all"
-              className="text-lime underline underline-offset-4"
+              className="text-brand underline underline-offset-4"
             >
               browsing everything
             </a>{' '}

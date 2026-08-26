@@ -2,12 +2,14 @@ import {returns, shipping} from '~/lib/store-config';
 import {LightningIcon, ReturnIcon, TruckIcon} from './Icons';
 
 /**
- * Continuous marquee ticker above the header.
+ * The colour-block announcement strip above the header -- the terracotta
+ * band doing the same job Kaleido's yellow bar does: one confident claim,
+ * always visible, set apart from the rest of the page by its own solid
+ * colour rather than blending into a neutral nav.
  *
- * A static trust strip reads as a banner people learn to ignore; a slow,
- * looping ticker reads as a live signal and holds attention for the half a
- * second it takes to register the claim. The list is duplicated once in the
- * DOM so the loop point is invisible.
+ * Runs as a slow marquee so the strip reads as a live signal rather than a
+ * banner people learn to ignore. Duplicated once in the DOM so the loop is
+ * seamless.
  */
 export function TrustBar() {
   const points = [
@@ -24,33 +26,28 @@ export function TrustBar() {
         : `Ships in ${shipping.processingTime}`,
     },
     {icon: LightningIcon, text: 'Secure checkout via Shopify'},
-    shipping.tracking
-      ? {icon: TruckIcon, text: 'Tracked on every order'}
-      : null,
+    shipping.tracking ? {icon: TruckIcon, text: 'Tracked on every order'} : null,
   ].filter(Boolean) as {icon: React.ComponentType<{className?: string}>; text: string}[];
 
   const loop = [...points, ...points];
 
   return (
-    <div className="relative overflow-hidden border-b border-line bg-surface py-2">
+    <div className="relative h-announce overflow-hidden bg-brand text-bg">
       <div
-        className="flex w-max animate-marquee gap-10"
-        style={{'--marquee-duration': '32s'} as React.CSSProperties}
+        className="flex h-full w-max animate-marquee items-center gap-10"
+        style={{'--marquee-duration': '28s'} as React.CSSProperties}
       >
         {loop.map(({icon: Icon, text}, i) => (
           <span
             // eslint-disable-next-line react/no-array-index-key -- duplicated loop, text alone can repeat
             key={`${text}-${i}`}
-            className="flex shrink-0 items-center gap-2 text-[13px] font-semibold tracking-tight text-ash"
+            className="flex shrink-0 items-center gap-2 text-[12px] font-bold uppercase tracking-[0.08em]"
           >
-            <Icon className="h-3.5 w-3.5 text-lime" />
+            <Icon className="h-3.5 w-3.5" />
             {text}
           </span>
         ))}
       </div>
-      {/* Edge fades so the ticker doesn't hard-cut at the viewport edge */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-surface to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-surface to-transparent" />
     </div>
   );
 }

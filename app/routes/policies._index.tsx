@@ -39,10 +39,10 @@ export default function Policies() {
 
   return (
     <Container width="narrow" className="py-12 sm:py-16">
-      <h1 className="display text-3xl text-chalk sm:text-4xl">
+      <h1 className="display text-3xl text-ink sm:text-4xl">
         Policies
       </h1>
-      <p className="mt-3.5 text-base leading-relaxed text-ash">
+      <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
         The terms we hold ourselves to, in full.
       </p>
 
@@ -52,10 +52,10 @@ export default function Policies() {
             <Link
               to={`/policies/${policy.handle}`}
               prefetch="intent"
-              className="flex items-center justify-between gap-4 px-5 py-4 text-[15px] font-medium text-chalk transition-colors hover:bg-surface"
+              className="flex items-center justify-between gap-4 px-5 py-4 text-[15px] font-medium text-ink transition-colors hover:bg-surface"
             >
               {policy.title}
-              <ArrowIcon className="h-[18px] w-[18px] text-lime" />
+              <ArrowIcon className="h-[18px] w-[18px] text-brand" />
             </Link>
           </li>
         ))}

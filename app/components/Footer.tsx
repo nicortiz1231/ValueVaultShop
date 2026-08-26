@@ -10,6 +10,7 @@ import {
   support,
 } from '~/lib/store-config';
 import {ShieldIcon} from './Icons';
+import {Watermark} from './Watermark';
 import {Container} from './ui/Container';
 
 interface FooterProps {
@@ -32,24 +33,50 @@ export function Footer({
   publicStoreDomain,
 }: FooterProps) {
   return (
-    <footer className="relative mt-auto overflow-hidden border-t border-line bg-void">
-      <div
-        className="bloom bottom-[-20%] left-1/2 h-[28rem] w-[28rem] -translate-x-1/2 opacity-40"
-        aria-hidden="true"
-      />
-      <Container className="relative">
+    <footer className="mt-auto border-t border-line bg-bg-deep">
+      {/* Newsletter band -- the same "unlock perks, get styling tips" beat
+          Kaleido leads its footer with, worded honestly for a general store. */}
+      <div className="border-b border-line bg-block-sage">
+        <Container>
+          <div className="flex flex-col items-start justify-between gap-5 py-9 sm:flex-row sm:items-center">
+            <p className="display max-w-sm text-2xl italic text-ink">
+              Get first look at new arrivals and real discounts.
+            </p>
+            {/* TODO(steven): wire this to a real subscriber list (Shopify's
+                customer newsletter opt-in, or Klaviyo/Mailchimp) before launch.
+                It currently only prevents the page reload -- collecting an
+                email and silently discarding it would be worse than not
+                asking, so this must be connected before it goes live. */}
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="flex w-full max-w-sm gap-2"
+            >
+              <label htmlFor="footer-email" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="footer-email"
+                type="email"
+                required
+                placeholder="Your email"
+                className="h-12 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-5 text-[15px] text-ink placeholder:text-ink-soft"
+              />
+              <button
+                type="submit"
+                className="h-12 shrink-0 rounded-pill bg-ink px-6 text-sm font-semibold text-bg transition-colors hover:bg-ink/85"
+              >
+                Sign up
+              </button>
+            </form>
+          </div>
+        </Container>
+      </div>
+
+      <Container>
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-14 sm:grid-cols-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:py-16">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-            <div className="flex items-center gap-2.5">
-              <span
-                aria-hidden="true"
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-lime text-[15px] font-black text-canvas shadow-glow"
-              >
-                V
-              </span>
-              <span className="display text-[19px] text-chalk">{store.name}</span>
-            </div>
-            <p className="mt-3.5 max-w-xs text-sm leading-relaxed text-ash">
+            <span className="display text-2xl italic text-ink">{store.name}</span>
+            <p className="mt-3.5 max-w-xs text-sm leading-relaxed text-ink-muted">
               {store.description}
             </p>
           </div>
@@ -95,33 +122,33 @@ export function Footer({
         </div>
 
         <div className="flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-line py-7 text-sm">
-          <span className="font-semibold text-chalk">Questions?</span>
+          <span className="font-semibold text-ink">Questions?</span>
           <a
             href={`mailto:${support.email}`}
-            className="text-lime underline underline-offset-4 hover:text-chalk"
+            className="text-brand underline underline-offset-4 hover:text-ink"
           >
             {support.email}
           </a>
           {support.phone && (
             <a
               href={`tel:${support.phone.replace(/[^\d+]/g, '')}`}
-              className="text-lime underline underline-offset-4 hover:text-chalk"
+              className="text-brand underline underline-offset-4 hover:text-ink"
             >
               {support.phone}
             </a>
           )}
-          <span className="text-dim">We reply {support.responseTime}.</span>
+          <span className="text-ink-soft">We reply {support.responseTime}.</span>
           {support.address && (
-            <span className="text-dim">{support.address}</span>
+            <span className="text-ink-soft">{support.address}</span>
           )}
         </div>
 
         <div className="flex flex-col gap-5 border-t border-line py-7 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-dim">
+            <p className="text-sm text-ink-soft">
               © {new Date().getFullYear()} {store.name}. All rights reserved.
             </p>
-            <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-dim">
+            <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-ink-soft">
               <ShieldIcon className="h-4 w-4" />
               Checkout secured by Shopify · {returns.windowDays}-day returns ·
               Ships in {shipping.processingTime}
@@ -132,7 +159,7 @@ export function Footer({
             {paymentMethods.map((method) => (
               <li
                 key={method}
-                className="rounded-md border border-line bg-surface px-2 py-1 text-[11px] font-semibold tracking-tight text-dim"
+                className="rounded-md border border-line bg-surface px-2 py-1 text-[11px] font-semibold tracking-tight text-ink-soft"
               >
                 {method}
               </li>
@@ -140,6 +167,8 @@ export function Footer({
           </ul>
         </div>
       </Container>
+
+      <Watermark className="border-t border-line" />
     </footer>
   );
 }
@@ -183,7 +212,7 @@ function PolicyLinks({
             href={item.url}
             rel="noopener noreferrer"
             target="_blank"
-            className="text-sm text-ash transition-colors hover:text-chalk"
+            className="text-sm text-ink-muted transition-colors hover:text-ink"
           >
             {item.title}
           </a>
@@ -202,7 +231,7 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h3 className="text-[13px] font-bold uppercase tracking-[0.08em] text-dim">
+      <h3 className="text-[13px] font-bold uppercase tracking-[0.08em] text-ink-soft">
         {title}
       </h3>
       <nav className="mt-4 flex flex-col gap-2.5">{children}</nav>
@@ -216,7 +245,7 @@ function FooterLink({to, children}: {to: string; children: React.ReactNode}) {
     <Component
       to={to}
       prefetch="intent"
-      className="text-sm text-ash transition-colors hover:text-chalk"
+      className="text-sm text-ink-muted transition-colors hover:text-ink"
     >
       {children}
     </Component>

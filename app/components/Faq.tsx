@@ -16,11 +16,11 @@ export function Faq() {
       {faqs.map((faq, i) => (
         <Reveal key={faq.question} as="div" delay={i * 60}>
           <details className="group">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 text-[15px] font-semibold text-chalk transition-colors hover:bg-white/[0.03] sm:px-6">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 text-[15px] font-semibold text-ink transition-colors hover:bg-white/[0.03] sm:px-6">
               {faq.question}
-              <ChevronIcon className="h-5 w-5 shrink-0 text-lime transition-transform duration-200 group-open:-rotate-180" />
+              <ChevronIcon className="h-5 w-5 shrink-0 text-brand transition-transform duration-200 group-open:-rotate-180" />
             </summary>
-            <p className="px-5 pb-5 text-[15px] leading-relaxed text-ash sm:px-6">
+            <p className="px-5 pb-5 text-[15px] leading-relaxed text-ink-muted sm:px-6">
               {faq.answer}
             </p>
           </details>

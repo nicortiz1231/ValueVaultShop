@@ -33,12 +33,12 @@ export function StarRating({
             key={star}
             filled={star <= rounded}
             className={`h-4 w-4 ${
-              star <= rounded ? 'text-flare' : 'text-line-strong'
+              star <= rounded ? 'text-sale' : 'text-line-strong'
             }`}
           />
         ))}
       </div>
-      <span className="text-[13px] text-ash">
+      <span className="text-[13px] text-ink-muted">
         {rating.toFixed(1)} ({count})
       </span>
       <span className="sr-only">

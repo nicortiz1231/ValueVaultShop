@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Pagination} from '@shopify/hydrogen';
 
 const pagerLink =
-  'inline-flex h-11 items-center justify-center rounded-pill border border-line-strong bg-surface px-6 text-sm font-semibold text-chalk transition-colors hover:bg-surface-2';
+  'inline-flex h-11 items-center justify-center rounded-pill border border-line-strong bg-surface px-6 text-sm font-semibold text-ink transition-colors hover:bg-bg-deep';
 
 /**
  * Wraps Shopify's <Pagination> with the storefront's own styling.

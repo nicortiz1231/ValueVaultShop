@@ -108,7 +108,7 @@ export default function Cart() {
 
   return (
     <Container className="py-10 sm:py-14">
-      <h1 className="display mb-8 text-3xl text-chalk sm:text-4xl">
+      <h1 className="display mb-8 text-3xl text-ink sm:text-4xl">
         Your cart
       </h1>
       <CartMain layout="page" cart={cart} />

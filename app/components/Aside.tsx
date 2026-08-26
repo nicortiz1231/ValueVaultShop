@@ -92,14 +92,14 @@ export function Aside({
         ].join(' ')}
       >
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-line px-5">
-          <h3 id={id} className="text-lg font-bold tracking-tight text-chalk">
+          <h3 id={id} className="text-lg font-bold tracking-tight text-ink">
             {heading}
           </h3>
           <button
             onClick={close}
             aria-label="Close"
             tabIndex={expanded ? 0 : -1}
-            className="-mr-2 rounded-full p-2 text-ash transition-colors hover:bg-surface-2 hover:text-chalk"
+            className="-mr-2 rounded-full p-2 text-ink-muted transition-colors hover:bg-bg-deep hover:text-ink"
           >
             <CloseIcon />
           </button>

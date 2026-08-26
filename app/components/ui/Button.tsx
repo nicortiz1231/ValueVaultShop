@@ -6,10 +6,10 @@ type Size = 'md' | 'lg';
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-lime text-canvas shadow-glow hover:shadow-glow-soft hover:bg-lime-deep disabled:bg-dim disabled:shadow-none',
+    'bg-brand text-bg shadow-card hover:shadow-lift hover:bg-brand-deep disabled:bg-ink-soft disabled:shadow-none',
   secondary:
-    'glass text-chalk hover:border-line-strong hover:bg-white/[0.06]',
-  ghost: 'bg-transparent text-chalk hover:bg-white/[0.06]',
+    'bg-surface border border-line text-ink hover:border-line-strong hover:bg-white/[0.06]',
+  ghost: 'bg-transparent text-ink hover:bg-white/[0.06]',
 };
 
 const sizes: Record<Size, string> = {

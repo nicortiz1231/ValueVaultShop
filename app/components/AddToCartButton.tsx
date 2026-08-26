@@ -33,9 +33,9 @@ export function AddToCartButton({
               disabled={disabled ?? busy}
               className={[
                 'inline-flex h-13 w-full items-center justify-center gap-2 rounded-pill',
-                'bg-lime px-7 text-base font-semibold text-canvas shadow-glow transition-all',
-                'hover:bg-lime-deep hover:shadow-glow-soft active:scale-[0.98]',
-                'disabled:cursor-not-allowed disabled:bg-dim disabled:text-ash disabled:shadow-none',
+                'bg-brand px-7 text-base font-semibold text-bg shadow-card transition-all',
+                'hover:bg-brand-deep hover:shadow-lift active:scale-[0.98]',
+                'disabled:cursor-not-allowed disabled:bg-ink-soft disabled:text-ink-muted disabled:shadow-none',
                 className,
               ].join(' ')}
             >

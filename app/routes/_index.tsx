@@ -12,10 +12,11 @@ import {MockShopNotice} from '~/components/MockShopNotice';
 import {TrustPoints} from '~/components/TrustPoints';
 import {Faq} from '~/components/Faq';
 import {Reveal} from '~/components/Reveal';
+import {Watermark} from '~/components/Watermark';
 import {Container} from '~/components/ui/Container';
 import {Section} from '~/components/ui/Section';
 import {ButtonLink} from '~/components/ui/Button';
-import {ArrowIcon, CheckIcon, SparkleIcon} from '~/components/Icons';
+import {ArrowIcon, CheckIcon} from '~/components/Icons';
 import {categories, returns, shipping, store} from '~/lib/store-config';
 
 export const meta: Route.MetaFunction = () => {
@@ -65,9 +66,11 @@ export default function Homepage() {
         </Container>
       )}
 
-      <Hero collection={data.featuredCollection} />
+      <Hero collections={data.collections} />
+      <PromoBanner />
       <TrustPoints />
-      <CategoryGrid collections={data.collections} />
+      <Watermark />
+      <CategoryPromo collections={data.collections} />
       <TrendingProducts products={data.recommendedProducts} />
       <StorePromise />
       <FaqSection />
@@ -78,121 +81,98 @@ export default function Homepage() {
 /**
  * Above the fold.
  *
- * A visitor arriving cold from TikTok decides in seconds whether this is a
- * real, well-made shop -- so the hero has to do two jobs at once: look like a
- * 2026 product launch, and still say plainly what the store sells and why it
- * is safe to buy from. The bloom, the huge display type and the floating
- * product frame carry the "award site" feeling; the pill of trust facts right
- * under the CTA carries the substance.
+ * Structurally borrowed from kaleidojewellery.com: two full-bleed colour-block
+ * panels side by side, each carrying a product photo, with the store's own
+ * italic wordmark overlaid huge across the seam. Product photos are shot on
+ * plain white, so `mix-blend-multiply` tints the white background to the
+ * panel's own colour underneath -- the cheapest way to make a studio photo
+ * feel like it belongs in a coloured block rather than sitting pasted on top.
  */
-function Hero({collection}: {collection?: FeaturedCollectionFragment}) {
+function Hero({collections}: {collections: HomeCollectionFragment[]}) {
+  const [left, right] = collections;
+
+  return (
+    <section className="relative overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-2">
+        <HeroPanel collection={left} blockBg="bg-block-clay" />
+        <HeroPanel collection={right} blockBg="bg-block-sage" />
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center px-4 sm:bottom-10">
+        <Reveal>
+          <span className="display text-center text-[15vw] italic leading-[0.85] text-ink sm:text-[9vw]">
+            {store.name}
+          </span>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function HeroPanel({
+  collection,
+  blockBg,
+}: {
+  collection?: HomeCollectionFragment;
+  blockBg: string;
+}) {
   const image = collection?.image;
 
   return (
-    <section className="relative overflow-hidden border-b border-line">
-      <div
-        className="bloom left-1/2 top-[-10%] h-[36rem] w-[36rem] -translate-x-1/2"
-        aria-hidden="true"
-      />
-      <div
-        className="bloom right-[-10%] top-[20%] h-80 w-80 opacity-60"
-        aria-hidden="true"
-        style={{background: 'radial-gradient(circle, oklch(0.7 0.19 40 / 20%) 0%, transparent 70%)'}}
-      />
+    <Link
+      to={collection ? `/collections/${collection.handle}` : '/collections/all'}
+      prefetch="intent"
+      className={`group relative block aspect-[4/5] overflow-hidden sm:aspect-[3/4] ${blockBg}`}
+    >
+      {image ? (
+        <Image
+          data={image}
+          sizes="(min-width: 640px) 50vw, 100vw"
+          alt={image.altText || collection!.title}
+          loading="eager"
+          className="h-full w-full object-cover mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-105"
+        />
+      ) : null}
+      {collection && (
+        <span className="absolute bottom-6 left-6 rounded-pill bg-surface px-4 py-2 text-[12px] font-bold uppercase tracking-[0.1em] text-ink shadow-card">
+          {collection.title}
+        </span>
+      )}
+    </Link>
+  );
+}
 
-      <Container className="relative">
-        <div className="grid items-center gap-14 py-20 lg:grid-cols-[1.15fr_1fr] lg:gap-10 lg:py-28">
-          <div className="max-w-xl">
-            <Reveal>
-              <span className="inline-flex items-center gap-2 rounded-pill border border-line-strong bg-glass px-3.5 py-1.5 text-[13px] font-semibold text-ash">
-                <SparkleIcon className="h-3.5 w-3.5 text-lime" />
-                New drops every week
-              </span>
-            </Reveal>
+/**
+ * Bold colour-block claim strip -- the structural role Kaleido's "10% off /
+ * free earrings" banner plays, with real facts standing in for a promo code.
+ */
+function PromoBanner() {
+  const claims = [
+    {
+      big: returns.freeReturnShipping ? `${returns.windowDays}-DAY` : `${returns.windowDays}-DAY`,
+      small: returns.freeReturnShipping ? 'Free returns, we pay postage' : 'Returns window',
+    },
+    {big: 'Fast', small: `Dispatched in ${shipping.processingTime}`},
+    {big: 'Secure', small: 'Checkout handled by Shopify'},
+  ];
 
-            <Reveal delay={80}>
-              <h1 className="display mt-6 text-[3rem] text-chalk sm:text-[3.75rem] lg:text-[4.5rem]">
-                Stuff that
-                <br />
-                <span className="text-lime">actually</span> works.
-              </h1>
-            </Reveal>
-
-            <Reveal delay={160}>
-              <p className="mt-6 max-w-md text-lg leading-relaxed text-ash">
-                {store.tagline} Curated picks for your kitchen, home, pets and
-                kids — chosen because they earn their place, not because they
-                were cheap to stock.
-              </p>
-            </Reveal>
-
-            <Reveal delay={240} className="mt-9 flex flex-wrap gap-3">
-              <ButtonLink to="/collections/all" size="lg" magnetic>
-                Shop best sellers
-                <ArrowIcon className="h-[18px] w-[18px]" />
-              </ButtonLink>
-              <ButtonLink to="/pages/about-us" size="lg" variant="secondary">
-                Why shop with us
-              </ButtonLink>
-            </Reveal>
-
-            <Reveal
-              delay={320}
-              className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2.5 border-t border-line pt-6"
+  return (
+    <section className="bg-block-butter">
+      <Container>
+        <div className="grid grid-cols-1 divide-y divide-ink/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          {claims.map((claim) => (
+            <div
+              key={claim.small}
+              className="flex flex-col items-center justify-center gap-1.5 py-9 text-center sm:py-14"
             >
-              {[
-                returns.freeReturnShipping
-                  ? `${returns.windowDays}-day free returns`
-                  : `${returns.windowDays}-day returns`,
-                `Ships in ${shipping.processingTime}`,
-                'Secure Shopify checkout',
-              ].map((item) => (
-                <span
-                  key={item}
-                  className="flex items-center gap-1.5 text-[13px] font-medium text-dim"
-                >
-                  <CheckIcon className="h-3.5 w-3.5 text-lime" />
-                  {item}
-                </span>
-              ))}
-            </Reveal>
-          </div>
-
-          <Reveal delay={200} className="relative">
-            <div className="animate-float">
-              {image ? (
-                <Link
-                  to={`/collections/${collection!.handle}`}
-                  className="group glass relative block overflow-hidden rounded-[2rem] shadow-card transition-transform duration-500 ease-out hover:scale-[1.015]"
-                >
-                  <Image
-                    data={image}
-                    sizes="(min-width: 1024px) 560px, 100vw"
-                    alt={image.altText || collection!.title}
-                    aspectRatio="4/5"
-                    loading="eager"
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-canvas/70 via-transparent to-transparent" />
-                  <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.15em] text-lime">
-                        Featured
-                      </p>
-                      <p className="mt-1 text-xl font-bold text-chalk">
-                        {collection!.title}
-                      </p>
-                    </div>
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-lime text-canvas shadow-glow transition-transform duration-300 group-hover:rotate-45">
-                      <ArrowIcon className="h-5 w-5 -rotate-45" />
-                    </span>
-                  </div>
-                </Link>
-              ) : (
-                <div className="glass aspect-[4/5] rounded-[2rem] shadow-card" />
-              )}
+              <span className="display text-4xl italic text-ink sm:text-5xl">
+                {claim.big}
+              </span>
+              <span className="max-w-[16rem] text-[12px] font-bold uppercase tracking-[0.12em] text-ink-muted">
+                {claim.small}
+              </span>
             </div>
-          </Reveal>
+          ))}
         </div>
       </Container>
     </section>
@@ -200,60 +180,48 @@ function Hero({collection}: {collection?: FeaturedCollectionFragment}) {
 }
 
 /**
- * Category tiles, bento-style.
- *
- * Driven by whatever collections actually exist in Shopify, so a tile can
- * never point at an empty or deleted collection. The hover state -- image
- * zoom plus a rotating arrow badge -- is the single interaction most likely
- * to make the page feel "designed" rather than templated.
+ * Two large lifestyle-scale tiles in place of a dense category grid --
+ * Kaleido's "Made To Stack" / "Gym Ready Looks" pattern. Fewer, bigger
+ * choices reads as curated; a wall of small squares reads as inventory.
  */
-function CategoryGrid({collections}: {collections: HomeCollectionFragment[]}) {
-  const tiles = collections.slice(0, 4);
-  if (!tiles.length) return null;
+function CategoryPromo({collections}: {collections: HomeCollectionFragment[]}) {
+  const tiles = collections.slice(0, 2);
+  if (tiles.length < 2) return null;
 
+  const blocks = ['bg-block-sky', 'bg-block-clay'];
   const blurbFor = (handle: string) =>
     categories.find((category) => category.handle === handle)?.blurb;
 
   return (
-    <Section
-      eyebrow="Browse"
-      title="Shop by room"
-      intro="Four small collections rather than an endless catalogue — everything here has been picked by hand."
-    >
-      <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+    <Section eyebrow="Shop by room" title="Pick a starting point">
+      <div className="grid gap-5 sm:grid-cols-2">
         {tiles.map((collection, i) => (
-          <Reveal key={collection.id} delay={i * 90} as="div">
+          <Reveal key={collection.id} delay={i * 100} as="div">
             <Link
               to={`/collections/${collection.handle}`}
               prefetch="intent"
-              className="group glass relative block overflow-hidden rounded-card transition-all duration-300 hover:border-line-strong hover:shadow-card"
+              className={`group relative block aspect-[4/5] overflow-hidden rounded-card sm:aspect-[3/4] ${blocks[i]}`}
             >
-              <div className="relative overflow-hidden bg-surface-2">
-                {collection.image ? (
-                  <Image
-                    data={collection.image}
-                    sizes="(min-width: 1024px) 290px, 45vw"
-                    alt={collection.image.altText || collection.title}
-                    aspectRatio="4/3"
-                    className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                  />
-                ) : (
-                  <div className="aspect-[4/3] w-full" />
-                )}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-canvas/80 via-canvas/0 to-transparent" />
-                <span className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-lime text-canvas opacity-0 shadow-glow transition-all duration-300 group-hover:opacity-100 group-hover:rotate-45">
-                  <ArrowIcon className="h-4 w-4 -rotate-45" />
+              {collection.image && (
+                <Image
+                  data={collection.image}
+                  sizes="(min-width: 1024px) 600px, 90vw"
+                  alt={collection.image.altText || collection.title}
+                  className="h-full w-full object-cover mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+              )}
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-6">
+                <div>
+                  <p className="display text-2xl italic text-ink sm:text-3xl">
+                    {collection.title}
+                  </p>
+                  <p className="mt-1 max-w-[16rem] text-[13px] font-medium text-ink-muted">
+                    {blurbFor(collection.handle) ?? 'Shop the collection'}
+                  </p>
+                </div>
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink text-bg shadow-lift transition-transform duration-300 group-hover:rotate-45">
+                  <ArrowIcon className="h-5 w-5 -rotate-45" />
                 </span>
-              </div>
-              <div className="p-4">
-                <h3 className="text-[15px] font-bold text-chalk">
-                  {collection.title}
-                </h3>
-                <p className="mt-1 line-clamp-2-fixed text-[13px] leading-relaxed text-dim">
-                  {blurbFor(collection.handle) ??
-                    collection.description ??
-                    'Shop the collection'}
-                </p>
               </div>
             </Link>
           </Reveal>
@@ -270,7 +238,7 @@ function TrendingProducts({
 }) {
   return (
     <Section
-      className="border-y border-line bg-surface/40"
+      className="border-y border-line bg-surface"
       eyebrow="Popular"
       title="Trending now"
       intro="What people are actually buying this week."
@@ -278,7 +246,7 @@ function TrendingProducts({
         <Link
           to="/collections/all"
           prefetch="intent"
-          className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-lime transition-opacity hover:opacity-80"
+          className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-brand hover:text-brand-deep"
         >
           Shop all
           <ArrowIcon className="h-[18px] w-[18px]" />
@@ -312,9 +280,9 @@ function ProductGridSkeleton() {
     <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-5 lg:grid-cols-4">
       {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((key) => (
         <div key={key} className="animate-pulse">
-          <div className="aspect-square rounded-card bg-surface-2" />
-          <div className="mt-3.5 h-4 w-4/5 rounded bg-surface-2" />
-          <div className="mt-2 h-4 w-1/3 rounded bg-surface-2" />
+          <div className="aspect-square rounded-card bg-bg-deep" />
+          <div className="mt-3.5 h-4 w-4/5 rounded bg-bg-deep" />
+          <div className="mt-2 h-4 w-1/3 rounded bg-bg-deep" />
         </div>
       ))}
     </div>
@@ -350,14 +318,14 @@ function StorePromise() {
       <div className="grid gap-4 sm:gap-5 lg:grid-cols-3">
         {promises.map((promise, i) => (
           <Reveal key={promise.title} delay={i * 90} as="div">
-            <div className="glass group h-full rounded-card p-7 transition-colors duration-300 hover:border-line-strong">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-lime/15 text-lime transition-colors duration-300 group-hover:bg-lime group-hover:text-canvas">
+            <div className="group h-full rounded-card border border-line bg-surface p-7 transition-colors duration-300 hover:border-line-strong">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-tint text-brand transition-colors duration-300 group-hover:bg-brand group-hover:text-bg">
                 <CheckIcon className="h-5 w-5" />
               </span>
-              <h3 className="mt-5 text-[17px] font-bold text-chalk">
+              <h3 className="mt-5 text-[17px] font-bold text-ink">
                 {promise.title}
               </h3>
-              <p className="mt-2.5 text-[15px] leading-relaxed text-ash">
+              <p className="mt-2.5 text-[15px] leading-relaxed text-ink-muted">
                 {promise.body}
               </p>
             </div>
@@ -372,7 +340,7 @@ function FaqSection() {
   return (
     <Section
       id="faq"
-      className="border-t border-line"
+      className="border-t border-line bg-block-sky/40"
       eyebrow="Questions"
       title="Before you buy"
       intro="If yours is not here, email us — a person will answer."

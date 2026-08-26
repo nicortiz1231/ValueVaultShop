@@ -39,9 +39,9 @@ export function ProductTrustPanel() {
       {rows.map(({icon: Icon, text}) => (
         <li
           key={text}
-          className="flex items-center gap-3 px-4 py-3 text-sm text-ash"
+          className="flex items-center gap-3 px-4 py-3 text-sm text-ink-muted"
         >
-          <Icon className="h-[18px] w-[18px] shrink-0 text-lime" />
+          <Icon className="h-[18px] w-[18px] shrink-0 text-brand" />
           <span>{text}</span>
         </li>
       ))}

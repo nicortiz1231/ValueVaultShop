@@ -43,7 +43,7 @@ export function ProductGallery({
 
   if (!active) {
     return (
-      <div className="aspect-square w-full rounded-card border border-line bg-surface-2" />
+      <div className="aspect-square w-full rounded-card border border-line bg-bg-deep" />
     );
   }
 
@@ -75,7 +75,7 @@ export function ProductGallery({
                   className={[
                     'h-18 w-18 overflow-hidden rounded-lg border-2 transition-colors',
                     isActive
-                      ? 'border-lime'
+                      ? 'border-brand'
                       : 'border-line hover:border-line-strong',
                   ].join(' ')}
                 >

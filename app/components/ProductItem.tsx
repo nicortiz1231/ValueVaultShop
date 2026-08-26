@@ -58,7 +58,7 @@ export function ProductItem({
       to={variantUrl}
       className={`group flex flex-col ${className}`}
     >
-      <div className="glass relative overflow-hidden rounded-card transition-all duration-300 group-hover:border-line-strong group-hover:shadow-card">
+      <div className="bg-surface border border-line relative overflow-hidden rounded-card transition-all duration-300 group-hover:border-line-strong group-hover:shadow-card">
         {image ? (
           <Image
             alt={image.altText || product.title}
@@ -69,31 +69,31 @@ export function ProductItem({
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
           />
         ) : (
-          <div className="aspect-square w-full bg-surface-2" />
+          <div className="aspect-square w-full bg-bg-deep" />
         )}
 
         {percentOff > 0 && (
-          <span className="absolute left-3 top-3 rounded-pill bg-flare px-2.5 py-1 text-[11px] font-bold tracking-tight text-chalk">
+          <span className="absolute left-3 top-3 rounded-pill bg-sale px-2.5 py-1 text-[11px] font-bold tracking-tight text-bg">
             −{percentOff}%
           </span>
         )}
 
-        <span className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-lime text-canvas opacity-0 shadow-glow transition-all duration-300 group-hover:opacity-100 group-hover:rotate-45">
+        <span className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-brand text-bg opacity-0 shadow-card transition-all duration-300 group-hover:opacity-100 group-hover:rotate-45">
           <ArrowIcon className="h-4 w-4 -rotate-45" />
         </span>
       </div>
 
       <div className="flex flex-1 flex-col px-0.5 pt-3.5">
-        <h3 className="line-clamp-2-fixed text-[15px] font-medium leading-snug text-chalk transition-colors group-hover:text-lime">
+        <h3 className="line-clamp-2-fixed text-[15px] font-medium leading-snug text-ink transition-colors group-hover:text-brand">
           {product.title}
         </h3>
 
         <div className="mt-auto flex items-baseline gap-2 pt-2">
-          <span className="text-[15px] font-bold text-chalk">
+          <span className="text-[15px] font-bold text-ink">
             <Money data={price} />
           </span>
           {compareAt && (
-            <span className="text-[13px] text-dim line-through">
+            <span className="text-[13px] text-ink-soft line-through">
               <Money data={compareAt} />
             </span>
           )}

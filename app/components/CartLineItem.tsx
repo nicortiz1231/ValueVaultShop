@@ -67,13 +67,13 @@ export function CartLineItem({
             prefetch="intent"
             to={lineItemUrl}
             onClick={() => layout === 'aside' && close()}
-            className="text-[15px] font-medium leading-snug text-chalk hover:text-lime"
+            className="text-[15px] font-medium leading-snug text-ink hover:text-brand"
           >
             {product.title}
           </Link>
 
           {options.length > 0 && (
-            <ul className="mt-1 flex flex-wrap gap-x-3 text-[13px] text-ash">
+            <ul className="mt-1 flex flex-wrap gap-x-3 text-[13px] text-ink-muted">
               {options.map((option) => (
                 <li key={option.name}>
                   {option.name}: {option.value}
@@ -84,7 +84,7 @@ export function CartLineItem({
 
           <div className="mt-auto flex items-end justify-between gap-3 pt-3">
             <CartLineQuantity line={line} />
-            <span className="text-[15px] font-semibold text-chalk">
+            <span className="text-[15px] font-semibold text-ink">
               <ProductPrice price={line?.cost?.totalAmount} />
             </span>
           </div>
@@ -127,7 +127,7 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   const stepper =
-    'flex h-8 w-8 items-center justify-center text-ash transition-colors hover:text-chalk disabled:cursor-not-allowed disabled:opacity-35';
+    'flex h-8 w-8 items-center justify-center text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-35';
 
   return (
     <div className="flex items-center gap-3">
@@ -144,7 +144,7 @@ function CartLineQuantity({line}: {line: CartLine}) {
           </button>
         </CartLineUpdateButton>
 
-        <span className="min-w-6 text-center text-sm font-semibold tabular-nums text-chalk">
+        <span className="min-w-6 text-center text-sm font-semibold tabular-nums text-ink">
           {quantity}
         </span>
 
@@ -188,7 +188,7 @@ function CartLineRemoveButton({
       <button
         disabled={disabled}
         type="submit"
-        className="text-[13px] text-dim underline underline-offset-4 transition-colors hover:text-flare disabled:opacity-40"
+        className="text-[13px] text-ink-soft underline underline-offset-4 transition-colors hover:text-sale disabled:opacity-40"
       >
         Remove
       </button>

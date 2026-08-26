@@ -1,10 +1,12 @@
 /**
- * Value Vault design system — "Midnight & Citrus".
+ * Value Vault design system -- "Kaleidoscope" direction.
  *
- * Near-black canvas, electric lime accent, glass surfaces. Dark UI is doing
- * real work here beyond looking good: supplier product photography reads far
- * more expensive floated on black than it does on white, and the lime gives
- * the store one loud, consistent signature colour that people remember.
+ * Light, warm, editorial: an ivory base, color-blocked full-bleed sections
+ * that rotate per category, and an oversized serif wordmark reused as a
+ * recurring graphic motif. Structurally modelled on kaleidojewellery.com --
+ * photography-led hero, big lifestyle tiles instead of a dense product grid,
+ * bold promo banding -- with a palette built for home/kitchen/pet goods
+ * rather than jewellery.
  *
  * Tailwind v4, configured CSS-first: https://tailwindcss.com/docs/theme
  */
@@ -12,52 +14,56 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Canvas — layered near-blacks rather than one flat colour, so sections
-     can separate from each other without needing borders everywhere. */
-  --color-void: #08080a;
-  --color-canvas: #0a0a0c;
-  --color-surface: #121216;
-  --color-surface-2: #17171d;
-  --color-surface-3: #1f1f27;
+  /* Base surfaces -- warm ivory, never stark white */
+  --color-bg: #fbf6ee;
+  --color-bg-deep: #f1e6d3;
+  --color-surface: #ffffff;
 
-  /* Text */
-  --color-chalk: #f7f7f8;
-  --color-ash: #a3a3ae;
-  --color-dim: #6c6c7a;
+  /* Ink -- warm near-black, never pure black */
+  --color-ink: #241c15;
+  --color-ink-muted: #6b5d4f;
+  --color-ink-soft: #a3937f;
 
-  /* Accent — electric lime. Used for exactly one thing per screen: the
-     action we want taken. Its power comes entirely from scarcity. */
-  --color-lime: #ccff00;
-  --color-lime-deep: #a9d600;
-  --color-lime-dim: #7e9e12;
+  /* Brand -- terracotta. The one consistent colour across every section,
+     no matter which block colour that section carries. */
+  --color-brand: #c1502e;
+  --color-brand-deep: #9e3f23;
+  --color-brand-tint: #f7e4db;
 
-  /* Secondary — warm coral, reserved for sale pricing and savings so a
-     discount never competes with the primary action. */
-  --color-flare: #ff6b4a;
-  --color-flare-dim: #b8442a;
+  /* Sale -- a distinct coral so a discount never reads as the primary CTA */
+  --color-sale: #e85d3d;
+  --color-sale-tint: #fceae3;
 
-  /* Hairlines — alpha, so they sit correctly on any surface layer */
-  --color-line: oklch(1 0 0 / 8%);
-  --color-line-strong: oklch(1 0 0 / 15%);
-  --color-glass: oklch(1 0 0 / 4%);
+  /* Section block colours -- each product category gets its own, rotating
+     through the page the way Kaleido rotates pink/purple/blue/mint. */
+  --color-block-clay: #f3d9c7;
+  --color-block-clay-deep: #e8bfa2;
+  --color-block-sage: #dbe5cf;
+  --color-block-sage-deep: #c3d3b2;
+  --color-block-butter: #f6e6b0;
+  --color-block-butter-deep: #ecd583;
+  --color-block-sky: #d8e3ec;
+  --color-block-sky-deep: #b9cedd;
 
-  /* Type — Bricolage Grotesque for display (variable, characterful, current),
-     Inter Tight for everything a shopper actually has to read. */
-  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  /* Hairlines */
+  --color-line: oklch(0.2 0.03 60 / 10%);
+  --color-line-strong: oklch(0.2 0.03 60 / 20%);
+
+  /* Type -- Fraunces for the oversized editorial wordmark and headlines,
+     Inter Tight for everything a shopper has to actually read. */
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
   --font-sans: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
-  --radius-card: 1.25rem;
-  --radius-xl2: 1.75rem;
+  --radius-card: 1.5rem;
+  --radius-xl2: 2rem;
   --radius-pill: 999px;
 
-  /* Depth. On dark, glow reads as elevation the way shadow does on light. */
-  --shadow-card: 0 24px 60px -24px oklch(0 0 0 / 90%);
-  --shadow-glow: 0 0 48px -8px oklch(0.93 0.24 118 / 35%);
-  --shadow-glow-soft: 0 0 80px -20px oklch(0.93 0.24 118 / 25%);
+  --shadow-card: 0 2px 4px oklch(0.2 0.05 40 / 4%), 0 20px 40px -20px oklch(0.2 0.05 40 / 16%);
+  --shadow-lift: 0 8px 16px -8px oklch(0.2 0.05 40 / 20%), 0 24px 48px -20px oklch(0.2 0.05 40 / 20%);
 
-  --spacing-header: 4.5rem;
+  --spacing-header: 4.25rem;
+  --spacing-announce: 2.25rem;
 
-  /* Springy easing — the difference between "animated" and "alive" */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
@@ -66,79 +72,83 @@
   html {
     -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;
-    background-color: var(--color-canvas);
+    background-color: var(--color-bg);
   }
 
   body {
-    background-color: var(--color-canvas);
-    color: var(--color-chalk);
+    background-color: var(--color-bg);
+    color: var(--color-ink);
     font-family: var(--font-sans);
     overflow-x: hidden;
   }
 
-  /* The scaffold's reset rounds every image; components own their own corners. */
   img {
     border-radius: 0;
   }
 
   ::selection {
-    background: var(--color-lime);
-    color: var(--color-canvas);
+    background: var(--color-brand);
+    color: var(--color-bg);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-lime);
+    outline: 2px solid var(--color-brand);
     outline-offset: 3px;
     border-radius: 6px;
   }
 
-  /* Dark, unobtrusive scrollbar — a white default scrollbar on a black page
-     is one of the loudest "unfinished" tells there is. */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--color-canvas);
+    background: var(--color-bg);
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--color-surface-3);
+    background: var(--color-line-strong);
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-dim);
+    background: var(--color-ink-soft);
   }
 }
 
 @layer components {
-  /* Frosted panel used for cards, the header and the drawer. */
-  .glass {
-    background: var(--color-glass);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border: 1px solid var(--color-line);
-  }
-
-  /* Display type: tight, confident, optically corrected at large sizes. */
+  /* Editorial display type -- large, warm serif, optically sized by Fraunces'
+     own variable axis rather than faked with letter-spacing tricks. */
   .display {
     font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.035em;
-    line-height: 0.94;
+    font-weight: 500;
+    font-optical-sizing: auto;
+    letter-spacing: -0.01em;
+    line-height: 0.98;
     text-wrap: balance;
   }
 
-  /* Shopify-authored HTML (page bodies, policy text) arrives as bare tags. */
+  /* The oversized pale wordmark used as a recurring section-break motif,
+     the way Kaleido repeats its own logotype as background typography. */
+  .wordmark-bg {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-style: italic;
+    color: var(--color-ink);
+    opacity: 0.05;
+    letter-spacing: -0.02em;
+    line-height: 0.85;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+  }
+
   .rich-text {
-    color: var(--color-ash);
+    color: var(--color-ink-muted);
     font-size: 1rem;
     line-height: 1.75;
 
     h2, h3, h4 {
-      color: var(--color-chalk);
+      color: var(--color-ink);
       font-family: var(--font-display);
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-weight: 600;
       margin-top: 2.25rem;
       margin-bottom: 0.75rem;
     }
@@ -150,11 +160,11 @@
     ol { list-style: decimal; }
     li { margin-bottom: 0.4rem; }
     a {
-      color: var(--color-lime);
+      color: var(--color-brand);
       text-decoration: underline;
       text-underline-offset: 3px;
     }
-    strong { color: var(--color-chalk); font-weight: 600; }
+    strong { color: var(--color-ink); font-weight: 600; }
     img { border-radius: var(--radius-card); max-width: 100%; }
     hr { border: 0; border-top: 1px solid var(--color-line); margin: 2rem 0; }
   }
@@ -168,8 +178,6 @@
     overflow: hidden;
   }
 
-  /* Scroll-reveal. Elements start displaced and settle when they enter the
-     viewport — see components/Reveal.tsx, which toggles [data-revealed]. */
   .reveal {
     opacity: 0;
     transform: translateY(24px);
@@ -184,7 +192,6 @@
     transform: none;
   }
 
-  /* Continuous horizontal ticker, used by the marquee bar. */
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
@@ -195,34 +202,10 @@
 
   @keyframes float-slow {
     0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-14px) rotate(1.5deg); }
+    50% { transform: translateY(-14px) rotate(1deg); }
   }
   .animate-float {
     animation: float-slow 7s ease-in-out infinite;
-  }
-
-  /* Subtle film grain. Kills the plasticky flatness of large dark areas. */
-  .grain::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.4;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-  }
-
-  /* Radial lime bloom used behind hero and section headings. */
-  .bloom {
-    position: absolute;
-    border-radius: 999px;
-    filter: blur(90px);
-    pointer-events: none;
-    background: radial-gradient(
-      circle,
-      oklch(0.93 0.24 118 / 22%) 0%,
-      transparent 70%
-    );
   }
 }
 

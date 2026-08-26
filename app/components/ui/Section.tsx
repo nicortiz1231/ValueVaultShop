@@ -33,17 +33,17 @@ export function Section({
           >
             <div className="max-w-xl">
               {eyebrow && (
-                <span className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-lime">
+                <span className="mb-3 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-brand">
                   {eyebrow}
                 </span>
               )}
               {title && (
-                <h2 className="display text-3xl text-chalk sm:text-4xl lg:text-[2.75rem]">
+                <h2 className="display text-3xl text-ink sm:text-4xl lg:text-[2.75rem]">
                   {title}
                 </h2>
               )}
               {intro && (
-                <p className="mt-3.5 text-base leading-relaxed text-ash">
+                <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
                   {intro}
                 </p>
               )}

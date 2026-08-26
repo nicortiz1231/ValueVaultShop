@@ -27,8 +27,12 @@
 
   /* Retargeted at Midnight & Citrus so the remaining legacy rules stay dark
      rather than the scaffold's original black-on-white. */
-  --color-dark: #f7f7f8;
-  --color-light: #121216;
+  /* Retargeted at the light "Kaleidoscope" palette -- these two names are
+     inherited from the original scaffold and used by legacy rules below
+     (MockShopNotice, order-search-input) that predate the design system's
+     own tokens. */
+  --color-dark: #241c15;
+  --color-light: #ffffff;
 }
 
 /*
@@ -197,23 +201,23 @@
 }
 
 .order-search-fieldset {
-  border: 1px solid var(--color-line, oklch(1 0 0 / 8%));
+  border: 1px solid var(--color-line, oklch(0.2 0.03 60 / 10%));
   border-radius: 12px;
   padding: 1.25rem;
-  color: var(--color-chalk, #f7f7f8);
+  color: var(--color-ink, #241c15);
 }
 
 .order-search-legend {
   font-weight: 700;
   padding: 0 0.5rem;
-  color: var(--color-chalk, #f7f7f8);
+  color: var(--color-ink, #241c15);
 }
 
 .order-search-active {
   font-weight: normal;
   opacity: 0.6;
   margin-left: 0.5rem;
-  color: var(--color-ash, #a3a3ae);
+  color: var(--color-ink-muted, #6b5d4f);
 }
 
 .order-search-inputs {
@@ -232,15 +236,15 @@
 .order-search-input {
   width: 100%;
   padding: 0.65rem 0.85rem;
-  border: 1px solid var(--color-line-strong, oklch(1 0 0 / 15%));
+  border: 1px solid var(--color-line-strong, oklch(0.2 0.03 60 / 20%));
   border-radius: 999px;
   font-size: 1rem;
-  background: var(--color-surface, #121216);
-  color: var(--color-chalk, #f7f7f8);
+  background: var(--color-surface, #ffffff);
+  color: var(--color-ink, #241c15);
 }
 
 .order-search-input::placeholder {
-  color: var(--color-dim, #6c6c7a);
+  color: var(--color-ink-soft, #a3937f);
 }
 
 .order-search-buttons {
@@ -254,13 +258,13 @@
   padding: 0.6rem 1.25rem;
   font-weight: 600;
   font-size: 0.875rem;
-  background: var(--color-lime, #ccff00);
-  color: var(--color-canvas, #0a0a0c);
+  background: var(--color-brand, #c1502e);
+  color: var(--color-bg, #fbf6ee);
   border: none;
   cursor: pointer;
 }
 
 .order-search-buttons button:hover {
-  background: var(--color-lime-deep, #a9d600);
+  background: var(--color-brand-deep, #9e3f23);
 }
 }
