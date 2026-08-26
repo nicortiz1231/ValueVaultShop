@@ -150,14 +150,14 @@ function CategoryStrip({collections}: {collections: HomeCollectionFragment[]}) {
     <section className="bg-bg pt-1">
       {/* Thin gap between tiles (not flush, not a wide gutter) -- the gap
           colour is just the section's own background showing through. */}
-      <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-2 px-2 sm:grid-cols-3 lg:grid-cols-5">
         {tiles.map((collection, i) => (
           <Reveal key={collection.id} delay={i * 60} as="div">
             <Link
               to={`/collections/${collection.handle}`}
               prefetch="intent"
               data-cursor="Shop"
-              className="group relative block aspect-[4/5] overflow-hidden"
+              className="group relative block aspect-[4/5] overflow-hidden rounded-xl"
             >
               {collection.image ? (
                 <Image
@@ -232,12 +232,12 @@ function NewArrivals({products}: {products: Promise<NewArrivalsQuery | null>}) {
                 <Container>
                   <ul
                     ref={trackRef}
-                    className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                   >
                     {nodes.map((product) => (
                       <li
                         key={product.id}
-                        className="w-[70%] shrink-0 snap-start sm:w-[44%] lg:w-[calc(25%-0.75rem)]"
+                        className="w-[72%] shrink-0 snap-start sm:w-[45%] lg:w-[23.5%]"
                       >
                         <NewArrivalCard product={product} />
                       </li>
@@ -303,35 +303,41 @@ function NewArrivalCard({
       to={`/products/${product.handle}`}
       prefetch="intent"
       data-cursor="View"
-      className="group flex h-full flex-col overflow-hidden rounded-xl bg-bg"
+      className="group flex h-full flex-col rounded-xl bg-bg p-4 transition-shadow duration-300 hover:shadow-card sm:p-5"
     >
-      <div className="relative aspect-[4/5] overflow-hidden">
+      {badges.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {badges.map((badge) => (
+            <span
+              key={badge}
+              className="rounded-md bg-surface px-2.5 py-1 text-[12px] font-medium text-ink"
+            >
+              {badge}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* The product sits in a near-white panel rather than directly on the
+          cream. The reference gets a seamless single-surface card because its
+          photography is exported on exactly its own card colour; ours arrives
+          on #f3f3f3 studio grey, so blending it into cream (multiply) turns
+          the backdrop tan. A white panel is within ~5% of that grey, which
+          reads as seamless, and stays clean for any future photo background. */}
+      <div className="relative my-5 aspect-square w-full overflow-hidden rounded-lg bg-surface sm:my-6">
         {image ? (
           <Image
             data={image}
             sizes="(min-width: 1024px) 25vw, 70vw"
             alt={image.altText || product.title}
-            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+            className="h-full w-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
           <div className="h-full w-full bg-bg-deep" />
         )}
-
-        {badges.length > 0 && (
-          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-            {badges.map((badge) => (
-              <span
-                key={badge}
-                className="rounded-md bg-surface px-2 py-1 text-[11px] font-medium text-ink shadow-sm"
-              >
-                {badge}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
 
-      <div className="flex flex-col gap-2 p-4">
+      <div className="mt-auto flex flex-col gap-2">
         {swatches.length > 0 && (
           <div className="flex items-center gap-1.5">
             {swatches.map((value) => (
@@ -349,11 +355,9 @@ function NewArrivalCard({
           {product.title}
         </h3>
 
-        <div className="flex items-baseline gap-2">
-          <span className="text-[15px] font-semibold text-ink">
-            <Money data={product.priceRange.minVariantPrice} />
-          </span>
-        </div>
+        <span className="text-[15px] font-semibold text-ink">
+          <Money data={product.priceRange.minVariantPrice} />
+        </span>
       </div>
     </Link>
   );
@@ -362,13 +366,13 @@ function NewArrivalCard({
 function NewArrivalsSkeleton() {
   return (
     <Container>
-      <ul className="flex gap-4 overflow-hidden">
+      <ul className="flex gap-5 overflow-hidden">
         {['a', 'b', 'c', 'd'].map((key) => (
           <li
             key={key}
-            className="w-[70%] shrink-0 animate-pulse sm:w-[44%] lg:w-[calc(25%-0.75rem)]"
+            className="w-[72%] shrink-0 animate-pulse sm:w-[45%] lg:w-[23.5%]"
           >
-            <div className="aspect-[4/5] rounded-xl bg-bg-deep" />
+            <div className="aspect-[3/4] rounded-xl bg-bg-deep" />
             <div className="mt-3 h-4 w-4/5 rounded bg-bg-deep" />
             <div className="mt-2 h-4 w-1/3 rounded bg-bg-deep" />
           </li>
