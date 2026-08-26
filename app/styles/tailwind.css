@@ -49,10 +49,11 @@
   --color-line: oklch(0.2 0.03 60 / 10%);
   --color-line-strong: oklch(0.2 0.03 60 / 20%);
 
-  /* Type -- Fraunces for the oversized editorial wordmark and headlines,
-     Inter Tight for everything a shopper has to actually read. */
-  --font-display: 'Fraunces', ui-serif, Georgia, serif;
-  --font-sans: 'Inter Tight', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  /* Type -- Outfit (bold, rounded, geometric) for headlines and the wordmark
+     motif, Geist for everything a shopper has to actually read. Both are the
+     same open-source Google Fonts families the reference site itself uses. */
+  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
   --radius-card: 1.5rem;
   --radius-xl2: 2rem;
@@ -111,29 +112,41 @@
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-ink-soft);
   }
+
+  /* Hides the native cursor in favour of components/CustomCursor.tsx. Gated
+     on a class CustomCursor adds to <html> only after its own effect has
+     confirmed a fine pointer and no reduced-motion preference -- never a
+     bare media query. If JS fails to load or hydrate, the class never
+     appears and the native cursor is simply never hidden, rather than
+     leaving the page cursorless with no replacement. */
+  html.has-custom-cursor,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button {
+    cursor: none;
+  }
 }
 
 @layer components {
-  /* Editorial display type -- large, warm serif, optically sized by Fraunces'
-     own variable axis rather than faked with letter-spacing tricks. */
+  /* Display type -- bold, rounded, geometric. Matches the reference site's
+     own headline treatment (Outfit at 600-900) rather than an invented
+     serif/script guess. */
   .display {
     font-family: var(--font-display);
-    font-weight: 500;
-    font-optical-sizing: auto;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     line-height: 0.98;
     text-wrap: balance;
   }
 
   /* The oversized pale wordmark used as a recurring section-break motif,
-     the way Kaleido repeats its own logotype as background typography. */
+     the way the reference site repeats its own logotype as background
+     typography between sections and again in the footer. */
   .wordmark-bg {
     font-family: var(--font-display);
-    font-weight: 500;
-    font-style: italic;
+    font-weight: 800;
     color: var(--color-ink);
     opacity: 0.05;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     line-height: 0.85;
     white-space: nowrap;
     user-select: none;
@@ -180,16 +193,19 @@
 
   .reveal {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(28px) scale(0.98);
+    filter: blur(6px);
     transition:
-      opacity 0.7s var(--ease-out-quart),
-      transform 0.7s var(--ease-out-quart);
+      opacity 0.8s var(--ease-out-quart),
+      transform 0.8s var(--ease-out-quart),
+      filter 0.8s var(--ease-out-quart);
     transition-delay: var(--reveal-delay, 0ms);
-    will-change: opacity, transform;
+    will-change: opacity, transform, filter;
   }
   .reveal[data-revealed='true'] {
     opacity: 1;
     transform: none;
+    filter: blur(0);
   }
 
   @keyframes marquee {

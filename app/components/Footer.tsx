@@ -11,6 +11,7 @@ import {
 } from '~/lib/store-config';
 import {ShieldIcon} from './Icons';
 import {Watermark} from './Watermark';
+import {Arch} from './Arch';
 import {Container} from './ui/Container';
 
 interface FooterProps {
@@ -36,10 +37,11 @@ export function Footer({
     <footer className="mt-auto border-t border-line bg-bg-deep">
       {/* Newsletter band -- the same "unlock perks, get styling tips" beat
           Kaleido leads its footer with, worded honestly for a general store. */}
-      <div className="border-b border-line bg-block-sage">
-        <Container>
+      <div className="relative overflow-hidden border-b border-line bg-block-sage">
+        <Arch className="pointer-events-none absolute -right-10 -top-16 h-48 w-64 opacity-20" />
+        <Container className="relative">
           <div className="flex flex-col items-start justify-between gap-5 py-9 sm:flex-row sm:items-center">
-            <p className="display max-w-sm text-2xl italic text-ink">
+            <p className="display max-w-sm text-2xl text-ink">
               Get first look at new arrivals and real discounts.
             </p>
             {/* TODO(steven): wire this to a real subscriber list (Shopify's
@@ -75,7 +77,7 @@ export function Footer({
       <Container>
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 py-14 sm:grid-cols-3 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:py-16">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
-            <span className="display text-2xl italic text-ink">{store.name}</span>
+            <span className="display text-2xl text-ink">{store.name}</span>
             <p className="mt-3.5 max-w-xs text-sm leading-relaxed text-ink-muted">
               {store.description}
             </p>

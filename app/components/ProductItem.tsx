@@ -56,6 +56,7 @@ export function ProductItem({
       key={product.id}
       prefetch="intent"
       to={variantUrl}
+      data-cursor="View"
       className={`group flex flex-col ${className}`}
     >
       <div className="bg-surface border border-line relative overflow-hidden rounded-card transition-all duration-300 group-hover:border-line-strong group-hover:shadow-card">

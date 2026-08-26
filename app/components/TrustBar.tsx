@@ -1,53 +1,49 @@
+import {useEffect, useState} from 'react';
 import {returns, shipping} from '~/lib/store-config';
-import {LightningIcon, ReturnIcon, TruckIcon} from './Icons';
 
 /**
- * The colour-block announcement strip above the header -- the terracotta
- * band doing the same job Kaleido's yellow bar does: one confident claim,
- * always visible, set apart from the rest of the page by its own solid
- * colour rather than blending into a neutral nav.
+ * The rotating announcement strip above the header.
  *
- * Runs as a slow marquee so the strip reads as a live signal rather than a
- * banner people learn to ignore. Duplicated once in the DOM so the loop is
- * seamless.
+ * The reference site runs a single centred message that swaps every few
+ * seconds rather than a continuous marquee -- this matches that pattern
+ * exactly, crossfading between real claims instead of scrolling them.
  */
 export function TrustBar() {
-  const points = [
-    {
-      icon: ReturnIcon,
-      text: returns.freeReturnShipping
-        ? `Free ${returns.windowDays}-day returns`
-        : `${returns.windowDays}-day returns`,
-    },
-    {
-      icon: TruckIcon,
-      text: shipping.deliveryEstimate
-        ? `Delivered in ${shipping.deliveryEstimate}`
-        : `Ships in ${shipping.processingTime}`,
-    },
-    {icon: LightningIcon, text: 'Secure checkout via Shopify'},
-    shipping.tracking ? {icon: TruckIcon, text: 'Tracked on every order'} : null,
-  ].filter(Boolean) as {icon: React.ComponentType<{className?: string}>; text: string}[];
+  const messages = [
+    returns.freeReturnShipping
+      ? `Free ${returns.windowDays}-day returns — we pay the postage`
+      : `${returns.windowDays}-day returns`,
+    shipping.deliveryEstimate
+      ? `Delivered in ${shipping.deliveryEstimate}`
+      : `Ships in ${shipping.processingTime}`,
+    'Secure checkout, handled entirely by Shopify',
+  ];
 
-  const loop = [...points, ...points];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % messages.length);
+    }, 4200);
+    return () => clearInterval(id);
+    // messages is a fresh array each render; length is stable, so this is safe.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <div className="relative h-announce overflow-hidden bg-brand text-bg">
-      <div
-        className="flex h-full w-max animate-marquee items-center gap-10"
-        style={{'--marquee-duration': '28s'} as React.CSSProperties}
-      >
-        {loop.map(({icon: Icon, text}, i) => (
-          <span
-            // eslint-disable-next-line react/no-array-index-key -- duplicated loop, text alone can repeat
-            key={`${text}-${i}`}
-            className="flex shrink-0 items-center gap-2 text-[12px] font-bold uppercase tracking-[0.08em]"
-          >
-            <Icon className="h-3.5 w-3.5" />
-            {text}
-          </span>
-        ))}
-      </div>
+    <div className="relative flex h-announce items-center justify-center overflow-hidden bg-block-clay px-4 text-center">
+      {messages.map((message, i) => (
+        <span
+          key={message}
+          aria-hidden={i !== index}
+          className={`absolute text-[12px] font-medium tracking-tight text-ink transition-opacity duration-500 ${
+            i === index ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          {message}
+        </span>
+      ))}
     </div>
   );
 }

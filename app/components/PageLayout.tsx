@@ -15,6 +15,7 @@ import {
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
 import {TrustBar} from '~/components/TrustBar';
+import {SecondaryBar} from '~/components/SecondaryBar';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -47,6 +48,7 @@ export function PageLayout({
           publicStoreDomain={publicStoreDomain}
         />
       )}
+      <SecondaryBar />
       <main className="flex min-h-[50vh] flex-col">{children}</main>
       <Footer
         footer={footer}

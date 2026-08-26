@@ -34,7 +34,7 @@ function toInternalUrl(
 }
 
 /**
- * The wordmark. Set in the italic display serif rather than a boxed icon +
+ * The wordmark. Set in the display serif rather than a boxed icon +
  * name lockup -- the closest thing this store has to Kaleido's script
  * logotype, and it doubles as the source for the oversized watermark motif
  * reused through the page (see components/Watermark.tsx).
@@ -44,7 +44,7 @@ export function Logo({className = ''}: {className?: string}) {
     <Link
       to="/"
       prefetch="intent"
-      className={`display text-[26px] italic text-ink ${className}`}
+      className={`display text-[26px] text-ink ${className}`}
       aria-label={`${store.name} — home`}
     >
       {store.name}
@@ -156,7 +156,7 @@ export function HeaderMenu({
           prefetch="intent"
           className={({isActive}) =>
             [
-              'text-[13px] font-semibold uppercase tracking-[0.08em] transition-colors',
+              'text-[15px] font-medium transition-colors',
               isActive ? 'text-brand' : 'text-ink-muted hover:text-ink',
             ].join(' ')
           }

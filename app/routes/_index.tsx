@@ -13,6 +13,7 @@ import {TrustPoints} from '~/components/TrustPoints';
 import {Faq} from '~/components/Faq';
 import {Reveal} from '~/components/Reveal';
 import {Watermark} from '~/components/Watermark';
+import {Arch} from '~/components/Arch';
 import {Container} from '~/components/ui/Container';
 import {Section} from '~/components/ui/Section';
 import {ButtonLink} from '~/components/ui/Button';
@@ -83,7 +84,7 @@ export default function Homepage() {
  *
  * Structurally borrowed from kaleidojewellery.com: two full-bleed colour-block
  * panels side by side, each carrying a product photo, with the store's own
- * italic wordmark overlaid huge across the seam. Product photos are shot on
+ * wordmark overlaid huge across the seam. Product photos are shot on
  * plain white, so `mix-blend-multiply` tints the white background to the
  * panel's own colour underneath -- the cheapest way to make a studio photo
  * feel like it belongs in a coloured block rather than sitting pasted on top.
@@ -98,9 +99,11 @@ function Hero({collections}: {collections: HomeCollectionFragment[]}) {
         <HeroPanel collection={right} blockBg="bg-block-sage" />
       </div>
 
+      <Arch className="pointer-events-none absolute bottom-0 left-1/2 h-[26vw] w-[52vw] max-h-64 max-w-[42rem] -translate-x-1/2 opacity-25" />
+
       <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center px-4 sm:bottom-10">
         <Reveal>
-          <span className="display text-center text-[15vw] italic leading-[0.85] text-ink sm:text-[9vw]">
+          <span className="display text-center text-[15vw] leading-[0.85] text-ink sm:text-[9vw]">
             {store.name}
           </span>
         </Reveal>
@@ -122,6 +125,7 @@ function HeroPanel({
     <Link
       to={collection ? `/collections/${collection.handle}` : '/collections/all'}
       prefetch="intent"
+      data-cursor="Shop"
       className={`group relative block aspect-[4/5] overflow-hidden sm:aspect-[3/4] ${blockBg}`}
     >
       {image ? (
@@ -165,7 +169,7 @@ function PromoBanner() {
               key={claim.small}
               className="flex flex-col items-center justify-center gap-1.5 py-9 text-center sm:py-14"
             >
-              <span className="display text-4xl italic text-ink sm:text-5xl">
+              <span className="display text-4xl text-ink sm:text-5xl">
                 {claim.big}
               </span>
               <span className="max-w-[16rem] text-[12px] font-bold uppercase tracking-[0.12em] text-ink-muted">
@@ -200,6 +204,7 @@ function CategoryPromo({collections}: {collections: HomeCollectionFragment[]}) {
             <Link
               to={`/collections/${collection.handle}`}
               prefetch="intent"
+              data-cursor="Shop"
               className={`group relative block aspect-[4/5] overflow-hidden rounded-card sm:aspect-[3/4] ${blocks[i]}`}
             >
               {collection.image && (
@@ -210,17 +215,23 @@ function CategoryPromo({collections}: {collections: HomeCollectionFragment[]}) {
                   className="h-full w-full object-cover mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-105"
                 />
               )}
-              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-6">
-                <div>
-                  <p className="display text-2xl italic text-ink sm:text-3xl">
-                    {collection.title}
-                  </p>
-                  <p className="mt-1 max-w-[16rem] text-[13px] font-medium text-ink-muted">
-                    {blurbFor(collection.handle) ?? 'Shop the collection'}
-                  </p>
-                </div>
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink text-bg shadow-lift transition-transform duration-300 group-hover:rotate-45">
-                  <ArrowIcon className="h-5 w-5 -rotate-45" />
+
+              {/* Headline sits high on the tile, CTA pill spans low -- the
+                  reference site's own promo-tile pattern, rather than a
+                  small floating icon badge. */}
+              <div className="absolute inset-x-6 top-6">
+                <p className="display text-3xl leading-[0.95] text-ink sm:text-4xl">
+                  {collection.title}
+                </p>
+                <p className="mt-2 max-w-[16rem] text-[13px] font-medium text-ink-muted">
+                  {blurbFor(collection.handle) ?? 'Shop the collection'}
+                </p>
+              </div>
+
+              <div className="absolute inset-x-6 bottom-6">
+                <span className="flex items-center justify-center gap-2 rounded-pill bg-ink py-3.5 text-sm font-semibold text-bg transition-colors duration-300 group-hover:bg-brand">
+                  Shop {collection.title}
+                  <ArrowIcon className="h-4 w-4" />
                 </span>
               </div>
             </Link>
