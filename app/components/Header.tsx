@@ -9,7 +9,6 @@ import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {navigation, store} from '~/lib/store-config';
 import {CartIcon, MenuIcon, SearchIcon, UserIcon} from './Icons';
-import {Container} from './ui/Container';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -65,7 +64,11 @@ export function Header({
   // the second offsets by the first's height.
   return (
     <header className="sticky top-[25px] z-30 border-b border-line bg-bg/95 backdrop-blur-sm lg:top-announce">
-      <Container>
+      {/* The reference header is full-bleed -- no max-width, just gutters of
+          16 / 20 / 32 / 40, so the wordmark and the icons sit near the edges
+          rather than inside a centred 1240px column the way the shared
+          Container would put them. */}
+      <div className="w-full px-4 min-[600px]:px-5 lg:px-8 min-[1440px]:px-10">
         <div className="flex h-header items-center gap-4">
           <button
             type="button"
@@ -87,7 +90,7 @@ export function Header({
 
           <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
         </div>
-      </Container>
+      </div>
     </header>
   );
 }
