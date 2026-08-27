@@ -76,6 +76,15 @@ export const reviews = {
 } as const;
 
 /**
+ * Social profiles, shown in the footer's "Follow us" block.
+ *
+ * Empty on purpose, and the whole block is hidden while it stays empty. A
+ * footer icon pointing at a profile that does not exist is a dead end, and an
+ * obvious one -- add entries here only once the accounts are real.
+ */
+export const social: {name: 'Instagram' | 'Facebook'; url: string}[] = [];
+
+/**
  * Payment methods shown in the footer.
  *
  * TODO(steven): confirm this list against Shopify admin → Settings → Payments

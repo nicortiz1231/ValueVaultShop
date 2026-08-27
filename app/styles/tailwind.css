@@ -224,12 +224,36 @@
     filter: blur(0);
   }
 
+  /* Announcement marquee -- ported from the reference site's own keyframe.
+     Each run shifts by its full width plus the 28px gap between runs, so the
+     run behind lands exactly on the position it vacated and the loop never
+     seams. --marquee-duration is set per instance from the measured track
+     width, which is what holds the scroll speed steady across viewports. */
   @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    to { transform: translateX(calc(-100% - 1.75rem)); }
   }
   .animate-marquee {
-    animation: marquee var(--marquee-duration, 40s) linear infinite;
+    animation: marquee var(--marquee-duration, 10s) linear infinite;
+  }
+
+  /* The reference site's `btn1`: 16px/56px, 4px radius, Outfit 500 at 14px.
+     Colours are ours -- its yellow maps onto our butter block colour. */
+  .btn-solid {
+    display: inline-block;
+    padding: 16px 56px;
+    border-radius: 4px;
+    background-color: var(--color-block-butter);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    letter-spacing: 0.1px;
+    transition: background-color 0.3s linear;
+  }
+  .btn-solid:hover {
+    background-color: var(--color-block-butter-deep);
+    color: var(--color-ink);
   }
 
   @keyframes float-slow {

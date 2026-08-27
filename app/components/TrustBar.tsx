@@ -1,12 +1,16 @@
-import {useEffect, useState} from 'react';
+import {Marquee} from '~/components/Marquee';
 import {returns, shipping} from '~/lib/store-config';
 
 /**
- * The rotating announcement strip above the header.
+ * The announcement marquee above the header.
  *
- * The reference site runs a single centred message that swaps every few
- * seconds rather than a continuous marquee -- this matches that pattern
- * exactly, crossfading between real claims instead of scrolling them.
+ * A port of the reference site's own announcement bar -- 28px between
+ * messages (its `colgap-28`), 25px tall, 30px from 1024 up, Geist 12px.
+ *
+ * The reference only scrolls this below 1024px and switches to a
+ * one-at-a-time carousel on desktop; here it is the marquee at every width.
+ * 70px/sec is its effective speed: its three messages total ~700px and it
+ * hard-codes a 10s cycle.
  */
 export function TrustBar() {
   const messages = [
@@ -19,31 +23,20 @@ export function TrustBar() {
     'Secure checkout, handled entirely by Shopify',
   ];
 
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % messages.length);
-    }, 4200);
-    return () => clearInterval(id);
-    // messages is a fresh array each render; length is stable, so this is safe.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
-    <div className="relative flex h-announce items-center justify-center overflow-hidden bg-block-clay px-4 text-center">
-      {messages.map((message, i) => (
+    <Marquee
+      gap={28}
+      speed={70}
+      className="h-[25px] bg-block-clay lg:h-announce"
+    >
+      {messages.map((message) => (
         <span
           key={message}
-          aria-hidden={i !== index}
-          className={`absolute text-[12px] font-medium tracking-tight text-ink transition-opacity duration-500 ${
-            i === index ? 'opacity-100' : 'opacity-0'
-          }`}
+          className="whitespace-nowrap text-[12px] font-normal leading-[1.5] text-ink min-[1920px]:text-[13px]"
         >
           {message}
         </span>
       ))}
-    </div>
+    </Marquee>
   );
 }
