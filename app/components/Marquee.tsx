@@ -30,6 +30,11 @@ export function Marquee({
   gap: number;
   /** Scroll speed in px/sec. */
   speed: number;
+  /**
+   * Positioning and colour are the caller's -- the announcement bar sticks,
+   * the running-text band does not, and hard-coding `relative` here would
+   * quietly win against a `sticky` passed in.
+   */
   className?: string;
   children: React.ReactNode;
 }) {
@@ -57,7 +62,7 @@ export function Marquee({
   }, [measure]);
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`overflow-hidden ${className}`}>
       <div className="flex h-full" style={{columnGap: gap}}>
         {Array.from({length: runs}, (_, run) => (
           <div

@@ -11,9 +11,9 @@ import type {HomeCollectionFragment} from 'storefrontapi.generated';
  * (520px from 1920) that sticks below the header as the banner scrolls past,
  * its `h2` scale, and a full-width button pinned to the bottom.
  *
- * The stick offset is our own header height rather than the reference's 104px
- * -- ours is a 53px sticky bar, and copying their number would leave the text
- * hanging 50px below where it should catch.
+ * The stick offset is our own sticky chrome rather than the reference's 104px
+ * -- announcement marquee plus header, so 25+53 and 30+53. Copying their
+ * number would leave the text hanging below where it should catch.
  */
 export function SplitBanners({
   collections,
@@ -62,7 +62,7 @@ export function SplitBanners({
             </div>
 
             <div className="absolute inset-0 z-[1] flex flex-col justify-between px-6 pb-6 lg:px-10 lg:pb-10">
-              <div className="sticky top-header mx-auto mb-[74.4px] max-w-[480px] pt-8 text-center text-white transition-all duration-500 lg:mb-[90.4px] lg:pt-10 min-[1440px]:pt-[60px] min-[1920px]:max-w-[520px]">
+              <div className="sticky top-[78px] mx-auto lg:top-[83px] mb-[74.4px] max-w-[480px] pt-8 text-center text-white transition-all duration-500 lg:mb-[90.4px] lg:pt-10 min-[1440px]:pt-[60px] min-[1920px]:max-w-[520px]">
                 <h2 className="mb-3 font-display text-[38px] font-semibold leading-none tracking-[-0.5px] min-[600px]:text-[48px] lg:text-[60px] min-[1440px]:text-[68px] min-[1920px]:mb-5 min-[1920px]:text-[80px]">
                   {title}
                 </h2>

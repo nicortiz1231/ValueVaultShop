@@ -8,7 +8,9 @@ import {returns, shipping} from '~/lib/store-config';
  * messages (its `colgap-28`), 25px tall, 30px from 1024 up, Geist 12px.
  *
  * The reference only scrolls this below 1024px and switches to a
- * one-at-a-time carousel on desktop; here it is the marquee at every width.
+ * one-at-a-time carousel on desktop; here it is the marquee at every width,
+ * and it stays pinned above the header on scroll rather than leaving with the
+ * page. The header sticks to this bar's height, not to 0 -- see Header.
  * 70px/sec is its effective speed: its three messages total ~700px and it
  * hard-codes a 10s cycle.
  */
@@ -27,7 +29,7 @@ export function TrustBar() {
     <Marquee
       gap={28}
       speed={70}
-      className="h-[25px] bg-block-clay lg:h-announce"
+      className="sticky top-0 z-40 h-[25px] bg-block-clay lg:h-announce"
     >
       {messages.map((message) => (
         <span

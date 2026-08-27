@@ -60,8 +60,11 @@ export function Header({
 }: HeaderProps) {
   const {open} = useAside();
 
+  // Pinned beneath the announcement marquee, which sticks at 0 and is 25px
+  // tall (30px from 1024). Two stacked sticky elements only stay stacked if
+  // the second offsets by the first's height.
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-bg/95 backdrop-blur-sm">
+    <header className="sticky top-[25px] z-30 border-b border-line bg-bg/95 backdrop-blur-sm lg:top-announce">
       <Container>
         <div className="flex h-header items-center gap-4">
           <button
