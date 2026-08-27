@@ -7,6 +7,10 @@ import {returns} from '~/lib/store-config';
  *
  * Ported values: 18px top / 16px bottom padding, a 20px icon 8px from its
  * label, 24px between items (32px from 1440), and its `h6` type scale.
+ *
+ * The white space above the band is ours, not the reference's. Its footer is
+ * tall enough that the band clears the last product row at the bottom of the
+ * scroll; ours is shorter, so without this the row above stays in frame.
  */
 export function RunningText() {
   const claims = [
@@ -17,17 +21,19 @@ export function RunningText() {
   ];
 
   return (
-    <section className="bg-block-sky pb-4 pt-[18px]">
-      <Marquee gap={24} speed={70}>
-        {claims.map((claim) => (
-          <span key={claim} className="flex items-center gap-2">
-            <SparkIcon className="h-5 w-5 shrink-0 text-ink" />
-            <span className="whitespace-nowrap font-display text-[18px] font-medium leading-[1.2] tracking-[0.1px] text-ink min-[600px]:text-[19px] lg:text-[20px] min-[1440px]:text-[22px] min-[1920px]:text-[24px]">
-              {claim}
+    <section className="bg-surface pt-12 lg:pt-16">
+      <div className="bg-block-sky pb-4 pt-[18px]">
+        <Marquee gap={24} speed={70}>
+          {claims.map((claim) => (
+            <span key={claim} className="flex items-center gap-2">
+              <SparkIcon className="h-5 w-5 shrink-0 text-ink" />
+              <span className="whitespace-nowrap font-display text-[18px] font-medium leading-[1.2] tracking-[0.1px] text-ink min-[600px]:text-[19px] lg:text-[20px] min-[1440px]:text-[22px] min-[1920px]:text-[24px]">
+                {claim}
+              </span>
             </span>
-          </span>
-        ))}
-      </Marquee>
+          ))}
+        </Marquee>
+      </div>
     </section>
   );
 }

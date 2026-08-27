@@ -35,6 +35,12 @@ const FALLBACK_POLICY_LINKS = [
  *
  * Below 1024 the link columns collapse into accordions and go full-bleed so
  * their hairlines run edge to edge, exactly as the reference does it.
+ *
+ * Vertical padding runs one step past the reference's (60/72/88 against its
+ * 48/60/72). Its footer stands ~80px taller than a like-for-like port of ours
+ * would, because it carries a "Follow us" block we have no accounts for. Left
+ * at its own numbers, the bottom of our page lands inside the product row
+ * above -- so the height comes back as padding instead.
  */
 export function Footer({
   footer: footerPromise,
@@ -45,11 +51,11 @@ export function Footer({
     <footer className="relative mt-auto overflow-hidden bg-surface">
       <div className="mx-auto w-full max-w-[1920px] px-4 min-[600px]:px-5 lg:px-8 min-[1200px]:px-10">
         {/* .row.top-content */}
-        <div className="relative -mx-1 flex flex-wrap py-9 min-[600px]:-mx-1.5 lg:py-12 min-[1440px]:-mx-2 min-[1440px]:py-[60px] min-[1920px]:py-[72px]">
+        <div className="relative -mx-1 flex flex-wrap py-9 min-[600px]:-mx-1.5 lg:py-[60px] min-[1440px]:-mx-2 min-[1440px]:py-[72px] min-[1920px]:py-[88px]">
           <div className="mb-4 w-full px-1 min-[600px]:px-1.5 lg:mb-0 lg:w-6/12 min-[1440px]:w-5/12 min-[1440px]:px-2">
             <p className="font-display text-[30px] font-semibold leading-none tracking-[-0.5px] text-ink min-[600px]:text-[36px] lg:text-[42px] min-[1440px]:text-[48px] min-[1920px]:text-[56px]">
-              First look at new arrivals and real discounts, straight to your
-              inbox.
+              First look at new arrivals, real discounts, and the things worth
+              knowing about, straight to your inbox.
             </p>
           </div>
 
@@ -94,7 +100,7 @@ export function Footer({
 
         {/* .bottom-content -- full-bleed below 1024 so the accordion
             hairlines run to the edges. */}
-        <div className="relative -mx-4 min-[600px]:-mx-5 lg:mx-0 lg:flex lg:justify-between lg:border-t lg:border-line lg:py-12 min-[1440px]:py-[60px] min-[1920px]:py-[72px]">
+        <div className="relative -mx-4 min-[600px]:-mx-5 lg:mx-0 lg:flex lg:justify-between lg:border-t lg:border-line lg:py-[60px] min-[1440px]:py-[72px] min-[1920px]:py-[88px]">
           <div className="lg:z-[2] lg:grid lg:w-1/2 lg:grid-cols-3 lg:gap-x-4 min-[1440px]:w-[40%]">
             <FooterColumn title="About">
               <FooterLink to="/pages/about-us">Our story</FooterLink>
