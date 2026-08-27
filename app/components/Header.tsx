@@ -72,11 +72,11 @@ export function Header({
         <div className="flex h-header items-center gap-4">
           <button
             type="button"
-            className="-ml-2 rounded-full p-2 text-ink transition-colors hover:bg-ink/5 lg:hidden"
+            className="-ml-1.5 rounded-full p-1.5 text-ink transition-colors hover:bg-ink/5 lg:hidden"
             onClick={() => open('mobile')}
             aria-label="Open menu"
           >
-            <MenuIcon />
+            <MenuIcon className="h-6 w-6 shrink-0" />
           </button>
 
           <Logo />
@@ -179,25 +179,33 @@ function HeaderCtas({
   cart,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
   const {open} = useAside();
-  const iconBtn = 'rounded-full p-2.5 text-ink transition-colors hover:bg-ink/5';
+  const iconBtn =
+    'rounded-full p-1.5 text-ink transition-colors hover:bg-ink/5';
 
   return (
-    <nav className="ml-auto flex items-center gap-1" role="navigation">
+    <nav className="ml-auto flex items-center" role="navigation">
       <button
         type="button"
         onClick={() => open('search')}
         className={iconBtn}
         aria-label="Search"
       >
-        <SearchIcon />
+        <SearchIcon className="h-6 w-6 shrink-0" />
       </button>
 
-      <NavLink to="/account" prefetch="intent" className={`hidden sm:block ${iconBtn}`}>
-        <Suspense fallback={<UserIcon />}>
-          <Await resolve={isLoggedIn} errorElement={<UserIcon />}>
+      <NavLink
+        to="/account"
+        prefetch="intent"
+        className={`hidden sm:block ${iconBtn}`}
+      >
+        <Suspense fallback={<UserIcon className="h-6 w-6 shrink-0" />}>
+          <Await
+            resolve={isLoggedIn}
+            errorElement={<UserIcon className="h-6 w-6 shrink-0" />}
+          >
             {(loggedIn) => (
               <>
-                <UserIcon />
+                <UserIcon className="h-6 w-6 shrink-0" />
                 <span className="sr-only">
                   {loggedIn ? 'Account' : 'Sign in'}
                 </span>
@@ -219,7 +227,7 @@ function CartBadge({count}: {count: number}) {
   return (
     <button
       type="button"
-      className="relative rounded-full p-2.5 text-ink transition-colors hover:bg-ink/5"
+      className="relative rounded-full p-1.5 text-ink transition-colors hover:bg-ink/5"
       onClick={() => {
         open('cart');
         publish('cart_viewed', {
@@ -231,9 +239,9 @@ function CartBadge({count}: {count: number}) {
       }}
       aria-label={`Cart, ${count} ${count === 1 ? 'item' : 'items'}`}
     >
-      <CartIcon />
+      <CartIcon className="h-6 w-6 shrink-0" />
       {count > 0 && (
-        <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold leading-none text-bg">
+        <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold leading-none text-bg">
           {count}
         </span>
       )}
