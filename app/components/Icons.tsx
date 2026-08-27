@@ -131,6 +131,15 @@ export function ArrowIcon({className}: IconProps) {
   );
 }
 
+/** The reference's diagonal banner arrow -- corner bracket plus stroke. */
+export function ArrowUpRightIcon({className}: IconProps) {
+  return (
+    <Svg className={className}>
+      <path d="M7.5 7h9.5v9.5M17 7L7 17" />
+    </Svg>
+  );
+}
+
 export function CheckIcon({className}: IconProps) {
   return (
     <Svg className={className}>
@@ -168,6 +177,30 @@ export function LeafIcon({className}: IconProps) {
     <Svg className={className}>
       <path d="M20 4C10 4 4 9 4 16v4" />
       <path d="M20 4c0 9-5 13-12 13H4" />
+    </Svg>
+  );
+}
+
+export function FilterIcon({className}: IconProps) {
+  return (
+    <Svg className={className}>
+      <path d="M4 7h16M7 12h10M10 17h4" />
+    </Svg>
+  );
+}
+
+export function PlusIcon({className}: IconProps) {
+  return (
+    <Svg className={className}>
+      <path d="M12 5v14M5 12h14" />
+    </Svg>
+  );
+}
+
+export function MinusIcon({className}: IconProps) {
+  return (
+    <Svg className={className}>
+      <path d="M5 12h14" />
     </Svg>
   );
 }

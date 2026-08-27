@@ -209,7 +209,7 @@
   font-weight: 600;
   font-size: 0.875rem;
   background: var(--color-brand, #c1502e);
-  color: var(--color-bg, #fbf6ee);
+  color: var(--color-bg, #ffffff);
   border: none;
   cursor: pointer;
 }

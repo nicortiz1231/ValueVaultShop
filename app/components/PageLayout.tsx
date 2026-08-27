@@ -4,6 +4,7 @@ import type {
   CartApiQueryFragment,
   FooterQuery,
   HeaderQuery,
+  MegaMenuBannersQuery,
 } from 'storefrontapi.generated';
 import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
@@ -15,13 +16,13 @@ import {
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
 import {TrustBar} from '~/components/TrustBar';
-import {SecondaryBar} from '~/components/SecondaryBar';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
   footer: Promise<FooterQuery | null>;
   header: HeaderQuery;
   isLoggedIn: Promise<boolean>;
+  megaMenu?: MegaMenuBannersQuery | null;
   publicStoreDomain: string;
   children?: React.ReactNode;
 }
@@ -32,23 +33,23 @@ export function PageLayout({
   footer,
   header,
   isLoggedIn,
+  megaMenu,
   publicStoreDomain,
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
       <CartAside cart={cart} />
       <SearchAside />
-      <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
+      <MobileMenuAside />
       <TrustBar />
       {header && (
         <Header
           header={header}
           cart={cart}
           isLoggedIn={isLoggedIn}
-          publicStoreDomain={publicStoreDomain}
+          megaMenu={megaMenu}
         />
       )}
-      <SecondaryBar />
       <main className="flex min-h-[50vh] flex-col">{children}</main>
       <Footer
         footer={footer}
@@ -165,26 +166,13 @@ function SearchAside() {
   );
 }
 
-function MobileMenuAside({
-  header,
-  publicStoreDomain,
-}: {
-  header: PageLayoutProps['header'];
-  publicStoreDomain: PageLayoutProps['publicStoreDomain'];
-}) {
+/** The nav is config-driven, so this needs nothing from the Shopify menu. */
+function MobileMenuAside() {
   return (
-    header.menu &&
-    header.shop.primaryDomain?.url && (
-      <Aside type="mobile" heading="Menu">
-        <div className="px-5">
-          <HeaderMenu
-            menu={header.menu}
-            viewport="mobile"
-            primaryDomainUrl={header.shop.primaryDomain.url}
-            publicStoreDomain={publicStoreDomain}
-          />
-        </div>
-      </Aside>
-    )
+    <Aside type="mobile" heading="Menu">
+      <div className="px-5">
+        <HeaderMenu viewport="mobile" />
+      </div>
+    </Aside>
   );
 }

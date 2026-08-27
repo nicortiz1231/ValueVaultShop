@@ -131,7 +131,7 @@
   }
 
   code {
-    background: var(--color-bg-deep, #f1e6d3);
+    background: var(--color-bg-deep, #f1f1f1);
     color: var(--color-ink, #241c15);
     border-radius: 4px;
     font-family: monospace;

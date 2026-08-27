@@ -29,12 +29,12 @@ export function TrustBar() {
     <Marquee
       gap={28}
       speed={70}
-      className="sticky top-0 z-40 h-[25px] bg-block-clay lg:h-announce"
+      className="sticky top-0 z-40 h-[25px] bg-ink lg:h-announce"
     >
       {messages.map((message) => (
         <span
           key={message}
-          className="whitespace-nowrap text-[12px] font-normal leading-[1.5] text-ink min-[1920px]:text-[13px]"
+          className="whitespace-nowrap text-[12px] font-normal leading-[1.5] text-white min-[1920px]:text-[13px]"
         >
           {message}
         </span>

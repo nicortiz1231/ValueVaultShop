@@ -25,21 +25,41 @@ storefront → it issues the Storefront API tokens that `env pull` then fetches.
 does get pushed, rotate it in the Headless channel rather than just deleting the
 commit.
 
-## 2. Check the collection handles
+## 2. Collection handles — verified
 
-`app/lib/store-config.ts` assumes these four collection handles exist:
+`app/lib/store-config.ts` drives the Shop menu, the /collections page and every
+category page from this list. All five were checked against the live Liquid
+store on 2026-08-27 and every one resolves:
 
-| Expected handle | Shown as |
-| --- | --- |
-| `kitchen-accessories` | Kitchen |
-| `home-accessories` | Home |
-| `pet-accessories` | Pets |
-| `kids-babies` | Kids & Baby |
+| Handle | Shown as | Products on the live store |
+| --- | --- | --- |
+| `best-selling` | Best Selling | 6 |
+| `kitchen-accessories` | Kitchen Accessories | 9 |
+| `home-accessories` | Home Accessories | 14 |
+| `pet-accessories` | Pet Accessories | 9 |
+| `kids-babies` | Kids & Babies | 6 |
 
-The homepage tiles are driven by whatever collections Shopify actually returns,
-so a mismatch will not break the page — but the hand-written blurbs only attach
-when a handle lines up. Confirm them in Shopify admin → Products → Collections
-and correct the file if they differ.
+So `/collections/home-accessories` will show the same fourteen products the
+live site shows the moment step 1 is done. Until then it 404s, because
+`mock.shop` has no such collection — that 404 is the storefront not being
+linked yet, not a broken route.
+
+## 3. Turn on filters in Search & Discovery
+
+The category pages have a Filter & Sort drawer, and its facets come from
+Shopify rather than from this codebase: whatever is enabled in Shopify admin →
+Apps → **Search & Discovery** → Filters is what appears. Availability and Price
+are on by default; the useful one to add for this catalogue is the **Color**
+product option, since most Value Vault products carry one.
+
+Two knock-on effects worth knowing:
+
+- Product cards draw colour swatch dots from the option's **swatch values**. If
+  the Color option's values are plain text with no swatch configured, the dots
+  are omitted rather than drawn grey — set swatches in admin → Settings →
+  Metafields → Product options if you want them.
+- Nothing needs a code change to add a facet. A new filter switched on in
+  admin appears in the drawer on the next page load.
 
 ---
 
@@ -106,6 +126,8 @@ is no rush and no downtime.
 ## Before flipping the domain
 
 - [ ] Real products and collections appear on the homepage
+- [ ] `/collections/home-accessories` lists all 14 products
+- [ ] Filter, sort and Load More all work on a category page
 - [ ] A test order completes end to end through Shopify checkout
 - [ ] Cart drawer, quantity steppers and remove all behave on a phone
 - [ ] Policy pages render and say the same thing as `store-config.ts`

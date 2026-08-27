@@ -1,7 +1,6 @@
 import {Link} from 'react-router';
-import {Image} from '@shopify/hydrogen';
-import type {HomeCollectionFragment} from 'storefrontapi.generated';
 import {Reveal} from '~/components/Reveal';
+import {promoImage} from '~/lib/site-imagery';
 
 /**
  * The reference site's `hero_banner` section -- a full-bleed photo with
@@ -13,26 +12,32 @@ import {Reveal} from '~/components/Reveal';
  *
  * The reference runs a second copy of this section immediately after, holding
  * an image-only promo graphic. That one is deliberately not cloned.
+ *
+ * The photograph is the storefront's own rather than a collection image --
+ * this section is full-bleed, so a 600-1080px collection photo was being
+ * stretched across the whole viewport. See [promoImage] in
+ * `~/lib/site-imagery`.
  */
-export function PromoBanner({
-  collection,
-}: {
-  collection?: HomeCollectionFragment;
-}) {
-  const image = collection?.image;
-
+export function PromoBanner() {
   return (
     <section className="relative grid bg-bg-deep">
       <div className="relative col-start-1 row-start-1 min-h-full w-full">
-        {image ? (
-          <Image
-            data={image}
-            sizes="100vw"
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        ) : null}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.2)_57.21%)]" />
+        <img
+          src={promoImage.src}
+          width={promoImage.width}
+          height={promoImage.height}
+          alt={promoImage.alt}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
+        {/* The reference's scrim runs transparent to 20% black. That was tuned
+            for its own dark product photography; this kitchen is bright top to
+            bottom, so 20% left the white copy washing out -- badly on a phone,
+            where the text block sits higher in the frame and so in the lighter
+            part of the gradient. Both stops are lifted, tuned by measuring the
+            backdrop behind the actual text rather than by eye. */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.32)_0%,rgba(0,0,0,0.56)_57.21%)]" />
       </div>
 
       <div className="col-start-1 row-start-1 z-[1] mx-auto flex w-full max-w-[1920px] items-center justify-center px-4 py-[60px] min-[600px]:h-[520px] min-[600px]:px-5 lg:h-auto lg:px-8 lg:py-10 min-[1200px]:px-10">

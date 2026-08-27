@@ -12,11 +12,12 @@ import {
 } from 'react-router';
 import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
-import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import {FOOTER_QUERY, HEADER_QUERY, MEGA_MENU_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
+import {shopByMenu} from '~/lib/store-config';
 import {CustomCursor} from './components/CustomCursor';
 
 export type RootLoader = typeof loader;
@@ -115,17 +116,32 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({context}: Route.LoaderArgs) {
   const {storefront} = context;
 
-  const [header] = await Promise.all([
+  const [header, megaMenu] = await Promise.all([
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheLong(),
       variables: {
         headerMenuHandle: 'main-menu', // Adjust to your header menu handle
       },
     }),
+    // The "Shop By" mega menu's two banner images. In parallel with the
+    // header and cached just as long, so it costs no extra time to first
+    // byte; a failure just leaves the banners as flat colour.
+    storefront
+      .query(MEGA_MENU_QUERY, {
+        cache: storefront.CacheLong(),
+        variables: {
+          firstHandle: shopByMenu.banners[0].handle,
+          secondHandle: shopByMenu.banners[1].handle,
+        },
+      })
+      .catch((error: Error) => {
+        console.error(error);
+        return null;
+      }),
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {header};
+  return {header, megaMenu};
 }
 
 /**

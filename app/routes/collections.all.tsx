@@ -1,16 +1,52 @@
 import type {Route} from './+types/collections.all';
+import {COLLECTION_PRODUCT_FRAGMENT} from '~/lib/product-card-fragment';
 import {useLoaderData} from 'react-router';
-import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
+import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
-import {ProductItem} from '~/components/ProductItem';
-import {Reveal} from '~/components/Reveal';
+import {anyProductHasSwatches, ProductCard} from '~/components/ProductCard';
 import {Container} from '~/components/ui/Container';
 import {TrustPoints} from '~/components/TrustPoints';
-import type {CollectionItemFragment} from 'storefrontapi.generated';
+import type {CollectionProductFragment} from 'storefrontapi.generated';
 import {store} from '~/lib/store-config';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: `Everything we stock | ${store.name}`}];
+/**
+ * The catalogue's three faces, chosen by `?sort=`.
+ *
+ * The header's "New In" and "Bestsellers" items point here rather than at
+ * collections of their own: both are orderings of the same catalogue, and a
+ * sort param keeps them true without a merchant having to hand-maintain two
+ * more collections in the admin.
+ */
+const SORTS = {
+  new: {
+    sortKey: 'CREATED_AT',
+    reverse: true,
+    heading: 'New in',
+    blurb: 'The most recent additions to the shelf, newest first.',
+  },
+  'best-selling': {
+    sortKey: 'BEST_SELLING',
+    reverse: false,
+    heading: 'Bestsellers',
+    blurb: 'What everyone else is buying, in order of how often it sells.',
+  },
+} as const;
+
+const DEFAULT_VIEW = {
+  heading: 'Everything we stock',
+  blurb:
+    'Every product here was picked by hand. If we would not use it ourselves, it does not make the shelf.',
+};
+
+type SortParam = keyof typeof SORTS;
+
+function getSort(request: Request) {
+  const sort = new URL(request.url).searchParams.get('sort');
+  return sort && sort in SORTS ? SORTS[sort as SortParam] : null;
+}
+
+export const meta: Route.MetaFunction = ({data}) => {
+  return [{title: `${data?.heading ?? DEFAULT_VIEW.heading} | ${store.name}`}];
 };
 
 export async function loader(args: Route.LoaderArgs) {
@@ -32,14 +68,23 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
+  const sort = getSort(request);
 
   const [{products}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
-      variables: {...paginationVariables},
+      variables: {
+        ...paginationVariables,
+        sortKey: sort?.sortKey,
+        reverse: sort?.reverse,
+      },
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
-  return {products};
+  return {
+    products,
+    heading: sort?.heading ?? DEFAULT_VIEW.heading,
+    blurb: sort?.blurb ?? DEFAULT_VIEW.blurb,
+  };
 }
 
 /**
@@ -52,33 +97,30 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 export default function Collection() {
-  const {products} = useLoaderData<typeof loader>();
+  const {products, heading, blurb} = useLoaderData<typeof loader>();
 
   return (
     <>
       <Container className="py-10 sm:py-14">
         <header className="max-w-2xl">
-          <h1 className="display text-3xl text-ink sm:text-4xl">
-            Everything we stock
-          </h1>
+          <h1 className="display text-3xl text-ink sm:text-4xl">{heading}</h1>
           <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
-            Every product here was picked by hand. If we would not use it
-            ourselves, it does not make the shelf.
+            {blurb}
           </p>
         </header>
 
         <div className="mt-10">
-          <PaginatedResourceSection<CollectionItemFragment>
+          <PaginatedResourceSection<CollectionProductFragment>
             connection={products}
-            resourcesClassName="grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-x-5 lg:grid-cols-4"
+            resourcesClassName="grid grid-cols-2 gap-x-3 gap-y-8 lg:grid-cols-4 lg:gap-y-10"
           >
-            {({node: product, index}) => (
-              <Reveal key={product.id} as="div" delay={(index % 4) * 60}>
-                <ProductItem
-                  product={product}
-                  loading={index < 8 ? 'eager' : undefined}
-                />
-              </Reveal>
+            {({node: product, index, nodes}) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                reserveSwatchRow={anyProductHasSwatches(nodes)}
+                loading={index < 8 ? 'eager' : undefined}
+              />
             )}
           </PaginatedResourceSection>
         </div>
@@ -89,38 +131,6 @@ export default function Collection() {
   );
 }
 
-const COLLECTION_ITEM_FRAGMENT = `#graphql
-  fragment MoneyCollectionItem on MoneyV2 {
-    amount
-    currencyCode
-  }
-  fragment CollectionItem on Product {
-    id
-    handle
-    title
-    featuredImage {
-      id
-      altText
-      url
-      width
-      height
-    }
-    priceRange {
-      minVariantPrice {
-        ...MoneyCollectionItem
-      }
-      maxVariantPrice {
-        ...MoneyCollectionItem
-      }
-    }
-    compareAtPriceRange {
-      minVariantPrice {
-        ...MoneyCollectionItem
-      }
-    }
-  }
-` as const;
-
 // NOTE: https://shopify.dev/docs/api/storefront/latest/objects/product
 const CATALOG_QUERY = `#graphql
   query Catalog(
@@ -130,10 +140,19 @@ const CATALOG_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
+    $sortKey: ProductSortKeys
+    $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
-    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
+    products(
+      first: $first
+      last: $last
+      before: $startCursor
+      after: $endCursor
+      sortKey: $sortKey
+      reverse: $reverse
+    ) {
       nodes {
-        ...CollectionItem
+        ...CollectionProduct
       }
       pageInfo {
         hasPreviousPage
@@ -143,5 +162,5 @@ const CATALOG_QUERY = `#graphql
       }
     }
   }
-  ${COLLECTION_ITEM_FRAGMENT}
+  ${COLLECTION_PRODUCT_FRAGMENT}
 ` as const;

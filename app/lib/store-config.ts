@@ -102,42 +102,98 @@ export const paymentMethods = [
   'Google Pay',
 ] as const;
 
-/** Top-level navigation, used when the Shopify menu has not loaded. */
-export const navigation = [
-  {title: 'Shop all', url: '/collections/all'},
-  {title: 'Kitchen', url: '/collections/kitchen-accessories'},
-  {title: 'Home', url: '/collections/home-accessories'},
-  {title: 'Pets', url: '/collections/pet-accessories'},
-  {title: 'Kids & Baby', url: '/collections/kids-babies'},
-  {title: 'About', url: '/pages/about-us'},
-] as const;
+type NavLink = {title: string; url: string};
 
 /**
- * The four category tiles on the homepage.
+ * The header navigation, top level.
+ *
+ * This is the live valuevaultshop.net header, verbatim -- the Shopify menu
+ * is not consulted for it, so what a visitor sees does not depend on which
+ * storefront this build happens to be linked to. `panel` marks the one item
+ * that opens the "Shop" dropdown; see [shopByMenu] for what is in it.
+ */
+export const navigation: (NavLink & {panel?: true})[] = [
+  {title: 'Home', url: '/'},
+  // The real site's "Shop" is a disclosure with no destination of its own.
+  // Ours points somewhere so that following it by keyboard, or tapping it on
+  // a phone, is not a dead end.
+  {title: 'Shop', url: '/collections', panel: true},
+  {title: 'About Us', url: '/pages/about-us'},
+  {title: 'Contact Us', url: '/pages/contact'},
+  // A Shopify app proxy on the live site. Hydrogen has no proxy routes, so
+  // this needs a real destination before launch.
+  {title: 'Order Look Up', url: '/apps/trackingmore'},
+];
+
+/**
+ * The store's categories -- the live valuevaultshop.net "Shop" menu, in its
+ * own order.
+ *
+ * One list feeds the Shop dropdown, the /collections page and the footer, so
+ * there is a single place to edit when the real store's categories change.
  * `handle` must match a real Shopify collection handle.
  */
 export const categories = [
   {
-    title: 'Kitchen',
+    title: 'Best Selling',
+    handle: 'best-selling',
+    blurb: 'What everyone else is buying',
+  },
+  {
+    title: 'Trending Now',
+    handle: 'trending-now',
+    blurb: 'Picking up speed right now',
+  },
+  {
+    title: 'Kitchen Accessories',
     handle: 'kitchen-accessories',
     blurb: 'Tools that earn their drawer space',
   },
   {
-    title: 'Home',
+    title: 'Home Accessories',
     handle: 'home-accessories',
     blurb: 'Small upgrades for everyday rooms',
   },
   {
-    title: 'Pets',
+    title: 'Pet Accessories',
     handle: 'pet-accessories',
     blurb: 'For the other members of the household',
   },
   {
-    title: 'Kids & Baby',
+    title: 'Kids & Babies',
     handle: 'kids-babies',
     blurb: 'Practical things for busy parents',
   },
 ] as const;
+
+/**
+ * The "Shop" dropdown -- the panel behind the one nav item that has one.
+ *
+ * A port of the reference site's own `mega-dropdown`: link groups on the
+ * left under small grey labels, and image banners filling the right half.
+ *
+ * Its links are [categories], so the dropdown and the rest of the site can
+ * never drift apart. Those handles are the real store's, not the demo
+ * catalogue the dev storefront is currently linked to, so they 404 locally
+ * until this project points at the real store. `banners` name collection
+ * handles and the header query pulls their Shopify collection images.
+ */
+export const shopByMenu = {
+  groups: [
+    {
+      title: 'Category',
+      links: categories.map((category) => ({
+        title: category.title,
+        url: `/collections/${category.handle}`,
+      })),
+    },
+  ],
+  /** Two, to match the reference's `banner-small` pair. */
+  banners: [
+    {title: 'Kitchen Accessories', handle: 'kitchen-accessories'},
+    {title: 'Home Accessories', handle: 'home-accessories'},
+  ],
+};
 
 /**
  * Homepage FAQ. These answer the questions a first-time visitor from social

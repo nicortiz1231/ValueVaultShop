@@ -1,14 +1,25 @@
-import {redirect, useLoaderData} from 'react-router';
+import {Link, redirect, useLoaderData} from 'react-router';
 import type {Route} from './+types/collections.$handle';
-import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import type {SiblingCollectionsQuery} from 'storefrontapi.generated';
+import {getPaginationVariables, Analytics, Pagination} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import {ProductItem} from '~/components/ProductItem';
-import {Reveal} from '~/components/Reveal';
+import {anyProductHasSwatches, ProductCard} from '~/components/ProductCard';
+import {
+  CollectionControls,
+  type FilterGroup,
+} from '~/components/CollectionControls';
 import {Container} from '~/components/ui/Container';
+import {
+  CollectionHeader,
+  type CategoryCircle,
+} from '~/components/CollectionHeader';
 import {TrustPoints} from '~/components/TrustPoints';
-import {store} from '~/lib/store-config';
-import type {ProductItemFragment} from 'storefrontapi.generated';
+import {categories, store} from '~/lib/store-config';
+import {
+  getFilterVariables,
+  getSortVariables,
+} from '~/lib/collection-filters';
+import {COLLECTION_PRODUCT_FRAGMENT} from '~/lib/product-card-fragment';
 
 export const meta: Route.MetaFunction = ({data}) => {
   const collection = data?.collection;
@@ -38,19 +49,34 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const {handle} = params;
   const {storefront} = context;
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 8,
-  });
 
   if (!handle) {
     throw redirect('/collections');
   }
 
-  const [{collection}] = await Promise.all([
+  const searchParams = new URL(request.url).searchParams;
+  const filters = getFilterVariables(searchParams);
+  const {sortKey, reverse} = getSortVariables(searchParams.get('sort_by'));
+
+  // 24 fills six rows of the four-column desktop grid before the shopper has
+  // to ask for more, which is roughly where the reference site's own first
+  // page ends.
+  const paginationVariables = getPaginationVariables(request, {pageBy: 24});
+
+  const [{collection}, countResult, siblingResult] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
-      variables: {handle, ...paginationVariables},
-      // Add other queries here, so that they are loaded in parallel
+      variables: {handle, filters, sortKey, reverse, ...paginationVariables},
     }),
+    // The Storefront API exposes no total on a collection's products
+    // connection, and the reference bar shows "N Products" -- so the count
+    // comes from a second, deliberately skinny query that asks only for ids
+    // under the same filters. It runs in parallel, so it costs no wall time.
+    storefront
+      .query(COLLECTION_COUNT_QUERY, {variables: {handle, filters}})
+      .catch(() => null),
+    // Images for the circular category row. Failing this must not take the
+    // page down -- the row simply falls back to plain circles.
+    storefront.query(SIBLING_COLLECTIONS_QUERY).catch(() => null),
   ]);
 
   if (!collection) {
@@ -62,8 +88,18 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: collection});
 
+  const countNodes = countResult?.collection?.products.nodes;
+
   return {
     collection,
+    filters: normalizeFilters(collection.products.filters),
+    // Deliberately null rather than 0 when the count query failed: the bar
+    // hides the number entirely rather than claiming an empty collection.
+    productCount: countNodes ? countNodes.length : null,
+    // Siblings, for the circular category row under the title. Built from the
+    // store's own category list rather than from Shopify, so its order is
+    // stable; Shopify is consulted only for each one's image.
+    siblings: buildSiblings(handle, siblingResult),
   };
 }
 
@@ -76,52 +112,121 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   return {};
 }
 
-export default function Collection() {
-  const {collection} = useLoaderData<typeof loader>();
+/** The store's categories minus the current one, each with its image. */
+function buildSiblings(
+  handle: string,
+  result: SiblingCollectionsQuery | null,
+): CategoryCircle[] {
+  const images = new Map(
+    (result?.collections.nodes ?? []).map((node) => [
+      node.handle,
+      node.image ?? node.products.nodes[0]?.featuredImage ?? null,
+    ]),
+  );
 
-  const count = collection.products.nodes.length;
+  return categories
+    .filter((category) => category.handle !== handle)
+    .map((category) => ({
+      title: category.title,
+      handle: category.handle,
+      image: images.get(category.handle) ?? null,
+    }));
+}
+
+/**
+ * Trims Shopify's filter payload to what the drawer draws.
+ *
+ * Filter values with a zero count are kept -- the drawer dims them -- but a
+ * whole group in which nothing is available is dropped, since an accordion
+ * that can only ever return no results is just an extra tap.
+ */
+function normalizeFilters(
+  filters: {
+    id: string;
+    label: string;
+    type: string;
+    values: {id: string; label: string; count: number; input: unknown}[];
+  }[],
+): FilterGroup[] {
+  return filters
+    .map((filter) => ({
+      id: filter.id,
+      label: filter.label,
+      type: filter.type,
+      values: filter.values.map((value) => ({
+        id: value.id,
+        label: value.label,
+        count: value.count,
+        input: String(value.input),
+      })),
+    }))
+    .filter(
+      (filter) =>
+        filter.values.length > 0 &&
+        (filter.type === 'PRICE_RANGE' ||
+          filter.values.some((value) => value.count > 0)),
+    );
+}
+
+export default function Collection() {
+  const {collection, filters, productCount, siblings} =
+    useLoaderData<typeof loader>();
 
   return (
     <>
-      <Container className="py-10 sm:py-14">
-        <header className="max-w-2xl">
-          <h1 className="display text-3xl text-ink sm:text-4xl">
-            {collection.title}
-          </h1>
-          {collection.description && (
-            <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
-              {collection.description}
-            </p>
-          )}
-        </header>
+      <CollectionHeader
+        title={collection.title}
+        description={collection.description}
+        categories={siblings}
+      />
 
-        {count === 0 ? (
-          <p className="mt-12 text-base text-ink-muted">
-            There is nothing in this collection just yet. Try{' '}
-            <a
-              href="/collections/all"
-              className="text-brand underline underline-offset-4"
-            >
-              browsing everything
-            </a>{' '}
-            instead.
-          </p>
+      {/* `sp-sm spt-no` on the reference: no padding above (the title section
+          has already provided it), 36px below, growing to 48/60 on wider
+          screens. */}
+      <Container width="full" className="pb-9 min-[1024px]:pb-12 min-[1440px]:pb-15">
+        <CollectionControls filters={filters} productCount={productCount} />
+
+        {collection.products.nodes.length === 0 ? (
+          <EmptyState hasFilters={filters.length > 0} />
         ) : (
-          <div className="mt-10">
-            <PaginatedResourceSection<ProductItemFragment>
-              connection={collection.products}
-              resourcesClassName="grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-x-5 lg:grid-cols-4"
-            >
-                {({node: product, index}) => (
-                <Reveal key={product.id} as="div" delay={(index % 4) * 60}>
-                  <ProductItem
-                    product={product}
-                    loading={index < 8 ? 'eager' : undefined}
-                  />
-                </Reveal>
-              )}
-            </PaginatedResourceSection>
-          </div>
+          <Pagination connection={collection.products}>
+            {({nodes, isLoading, hasNextPage, NextLink, PreviousLink}) => {
+              const reserveSwatchRow = anyProductHasSwatches(nodes);
+
+              return (
+                <div className="pt-5">
+                  <div className="flex justify-center empty:hidden">
+                    <PreviousLink className={pagerLink}>
+                      {isLoading ? 'Loading…' : 'Load previous'}
+                    </PreviousLink>
+                  </div>
+
+                  {/* The reference's grid, exactly: two up on a phone and
+                      four from 1024, with an 8px column gutter (its `.row`
+                      -4px margin against `.col-*` 4px padding) and a row gap
+                      that steps 20 -> 12 -> 20 -> 24 across its breakpoints. */}
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-5 min-[1024px]:grid-cols-4 min-[1024px]:gap-y-3 min-[1440px]:gap-y-5 min-[1920px]:gap-y-6">
+                    {nodes.map((product, index) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        reserveSwatchRow={reserveSwatchRow}
+                        loading={index < 8 ? 'eager' : undefined}
+                      />
+                    ))}
+                  </div>
+
+                  {hasNextPage && (
+                    <div className="mt-10 flex justify-center">
+                      <NextLink className={pagerLink}>
+                        {isLoading ? 'Loading…' : 'Load More'}
+                      </NextLink>
+                    </div>
+                  )}
+                </div>
+              );
+            }}
+          </Pagination>
         )}
       </Container>
 
@@ -140,41 +245,30 @@ export default function Collection() {
   );
 }
 
-const PRODUCT_ITEM_FRAGMENT = `#graphql
-  fragment MoneyProductItem on MoneyV2 {
-    amount
-    currencyCode
-  }
-  fragment ProductItem on Product {
-    id
-    handle
-    title
-    featuredImage {
-      id
-      altText
-      url
-      width
-      height
-    }
-    priceRange {
-      minVariantPrice {
-        ...MoneyProductItem
-      }
-      maxVariantPrice {
-        ...MoneyProductItem
-      }
-    }
-    compareAtPriceRange {
-      minVariantPrice {
-        ...MoneyProductItem
-      }
-    }
-  }
-` as const;
+const pagerLink =
+  'type-p2 inline-flex h-11 items-center justify-center rounded-[4px] border border-ink px-8 font-medium text-ink transition-colors hover:bg-ink hover:text-bg';
 
-// NOTE: https://shopify.dev/docs/api/storefront/2022-04/objects/collection
+function EmptyState({hasFilters}: {hasFilters: boolean}) {
+  return (
+    <div className="py-20 text-center">
+      <p className="type-p2 text-ink-muted">
+        {hasFilters
+          ? 'No products match these filters.'
+          : 'There is nothing in this collection just yet.'}
+      </p>
+      <Link
+        to="/collections/all"
+        className="type-p2 mt-4 inline-block font-medium text-brand underline underline-offset-4"
+      >
+        Browse everything instead
+      </Link>
+    </div>
+  );
+}
+
+// NOTE: https://shopify.dev/docs/api/storefront/latest/objects/collection
 const COLLECTION_QUERY = `#graphql
-  ${PRODUCT_ITEM_FRAGMENT}
+  ${COLLECTION_PRODUCT_FRAGMENT}
   query Collection(
     $handle: String!
     $country: CountryCode
@@ -183,26 +277,111 @@ const COLLECTION_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
+    $filters: [ProductFilter!]
+    $sortKey: ProductCollectionSortKeys
+    $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       id
       handle
       title
       description
+      image {
+        id
+        url
+        altText
+        width
+        height
+      }
       products(
         first: $first,
         last: $last,
         before: $startCursor,
-        after: $endCursor
+        after: $endCursor,
+        filters: $filters,
+        sortKey: $sortKey,
+        reverse: $reverse
       ) {
         nodes {
-          ...ProductItem
+          ...CollectionProduct
+        }
+        # The facets the merchant has switched on in Search & Discovery. Asking
+        # Shopify for them is what keeps the filter drawer honest about this
+        # collection rather than showing a hardcoded guess.
+        filters {
+          id
+          label
+          type
+          values {
+            id
+            label
+            count
+            input
+          }
         }
         pageInfo {
           hasPreviousPage
           hasNextPage
           endCursor
           startCursor
+        }
+      }
+    }
+  }
+` as const;
+
+/** Collection images for the circular category row under the title. */
+const SIBLING_COLLECTIONS_QUERY = `#graphql
+  query SiblingCollections($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    collections(first: 100) {
+      nodes {
+        id
+        handle
+        image {
+          id
+          url
+          altText
+          width
+          height
+        }
+        # Fallback for a collection the merchant never gave an image. An empty
+        # circle in the category row reads as a broken image, so borrow the
+        # first product's photo rather than render a blank.
+        products(first: 1) {
+          nodes {
+            id
+            featuredImage {
+              id
+              url
+              altText
+              width
+              height
+            }
+          }
+        }
+      }
+    }
+  }
+` as const;
+
+/**
+ * Ids only, purely to count the filtered result set for the "N Products"
+ * readout. 250 is the Storefront API's per-page ceiling; a category larger
+ * than that would under-report, which is a problem worth having.
+ */
+const COLLECTION_COUNT_QUERY = `#graphql
+  query CollectionCount(
+    $handle: String!
+    $country: CountryCode
+    $language: LanguageCode
+    $filters: [ProductFilter!]
+  ) @inContext(country: $country, language: $language) {
+    collection(handle: $handle) {
+      id
+      products(first: 250, filters: $filters) {
+        nodes {
+          id
         }
       }
     }

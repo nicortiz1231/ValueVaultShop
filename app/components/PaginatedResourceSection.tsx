@@ -17,7 +17,13 @@ export function PaginatedResourceSection<NodesType>({
   resourcesClassName,
 }: {
   connection: React.ComponentProps<typeof Pagination<NodesType>>['connection'];
-  children: React.FunctionComponent<{node: NodesType; index: number}>;
+  children: React.FunctionComponent<{
+    node: NodesType;
+    index: number;
+    /** Every node currently rendered, for decisions a single card cannot make
+        on its own -- see ProductCard's reserved swatch row. */
+    nodes: NodesType[];
+  }>;
   ariaLabel?: string;
   resourcesClassName?: string;
 }) {
@@ -25,7 +31,7 @@ export function PaginatedResourceSection<NodesType>({
     <Pagination connection={connection}>
       {({nodes, isLoading, PreviousLink, NextLink}) => {
         const resourcesMarkup = nodes.map((node, index) =>
-          children({node, index}),
+          children({node, index, nodes}),
         );
 
         return (

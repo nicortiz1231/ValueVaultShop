@@ -1,11 +1,14 @@
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/collections._index';
-import {getPaginationVariables, Image} from '@shopify/hydrogen';
+import {Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {Container} from '~/components/ui/Container';
 import {ArrowIcon} from '~/components/Icons';
-import {store} from '~/lib/store-config';
+import {categories, store} from '~/lib/store-config';
+import {
+  collectionFallbackImage,
+  type CollectionImage,
+} from '~/lib/collection-images';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -28,19 +31,32 @@ export async function loader(args: Route.LoaderArgs) {
  * Load data necessary for rendering content above the fold. This is the critical data
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
-async function loadCriticalData({context, request}: Route.LoaderArgs) {
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 4,
-  });
-
+async function loadCriticalData({context}: Route.LoaderArgs) {
   const [{collections}] = await Promise.all([
-    context.storefront.query(COLLECTIONS_QUERY, {
-      variables: paginationVariables,
-    }),
+    context.storefront.query(COLLECTIONS_QUERY),
     // Add other queries here, so that they are loaded in parallel
   ]);
 
-  return {collections};
+  // The page shows the store's own categories, in store-config's order, not
+  // whatever the storefront happens to return -- so the catalogue is only
+  // consulted for each one's image. Anything the store has not created yet
+  // still gets a card, just without a photo.
+  const images = Object.fromEntries(
+    collections.nodes.map((collection) => [collection.handle, collection]),
+  ) as Record<string, CollectionFragment | undefined>;
+
+  return {
+    // Collections with no image set in admin borrow one from a product they
+    // contain, the same stand-in the homepage category row uses, so the two
+    // pages never show the same collection differently. Shopify's own image
+    // is always preferred over it.
+    tiles: categories.map((category) => ({
+      ...category,
+      image:
+        images[category.handle]?.image ??
+        collectionFallbackImage(category.handle),
+    })),
+  };
 }
 
 /**
@@ -53,57 +69,50 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 }
 
 export default function Collections() {
-  const {collections} = useLoaderData<typeof loader>();
+  const {tiles} = useLoaderData<typeof loader>();
 
   return (
     <Container className="py-10 sm:py-14">
       <header className="max-w-2xl">
-        <h1 className="display text-3xl text-ink sm:text-4xl">
-          Collections
-        </h1>
+        <h1 className="display text-3xl text-ink sm:text-4xl">Collections</h1>
         <p className="mt-3.5 text-base leading-relaxed text-ink-muted">
-          Browse by room, or see everything at once.
+          Browse by category, or see everything at once.
         </p>
       </header>
 
-      <div className="mt-10">
-        <PaginatedResourceSection<CollectionFragment>
-          connection={collections}
-          resourcesClassName="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3"
-        >
-          {({node: collection, index}) => (
-            <CollectionItem
-              key={collection.id}
-              collection={collection}
-              index={index}
-            />
-          )}
-        </PaginatedResourceSection>
+      <div className="mt-10 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3">
+        {tiles.map((tile, index) => (
+          <CollectionItem key={tile.handle} tile={tile} index={index} />
+        ))}
       </div>
     </Container>
   );
 }
 
 function CollectionItem({
-  collection,
+  tile,
   index,
 }: {
-  collection: CollectionFragment;
+  tile: {
+    title: string;
+    handle: string;
+    blurb: string;
+    image: CollectionFragment['image'] | CollectionImage;
+  };
   index: number;
 }) {
   return (
     <Link
-      key={collection.id}
-      to={`/collections/${collection.handle}`}
+      to={`/collections/${tile.handle}`}
       prefetch="intent"
       className="group overflow-hidden rounded-card border border-line bg-surface transition-shadow hover:shadow-card"
     >
       <div className="overflow-hidden bg-bg-deep">
-        {collection?.image ? (
+        {tile.image ? (
           <Image
-            alt={collection.image.altText || collection.title}
+            alt={tile.image.altText || tile.title}
             aspectRatio="4/3"
-            data={collection.image}
+            data={tile.image}
             loading={index < 3 ? 'eager' : undefined}
             sizes="(min-width: 1024px) 390px, 45vw"
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
@@ -112,10 +121,15 @@ function CollectionItem({
           <div className="aspect-[4/3] w-full" />
         )}
       </div>
-      <h2 className="flex items-center gap-1.5 p-4 text-[15px] font-semibold text-ink">
-        {collection.title}
-        <ArrowIcon className="h-4 w-4 text-brand opacity-0 transition-opacity group-hover:opacity-100" />
-      </h2>
+      <div className="p-4">
+        <h2 className="flex items-center gap-1.5 text-[15px] font-semibold text-ink">
+          {tile.title}
+          <ArrowIcon className="h-4 w-4 text-brand opacity-0 transition-opacity group-hover:opacity-100" />
+        </h2>
+        <p className="mt-1 text-[13px] leading-[1.5] text-ink-muted">
+          {tile.blurb}
+        </p>
+      </div>
     </Link>
   );
 }
@@ -133,28 +147,11 @@ const COLLECTIONS_QUERY = `#graphql
       height
     }
   }
-  query StoreCollections(
-    $country: CountryCode
-    $endCursor: String
-    $first: Int
-    $language: LanguageCode
-    $last: Int
-    $startCursor: String
-  ) @inContext(country: $country, language: $language) {
-    collections(
-      first: $first,
-      last: $last,
-      before: $startCursor,
-      after: $endCursor
-    ) {
+  query StoreCollections($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    collections(first: 100) {
       nodes {
         ...Collection
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
       }
     }
   }

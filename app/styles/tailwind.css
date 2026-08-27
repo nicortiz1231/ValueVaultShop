@@ -1,9 +1,9 @@
 /**
  * Value Vault design system -- "Kaleidoscope" direction.
  *
- * Light, warm, editorial: an ivory base, color-blocked full-bleed sections
- * that rotate per category, and an oversized serif wordmark reused as a
- * recurring graphic motif. Structurally modelled on kaleidojewellery.com --
+ * Light, editorial: a white base, color-blocked full-bleed sections that
+ * rotate per category, and an oversized serif wordmark reused as a recurring
+ * graphic motif. Structurally modelled on kaleidojewellery.com --
  * photography-led hero, big lifestyle tiles instead of a dense product grid,
  * bold promo banding -- with a palette built for home/kitchen/pet goods
  * rather than jewellery.
@@ -14,9 +14,20 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Base surfaces -- warm ivory, never stark white */
-  --color-bg: #fbf6ee;
-  --color-bg-deep: #f1e6d3;
+  /* Base surfaces.
+   *
+   * The canvas was an ivory #fbf6ee, warm by design. It is plain white now:
+   * every page, top to bottom, sits on the same ground as the product
+   * photography and the cards, so nothing reads as a tinted panel.
+   *
+   * --color-bg-deep is not a page background -- it is the one step down from
+   * the canvas, and it only ever appears as the space behind an image that
+   * has not loaded or does not exist, a skeleton block, or a button's hover
+   * fill. It was the ivory's darker partner (#f1e6d3) and is neutral grey to
+   * match the white canvas: against ivory that beige read as depth, against
+   * white it would have read as the one beige patch left on the page. */
+  --color-bg: #ffffff;
+  --color-bg-deep: #f1f1f1;
   --color-surface: #ffffff;
 
   /* Product-card surface.
@@ -27,10 +38,18 @@
    * reference site's cards, and it only works on an exact match (3 points
    * of difference already shows as a faint rectangle).
    *
-   * TODO(steven): retune this to the real Value Vault product photos when
-   * the store is linked. #f3f3f3 matches mock.shop's demo photography; most
-   * dropship photos are pure white, in which case set this to #ffffff. */
-  --color-card: #f3f3f3;
+   * The reference achieves it with a cream card because its jewellery is
+   * shot on cream. Value Vault's real catalogue is shot on pure white --
+   * sampled across the newest arrivals, the photo corners come back
+   * (255,255,255) -- so white is the matching value here. It was #f3f3f3
+   * while this project ran on mock.shop's demo photography, and that grey
+   * against white product shots is what put a visible band above and below
+   * every image.
+   *
+   * The handful of lifestyle shots (the galaxy lamp on grey, the building
+   * blocks on blue) cannot dissolve into any single colour; they letterbox,
+   * which is the honest trade for keeping products uncropped. */
+  --color-card: #ffffff;
 
   /* Ink -- warm near-black, never pure black */
   --color-ink: #241c15;
@@ -200,11 +219,110 @@
 }
 
 @layer utilities {
+  /* ---------------------------------------------------------------------
+   * Reference type scale.
+   *
+   * A direct port of kaleidojewellery.com's own `.h*` / `.p*` classes, read
+   * off its stylesheet rather than estimated from a screenshot -- same sizes,
+   * same line-heights, same letter-spacing, same breakpoints (600 / 1024 /
+   * 1440 / 1920, which are the reference's, not Tailwind's).
+   *
+   * The families are already ours: the reference sets Outfit for headings and
+   * Geist for body, which is exactly what @theme above declares. Colour is
+   * deliberately NOT set here -- these carry size only, so Value Vault's
+   * palette still applies on top.
+   * ------------------------------------------------------------------- */
+
+  .type-h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+  @media (min-width: 600px) {
+    .type-h3 { font-size: 36px; }
+  }
+  @media (min-width: 1024px) {
+    .type-h3 { font-size: 42px; }
+  }
+  @media (min-width: 1440px) {
+    .type-h3 { font-size: 48px; }
+  }
+  @media (min-width: 1920px) {
+    .type-h3 { font-size: 56px; }
+  }
+
+  .type-h6 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 1.2;
+    letter-spacing: 0.1px;
+  }
+  @media (min-width: 1024px) {
+    .type-h6 { font-size: 20px; }
+  }
+  @media (min-width: 1440px) {
+    .type-h6 { font-size: 22px; }
+  }
+
+  /* The product card title. Flat 14px at every width on the reference. */
+  .type-h8 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.2;
+    letter-spacing: 0.1px;
+  }
+  @media (min-width: 1920px) {
+    .type-h8 { font-size: 15px; }
+  }
+
+  .type-p1 {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* The reference's body default -- prices, filter labels, the product count. */
+  .type-p2 {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .type-p4 {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 1.5;
+    letter-spacing: 0.1px;
+  }
+
+  .type-p5 {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  /* Clamps to two lines AND reserves both, so a one-line product title does
+     not pull its price row up out of line with the rest of the grid row.
+     The reserved height must be EXACTLY two lines. Any taller and the box
+     outgrows the two lines the clamp renders, which lets the top of a third
+     line show through beneath them. `lh` is the element's own line-height, so
+     this stays exact whatever type scale it is used with; the em fallback
+     covers browsers without `lh` at the 1.2 line-height these titles use. */
   .line-clamp-2-fixed {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    min-height: 2.4em;
+    min-height: 2lh;
   }
 
   .reveal {
@@ -221,7 +339,15 @@
   .reveal[data-revealed='true'] {
     opacity: 1;
     transform: none;
-    filter: blur(0);
+    /* `none`, not `blur(0)`. Any filter value other than `none` creates a
+       stacking context that ISOLATES the group, so a descendant using
+       mix-blend-mode blends against this wrapper's own transparent backdrop
+       instead of the page behind it -- which silently disabled the hero
+       wordmark's difference blend and left it plain white over pale
+       photography. Dropping the filter once revealed also releases the
+       permanent GPU compositing layer it was holding. */
+    filter: none;
+    will-change: auto;
   }
 
   /* Announcement marquee -- ported from the reference site's own keyframe.
@@ -254,6 +380,63 @@
   .btn-solid:hover {
     background-color: var(--color-block-butter-deep);
     color: var(--color-ink);
+  }
+
+  /* The reference site's `simple-dropdown`: the panel that drops from a nav
+     item that has children. White, square at the top so it reads as an
+     extension of the header, 8px radius on the bottom two corners, and
+     revealed by animating max-height rather than height so the panel doesn't
+     need a measured size. Visibility is what actually takes it out of the
+     tab order, so it flips instantly on open and only after the collapse has
+     finished on close. */
+  .nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 50;
+    overflow: hidden;
+    max-height: 0;
+    visibility: hidden;
+    background-color: #ffffff;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    will-change: max-height;
+    transition:
+      max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0s linear 0.4s;
+  }
+  .nav-dropdown[data-open='true'] {
+    max-height: 500px;
+    visibility: visible;
+    transition:
+      max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0s linear 0s;
+  }
+
+  /* The reference's `menu-dropdown-wrapper`: the full-bleed sheet the "Shop
+     By" mega menu drops onto. Height is its own -- only opacity crossfades,
+     as it does there -- and visibility again lags the fade out so the links
+     leave the tab order only once the sheet has gone. */
+  .nav-mega {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 40;
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 5px 10px rgb(0 0 0 / 10%);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s linear,
+      visibility 0s linear 0.3s;
+  }
+  .nav-mega[data-open='true'] {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 0.3s linear,
+      visibility 0s linear 0s;
   }
 
   @keyframes float-slow {

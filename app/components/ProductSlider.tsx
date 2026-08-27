@@ -43,11 +43,17 @@ export function ProductSlider({
   linkLabel,
   linkTo,
   products,
+  showNewBadge = true,
 }: {
   title: string;
   linkLabel: string;
   linkTo: string;
   products: Promise<ProductSliderQuery | null>;
+  /**
+   * Off for the New Arrivals row, where the heading above the cards already
+   * says it and a "New" badge on every card is just the same word twice.
+   */
+  showNewBadge?: boolean;
 }) {
   const trackRef = useRef<HTMLUListElement | null>(null);
   const [atStart, setAtStart] = useState(true);
@@ -123,7 +129,10 @@ export function ProductSlider({
                           key={product.id}
                           className="shrink-0 snap-start w-[calc((100cqw_-_4px)/1.5)] min-[600px]:w-[calc((100cqw_-_18px)/2.5)] lg:w-[calc((100cqw_-_51.6px)/4.225)] min-[1920px]:w-[calc((100cqw_-_59.2px)/4.7)]"
                         >
-                          <SliderCard product={product} />
+                          <SliderCard
+                            product={product}
+                            showNewBadge={showNewBadge}
+                          />
                         </li>
                       ))}
                     </ul>
@@ -203,17 +212,38 @@ function NavArrowIcon({className}: {className?: string}) {
   );
 }
 
+/**
+ * How recently a product must have been added to still count as new.
+ *
+ * The badge used to be unconditional, on the reasoning that the New Arrivals
+ * query sorts by CREATED_AT so everything in it must be new. That does not
+ * hold: the sort orders the catalogue, it does not filter it, so on a small
+ * catalogue the row runs off the end of the genuinely-new products and keeps
+ * going. This storefront is mostly a single bulk import, so an unconditional
+ * badge was calling two-year-old products new -- on every row, including
+ * Bestsellers and Featured Products, which are not sorted by date at all.
+ */
+const NEW_FOR_DAYS = 30;
+
+function isNew(createdAt: string) {
+  const age = Date.now() - new Date(createdAt).getTime();
+  return Number.isFinite(age) && age < NEW_FOR_DAYS * 24 * 60 * 60 * 1000;
+}
+
 function SliderCard({
   product,
+  showNewBadge,
 }: {
   product: SliderProduct;
+  showNewBadge: boolean;
 }) {
   const image = product.featuredImage;
 
   // Badges.
   //
-  // "New" is true by construction: this section queries CREATED_AT desc, so
-  // everything in it genuinely is among the newest products in the catalogue.
+  // "New" is earned by the product's own createdAt (see [isNew]) rather than
+  // assumed from the row it happens to be in, and the New Arrivals row turns
+  // it off entirely as redundant with its own heading.
   //
   // Beyond that, only tags explicitly namespaced `badge:` are shown --
   // e.g. a Shopify tag `badge:Waterproof` renders as "Waterproof". Raw tags
@@ -221,7 +251,7 @@ function SliderCard({
   // `accessories`, `men`) and rendering them verbatim is noise, so opting in
   // by prefix keeps the shelf clean and gives the store one obvious lever.
   const badges = [
-    'New',
+    ...(showNewBadge && isNew(product.createdAt) ? ['New'] : []),
     ...(product.tags ?? [])
       .filter((tag) => tag.toLowerCase().startsWith('badge:'))
       .map((tag) => tag.slice('badge:'.length).trim())
@@ -253,7 +283,7 @@ function SliderCard({
           {badges.map((badge) => (
             <span
               key={badge}
-              className="rounded-[4px] bg-surface px-1.5 py-px text-[11px] leading-[1.5] tracking-[0.1px] text-ink min-[1440px]:text-[12px] min-[1920px]:text-[13px]"
+              className="rounded-[4px] border border-line bg-surface px-1.5 py-px text-[11px] leading-[1.5] tracking-[0.1px] text-ink min-[1440px]:text-[12px] min-[1920px]:text-[13px]"
             >
               {badge}
             </span>
@@ -314,6 +344,18 @@ function SliderCard({
             </span>
           </div>
         </div>
+
+        {/* The reference's quick-add: a 36x36 square outlined in 50% white,
+            bottom-aligned on the right of the info row. It is deliberately
+            near-invisible at rest -- white on a pale card -- and only reads
+            once the hover gradient darkens the bottom of the card, which is
+            the same moment the copy above flips to white. Desktop only, as
+            on the reference. */}
+        <span className="hidden shrink-0 self-end lg:block">
+          <span className="flex h-9 w-9 items-center justify-center rounded-[4px] border-[1.2px] border-line-strong text-ink transition-colors lg:group-hover:border-white/50 lg:group-hover:text-white">
+            <BagIcon className="h-[15px] w-[15px]" />
+          </span>
+        </span>
       </div>
     </Link>
   );
@@ -336,5 +378,27 @@ function SliderSkeleton() {
         ))}
       </ul>
     </div>
+  );
+}
+
+/**
+ * The reference's quick-add glyph -- a shopping bag, drawn at its own
+ * proportions (its svg is 12.25 x 15.75, i.e. noticeably taller than wide).
+ */
+function BagIcon({className}: {className?: string}) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 14 18"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M1 5h12l-.9 12H1.9L1 5Z" />
+      <path d="M4.6 7.4V4.1a2.4 2.4 0 0 1 4.8 0v3.3" />
+    </svg>
   );
 }

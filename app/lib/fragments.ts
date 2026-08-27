@@ -197,6 +197,41 @@ const MENU_FRAGMENT = `#graphql
   }
 ` as const;
 
+/**
+ * The two collection images behind the "Shop By" mega menu's banners.
+ *
+ * Handles come from `shopByMenu.banners` in store-config -- aliased rather
+ * than filtered so each banner keeps its slot even if one collection is
+ * missing an image.
+ */
+export const MEGA_MENU_QUERY = `#graphql
+  fragment MegaMenuBanner on Collection {
+    id
+    title
+    handle
+    image {
+      id
+      url
+      altText
+      width
+      height
+    }
+  }
+  query MegaMenuBanners(
+    $country: CountryCode
+    $firstHandle: String!
+    $language: LanguageCode
+    $secondHandle: String!
+  ) @inContext(country: $country, language: $language) {
+    first: collection(handle: $firstHandle) {
+      ...MegaMenuBanner
+    }
+    second: collection(handle: $secondHandle) {
+      ...MegaMenuBanner
+    }
+  }
+` as const;
+
 export const HEADER_QUERY = `#graphql
   fragment Shop on Shop {
     id

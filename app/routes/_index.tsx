@@ -79,14 +79,15 @@ export default function Homepage() {
 
   return (
     <>
-      <Hero collections={data.collections} />
-      <PromoBanner collection={data.collections[0]} />
+      <Hero />
+      <PromoBanner />
       <CategoryBlocks collections={data.collections} />
       <ProductSlider
         title="New Arrivals"
         linkLabel="Shop New Arrivals"
         linkTo="/collections/all"
         products={data.newArrivals}
+        showNewBadge={false}
       />
       <SplitBanners collections={data.collections} />
       <ProductSlider
@@ -95,7 +96,7 @@ export default function Homepage() {
         linkTo="/collections/all"
         products={data.bestsellers}
       />
-      <GridBanner collections={data.collections} />
+      <GridBanner />
       <Reviews collection={data.collections[1]} />
       <ProductSlider
         title="Featured Products"
@@ -124,7 +125,11 @@ const HOME_COLLECTIONS_QUERY = `#graphql
   }
   query HomeCollections($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 8, sortKey: UPDATED_AT, reverse: true) {
+    # 20 rather than the 8 collections the store has today: CategoryBlocks
+    # picks its six tiles by handle, so a handle must not fall off the end of
+    # this list as collections are added. The other sections index into it
+    # positionally, and a larger page leaves those indices untouched.
+    collections(first: 20, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...HomeCollection
       }
@@ -137,6 +142,7 @@ const PRODUCT_SLIDER_QUERY = `#graphql
     id
     title
     handle
+    createdAt
     tags
     priceRange {
       minVariantPrice {
