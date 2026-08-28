@@ -130,8 +130,13 @@ export default function Product() {
         />
 
         {/* Sticky on desktop so the buy box stays reachable through a long
-            description — on mobile it simply flows underneath the gallery. */}
-        <div className="lg:sticky lg:top-28 lg:self-start">
+            description — on mobile it simply flows underneath the gallery.
+
+            `min-w-0`, like the gallery column: a grid item defaults to a
+            content-based minimum width, so one long unbreakable token in the
+            description (a URL, a part number) would otherwise widen this
+            column past the phone viewport instead of wrapping inside it. */}
+        <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
           {product.vendor && (
             <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-ink-soft">
               {product.vendor}

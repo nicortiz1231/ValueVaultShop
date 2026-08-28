@@ -155,7 +155,7 @@ export function ProductSlider({
                     <ul
                       ref={attachTrack}
                       onScroll={syncEdges}
-                      className="flex snap-x snap-mandatory items-stretch overflow-x-auto scroll-smooth px-4 scroll-pl-4 gap-x-2 [scrollbar-width:none] min-[600px]:gap-x-3 min-[600px]:px-5 min-[600px]:scroll-pl-5 lg:gap-x-4 lg:px-8 lg:scroll-pl-8 wide:px-10 wide:scroll-pl-10 [&::-webkit-scrollbar]:hidden"
+                      className="flex snap-x snap-mandatory items-stretch overflow-x-auto overscroll-x-contain scroll-smooth px-4 scroll-pl-4 gap-x-2 [scrollbar-width:none] min-[600px]:gap-x-3 min-[600px]:px-5 min-[600px]:scroll-pl-5 lg:gap-x-4 lg:px-8 lg:scroll-pl-8 wide:px-10 wide:scroll-pl-10 [&::-webkit-scrollbar]:hidden"
                     >
                       {nodes.map((product) => (
                         <li

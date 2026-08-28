@@ -82,7 +82,7 @@ export function CollectionHeader({
             /* Bleeds to the screen edges so the row can scroll under the
                gutter on a phone, exactly as the reference's `.filter` does
                with its negative margin. */
-            className="-mx-4 mt-6 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] min-[600px]:-mx-5 min-[600px]:gap-3 min-[600px]:px-5 min-[1024px]:mx-0 min-[1024px]:mt-7 min-[1024px]:justify-center min-[1024px]:px-0 min-[1440px]:gap-4 [&::-webkit-scrollbar]:hidden"
+            className="-mx-4 mt-6 flex gap-2 overflow-x-auto overscroll-x-contain px-4 [scrollbar-width:none] min-[600px]:-mx-5 min-[600px]:gap-3 min-[600px]:px-5 min-[1024px]:mx-0 min-[1024px]:mt-7 min-[1024px]:justify-center min-[1024px]:px-0 min-[1440px]:gap-4 [&::-webkit-scrollbar]:hidden"
           >
             {categories.map((category) => (
               <Link

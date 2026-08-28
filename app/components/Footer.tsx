@@ -205,7 +205,11 @@ function NewsletterForm() {
         type="email"
         required
         placeholder="Enter your email"
-        className="m-0 w-full flex-auto rounded-[4px] border border-line bg-surface px-4 py-[11.756px] text-[13px] leading-[1.5] text-ink placeholder:text-ink-soft focus:outline-none"
+        // 16px on a phone so focusing it cannot trigger iOS Safari's
+        // zoom-in-on-a-small-field behaviour, which leaves the page
+        // magnified and pannable sideways with no way back. 13px again from
+        // 600px up, which is every width this footer was designed at.
+        className="m-0 w-full flex-auto rounded-[4px] border border-line bg-surface px-4 py-[11.756px] text-[16px] leading-[1.5] text-ink placeholder:text-ink-soft focus:outline-none min-[600px]:text-[13px]"
       />
       <button
         type="submit"

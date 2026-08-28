@@ -28,10 +28,18 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
   return (
     <div
       aria-labelledby={summaryId}
+      // `min-w-0` on the page branch, for the same reason the line-item list
+      // beside it carries one: both are items in the cart page's grid, and a
+      // grid item keeps its content's minimum width unless told it may
+      // shrink. The discount and gift-card rows here are a text field next to
+      // a button, which together measure ~310px, and that number was setting
+      // the width of the single mobile column -- and so of the page -- rather
+      // than the phone's screen. With the floor lifted the field shrinks
+      // (it already has its own `min-w-0`) and the button keeps its size.
       className={
         isAside
           ? 'shrink-0 border-t border-line bg-surface px-5 py-5'
-          : 'rounded-card border border-line bg-surface p-6 lg:sticky lg:top-28'
+          : 'min-w-0 rounded-card border border-line bg-surface p-6 lg:sticky lg:top-28'
       }
     >
       <h4 id={summaryId} className="sr-only">
@@ -137,7 +145,7 @@ function CartDiscounts({
               type="text"
               name="discountCode"
               placeholder="Discount code"
-              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-4 text-sm text-ink placeholder:text-ink-soft"
+              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-4 text-[16px] text-ink placeholder:text-ink-soft min-[600px]:text-sm"
             />
             <button
               type="submit"
@@ -268,7 +276,7 @@ function CartGiftCard({
               name="giftCardCode"
               placeholder="Gift card code"
               ref={giftCardCodeInput}
-              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-4 text-sm text-ink placeholder:text-ink-soft"
+              className="h-10 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-4 text-[16px] text-ink placeholder:text-ink-soft min-[600px]:text-sm"
             />
             <button
               type="submit"

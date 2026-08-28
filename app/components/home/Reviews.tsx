@@ -49,7 +49,7 @@ export function Reviews({
           </div>
 
           <div className="w-full bg-block-sky py-12 lg:w-8/12 lg:py-20 min-[1440px]:w-7/12 min-[1440px]:pb-[100px] min-[1440px]:pt-[120px] min-[1920px]:w-8/12 min-[1920px]:pb-[120px] min-[1920px]:pt-[200px]">
-            <ul className="flex snap-x snap-mandatory items-stretch gap-x-2 overflow-x-auto scroll-smooth px-4 scroll-pl-4 [scrollbar-width:none] min-[600px]:gap-x-2 lg:gap-x-3 lg:pl-[60px] lg:pr-8 lg:scroll-pl-[60px] min-[1200px]:gap-x-4 min-[1200px]:pr-11 [&::-webkit-scrollbar]:hidden">
+            <ul className="flex snap-x snap-mandatory items-stretch gap-x-2 overflow-x-auto overscroll-x-contain scroll-smooth px-4 scroll-pl-4 [scrollbar-width:none] min-[600px]:gap-x-2 lg:gap-x-3 lg:pl-[60px] lg:pr-8 lg:scroll-pl-[60px] min-[1200px]:gap-x-4 min-[1200px]:pr-11 [&::-webkit-scrollbar]:hidden">
               {items.map((review, i) => (
                 <Reveal
                   key={review.author}

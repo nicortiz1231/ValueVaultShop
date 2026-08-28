@@ -59,7 +59,7 @@ export default function SearchPage() {
                 placeholder="Search products…"
                 ref={inputRef}
                 type="search"
-                className="h-12 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-5 text-[15px] text-ink placeholder:text-ink-soft"
+                className="h-12 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-5 text-[16px] text-ink placeholder:text-ink-soft min-[600px]:text-[15px]"
               />
               <button
                 type="submit"

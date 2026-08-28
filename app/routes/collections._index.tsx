@@ -125,7 +125,9 @@ function CollectionItem({
       <div className="p-4">
         <h2 className="flex items-center gap-1.5 text-[15px] font-semibold text-ink">
           {tile.title}
-          <ArrowIcon className="h-4 w-4 text-brand opacity-0 transition-opacity group-hover:opacity-100" />
+          {/* Shown outright on touch, where there is no hover to reveal it
+              with — it is the only affordance marking the tile as a link. */}
+          <ArrowIcon className="h-4 w-4 text-brand opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100" />
         </h2>
         <p className="mt-1 text-[13px] leading-[1.5] text-ink-muted">
           {tile.blurb}

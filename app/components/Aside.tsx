@@ -18,6 +18,12 @@ type AsideContextValue = {
 /**
  * Slide-over panel used for the cart, search and mobile menu.
  *
+ * `side` decides which edge it is anchored to and slides in from. It defaults
+ * to the right, which is where the cart and search live because their icons
+ * are in the right-hand cluster of the header. The mobile menu passes `left`
+ * instead, so the panel comes out from under the hamburger that opened it
+ * rather than flying in from the opposite side of the screen.
+ *
  * @example
  * ```jsx
  * <Aside type="search" heading="Search">
@@ -29,14 +35,17 @@ export function Aside({
   children,
   heading,
   type,
+  side = 'right',
 }: {
   children?: React.ReactNode;
   type: AsideType;
   heading: React.ReactNode;
+  side?: 'left' | 'right';
 }) {
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
   const id = useId();
+  const offscreen = side === 'left' ? '-translate-x-full' : 'translate-x-full';
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -86,9 +95,13 @@ export function Aside({
 
       <aside
         className={[
-          'absolute right-0 top-0 flex h-full w-full max-w-[26rem] flex-col',
+          'absolute top-0 flex h-full w-full max-w-[26rem] flex-col',
           'bg-surface shadow-card transition-transform duration-300 ease-out',
-          expanded ? 'translate-x-0' : 'translate-x-full',
+          side === 'left' ? 'left-0' : 'right-0',
+          // Closed, the panel is parked one full width beyond its own edge --
+          // off to the left of a left-anchored panel, to the right of a
+          // right-anchored one, so the two directions take opposite signs.
+          expanded ? 'translate-x-0' : offscreen,
         ].join(' ')}
       >
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-line px-5">

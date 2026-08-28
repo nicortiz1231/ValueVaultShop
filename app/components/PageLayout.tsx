@@ -101,7 +101,10 @@ function SearchAside() {
                 ref={inputRef}
                 type="search"
                 list={queriesDatalistId}
-                className="h-11 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-4 text-[15px] text-ink placeholder:text-ink-soft"
+                // 16px minimum, or iOS Safari zooms the page in on focus and
+                // leaves it there. This drawer is the phone's only search, so
+                // the 15px only ever needs to apply from `lg` up.
+                className="h-11 min-w-0 flex-1 rounded-pill border border-line-strong bg-surface px-4 text-[16px] text-ink placeholder:text-ink-soft lg:text-[15px]"
               />
               <button
                 onClick={goToSearch}
@@ -176,7 +179,10 @@ function SearchAside() {
 /** The nav is config-driven, so this needs nothing from the Shopify menu. */
 function MobileMenuAside() {
   return (
-    <Aside type="mobile" heading="Menu">
+    // Anchored left, unlike the cart and search: the hamburger that opens it
+    // is the leftmost thing in the header, so the panel should come out from
+    // under the thumb that tapped it.
+    <Aside type="mobile" heading="Menu" side="left">
       <div className="px-5">
         <HeaderMenu viewport="mobile" />
       </div>

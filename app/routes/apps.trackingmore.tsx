@@ -101,7 +101,7 @@ export default function OrderLookupPage() {
                   setShowTrackingHelp(false);
                 }}
                 placeholder="Enter your tracking number"
-                className="min-h-12 flex-1 border border-line-strong bg-white px-4 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+                className="min-h-12 flex-1 border border-line-strong bg-white px-4 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink min-[600px]:text-[15px]"
               />
 
               <button

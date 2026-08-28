@@ -145,7 +145,7 @@ export default function ContactPage() {
                   type="text"
                   name="name"
                   autoComplete="name"
-                  className="w-full appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+                  className="w-full appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink min-[600px]:text-[15px]"
                   placeholder="Your name"
                 />
               </Field>
@@ -156,7 +156,7 @@ export default function ContactPage() {
                   type="email"
                   name="email"
                   autoComplete="email"
-                  className="w-full appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+                  className="w-full appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink min-[600px]:text-[15px]"
                   placeholder="you@example.com"
                 />
               </Field>
@@ -167,7 +167,7 @@ export default function ContactPage() {
                 <input
                   type="text"
                   name="orderNumber"
-                  className="w-full appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+                  className="w-full appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink min-[600px]:text-[15px]"
                   placeholder="Optional"
                 />
               </Field>
@@ -179,7 +179,7 @@ export default function ContactPage() {
                   required
                   name="message"
                   rows={6}
-                  className="w-full resize-none appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] leading-7 text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+                  className="w-full resize-none appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[16px] leading-7 text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink min-[600px]:text-[15px]"
                   placeholder="How can we help?"
                 />
               </Field>

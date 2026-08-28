@@ -69,7 +69,14 @@ export function OrderTrackForm({
             setShowHelp(false);
           }}
           placeholder="Tracking number"
-          className="my-0 h-9 min-w-0 flex-1 rounded-pill border border-line-strong bg-white px-3.5 text-[13px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+          // 16px below `lg`, 13px from there up. Not a size preference: iOS
+          // Safari zooms the whole page in when a field smaller than 16px
+          // takes focus, and it does not zoom back out afterwards -- the
+          // shopper is left on a magnified page they now have to pan
+          // sideways. This form renders twice, in the desktop dropdown and
+          // again inside the mobile menu drawer, and `lg` is exactly where
+          // the drawer hands over, so the desktop instance keeps its 13px.
+          className="my-0 h-9 min-w-0 flex-1 rounded-pill border border-line-strong bg-white px-3.5 text-[16px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink lg:text-[13px]"
         />
 
         {/* Matches the field exactly -- same 36px height, same pill radius --

@@ -342,13 +342,19 @@ function FilterDrawer({
       />
 
       {/* The reference's `.cns__drawer-inner`. Two quite different shapes:
-          a bottom sheet at 90vh on a phone, and from 600px up a floating
+          a bottom sheet at 90% on a phone, and from 600px up a floating
           panel inset 32px from the left and top, 360px wide (400 from 1440,
-          420 from 1920). Both slide in over 300ms. */}
+          420 from 1920). Both slide in over 300ms.
+
+          The sheet is a percentage of this fixed `inset-0` parent rather than
+          90vh, because on a phone those are not the same box: `vh` is the
+          LARGE viewport, the page as it is with the browser toolbars rolled
+          away, so a 90vh sheet measured against it hangs below the screen
+          while the toolbars are showing and its footer actions go with it. */}
       <div
         className={[
           'absolute flex flex-col bg-bg',
-          'bottom-0 left-0 h-[90vh] w-full rounded-t-[6px]',
+          'bottom-0 left-0 h-[90%] w-full rounded-t-[6px]',
           'min-[600px]:bottom-auto min-[600px]:left-8 min-[600px]:top-8',
           'min-[600px]:h-[calc(100vh-64px)] min-[600px]:w-[360px] min-[600px]:rounded-[8px]',
           'min-[1440px]:w-[400px] min-[1920px]:w-[420px]',
@@ -370,7 +376,15 @@ function FilterDrawer({
                 onClick={onClose}
                 aria-label="Close filters"
                 tabIndex={open ? 0 : -1}
-                className="flex h-4 w-4 items-center justify-center text-ink-muted transition-colors hover:text-ink"
+                // The icon stays 16px, but on a phone the thing you can
+                // actually hit must not be: the ::before grows the touch
+                // target to 36x40 without occupying any layout, so the header
+                // row is laid out exactly as it was. It reaches only 8px to
+                // the left -- the width of the gap -- so it stops at "Clear"
+                // rather than over it, and takes the slack on the right where
+                // there is nothing but the panel edge. Dropped from 600px up,
+                // where this is a pointer target rather than a thumb one.
+                className="relative flex h-4 w-4 items-center justify-center text-ink-muted transition-colors before:absolute before:-inset-y-3 before:-left-2 before:-right-3 before:content-[''] hover:text-ink min-[600px]:before:hidden"
               >
                 <CloseIcon className="h-4 w-4" />
               </button>

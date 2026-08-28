@@ -22,7 +22,14 @@
     padding: 0;
     display: flex;
     flex-direction: column;
+    /* `dvh`, not `vh`: on a phone `100vh` is the tall viewport the page only
+       has once the browser's toolbars have rolled away, so a short page is
+       given a body taller than the screen and picks up a stray scroll of
+       exactly the toolbar's height with nothing in it. `dvh` is the height
+       actually on screen. The `vh` line above it is the fallback for
+       anything that does not know `dvh`. */
     min-height: 100vh;
+    min-height: 100dvh;
   }
 
   h1, h2, p {

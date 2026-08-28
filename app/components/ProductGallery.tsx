@@ -47,8 +47,18 @@ export function ProductGallery({
     );
   }
 
+  // `min-w-0` is load-bearing on a phone. This column is a grid item, and a
+  // grid item's automatic minimum size is its content's min-content width --
+  // which here is the thumbnail strip's, the full un-scrolled row of 72px
+  // tiles (482px at six images, 564px at seven). Without this the whole
+  // product grid, both columns, is sized to that number rather than to the
+  // viewport, and every line of the info column beside it hangs off the right
+  // edge of a 390px screen. `overflow-x-auto` on the strip does not save it:
+  // the automatic-minimum-size escape hatch applies on a flex container's
+  // MAIN axis, and this column is `flex-col`, so the strip's width is a cross
+  // axis and keeps its content-based minimum.
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex min-w-0 flex-col gap-3">
       <div className="overflow-hidden rounded-card border border-line bg-surface">
         <Image
           alt={active.altText || title}
@@ -62,7 +72,7 @@ export function ProductGallery({
       </div>
 
       {gallery.length > 1 && (
-        <ul className="flex gap-2.5 overflow-x-auto pb-1">
+        <ul className="flex gap-2.5 overflow-x-auto overscroll-x-contain pb-1">
           {gallery.map((image) => {
             const isActive = image.id === active.id;
             return (

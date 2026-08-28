@@ -103,7 +103,13 @@ export const CartLineItem = forwardRef<
             </ul>
           )}
 
-          <div className="mt-auto flex items-end justify-between gap-3 pt-3">
+          {/* Wraps rather than overflows. The stepper and the line total are
+              both fixed-size — neither can give — so on the narrowest phones
+              (320px, where the text column is about 174px) the total would
+              otherwise be pushed straight out through the right edge of the
+              card. There is room for them side by side from ~360px up, which
+              is every mainstream phone, so wrapping is the rare case. */}
+          <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-3">
             <CartLineQuantity line={line} />
             <AnimatedMoney
               data={displayLineTotal(line, priceLocally)}

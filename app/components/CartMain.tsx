@@ -73,10 +73,17 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
 
       <ul
         aria-labelledby="cart-lines"
+        // `min-w-0` on the page branch: this list is a grid item, and a grid
+        // item is auto-sized to its content's minimum width unless told
+        // otherwise. A line's thumbnail, quantity stepper and price total
+        // about 360px whatever the screen is, so without it the cart column
+        // is 360px wide on a 320px phone and the whole page hangs off the
+        // right edge. The drawer branch is a flex child, not a grid item, and
+        // is already free to shrink.
         className={
           isAside
             ? 'flex-1 divide-y divide-line overflow-y-auto px-5'
-            : 'divide-y divide-line border-y border-line'
+            : 'min-w-0 divide-y divide-line border-y border-line'
         }
       >
         {/* `popLayout` pulls a removed line out of the flow before it has

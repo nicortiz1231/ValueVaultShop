@@ -75,7 +75,7 @@ export function GridBanner() {
             </Reveal>
           </div>
 
-          <ul className="flex snap-x snap-mandatory items-start gap-x-3 overflow-x-auto scroll-smooth px-4 scroll-pl-4 [scrollbar-width:none] min-[600px]:px-5 min-[600px]:scroll-pl-5 lg:grid lg:grid-cols-3 lg:gap-4 lg:overflow-visible lg:px-8 min-[1200px]:px-10 [&::-webkit-scrollbar]:hidden">
+          <ul className="flex snap-x snap-mandatory items-start gap-x-3 overflow-x-auto overscroll-x-contain scroll-smooth px-4 scroll-pl-4 [scrollbar-width:none] min-[600px]:px-5 min-[600px]:scroll-pl-5 lg:grid lg:grid-cols-3 lg:gap-4 lg:overflow-visible lg:px-8 min-[1200px]:px-10 [&::-webkit-scrollbar]:hidden">
             {cards.map(({title, body, to, image, aspect}, i) => (
               <Reveal
                 key={title}
