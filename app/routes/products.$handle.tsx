@@ -71,7 +71,15 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
   return {
-    product,
+    // Stripped here rather than at render so the supplier's URLs never reach
+    // the browser at all. Doing it in the component left the original HTML
+    // sitting in the serialised loader data -- the page looked right, but the
+    // dropshipping host was still one view-source away, which is the thing
+    // this was meant to avoid. It also trims the payload by ~2.3KB.
+    product: {
+      ...product,
+      descriptionHtml: stripBlockedDescriptionImages(product.descriptionHtml),
+    },
   };
 }
 
@@ -106,11 +114,9 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const {title} = product;
-  // The imported descriptions carry supplier-hosted images the storefront's
-  // own CSP refuses to load, which render as a column of broken-image icons
-  // under the Details heading. See ~/lib/product-description.
-  const descriptionHtml = stripBlockedDescriptionImages(product.descriptionHtml);
+  // `descriptionHtml` has already had the images the CSP would refuse removed,
+  // in the loader -- see ~/lib/product-description.
+  const {title, descriptionHtml} = product;
   const inStock = Boolean(selectedVariant?.availableForSale);
 
   return (
