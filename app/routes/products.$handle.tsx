@@ -14,6 +14,7 @@ import {ProductForm} from '~/components/ProductForm';
 import {ProductTrustPanel} from '~/components/ProductTrustPanel';
 import {StarRating} from '~/components/StarRating';
 import {Container} from '~/components/ui/Container';
+import {stripBlockedDescriptionImages} from '~/lib/product-description';
 import {CheckIcon} from '~/components/Icons';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {store} from '~/lib/store-config';
@@ -105,7 +106,11 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const {title, descriptionHtml} = product;
+  const {title} = product;
+  // The imported descriptions carry supplier-hosted images the storefront's
+  // own CSP refuses to load, which render as a column of broken-image icons
+  // under the Details heading. See ~/lib/product-description.
+  const descriptionHtml = stripBlockedDescriptionImages(product.descriptionHtml);
   const inStock = Boolean(selectedVariant?.availableForSale);
 
   return (
