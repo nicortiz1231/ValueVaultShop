@@ -27,12 +27,37 @@ import {resolveCollectionImage} from '~/lib/collection-images';
  * collection never appears two different ways. Shopify's own image is always
  * preferred, so setting one in admin silently takes over here.
  */
+
+/**
+ * The two collections the banners show, named rather than counted to.
+ *
+ * This was `collections.slice(2, 4)` -- the third and fourth entries of a
+ * query that asks for `sortKey: UPDATED_AT, reverse: true`. That made the
+ * homepage a function of the order collections happen to have been last
+ * edited in admin: editing any collection reordered the list and the banners
+ * silently swapped to whoever landed in those two slots. It is how Trending
+ * Now became "Kitchen Gadgets Under $20" here without this file changing, and
+ * it took the panel's photograph with it, because the stand-in in
+ * `~/lib/collection-images` is keyed by handle and there is none for that one.
+ *
+ * Naming them also means `collection-images` can be trusted: an entry there
+ * only helps if the handle it is keyed to is actually the one on screen.
+ * CategoryBlocks already picks its collections this way.
+ */
+const BANNER_HANDLES = ['trending-now', 'best-selling'] as const;
 export function SplitBanners({
   collections,
 }: {
   collections: HomeCollectionFragment[];
 }) {
-  const [first, second] = collections.slice(2, 4);
+  // The old positional pick is kept only as a safety net, so a handle renamed
+  // in admin degrades to some collection rather than to an empty section.
+  const positional = collections.slice(2, 4);
+  const [first, second] = BANNER_HANDLES.map(
+    (handle, index) =>
+      collections.find((collection) => collection.handle === handle) ??
+      positional[index],
+  );
   if (!first || !second) return null;
 
   const blocks = [
