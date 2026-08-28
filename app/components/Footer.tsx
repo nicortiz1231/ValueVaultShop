@@ -1,7 +1,27 @@
 import {Suspense} from 'react';
 import {Await, Link, NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
-import {categories, social, store, support} from '~/lib/store-config';
+import {
+  categories,
+  navigation,
+  social,
+  store,
+  support,
+} from '~/lib/store-config';
+
+/**
+ * Where "Order lookup" goes, taken from the nav config rather than written
+ * out again here.
+ *
+ * It used to be `/account/orders`, which is not order lookup -- it is the
+ * signed-in account area, and the shopper who wants to find an order is
+ * precisely the one least likely to have an account. Following it signed out
+ * left the storefront altogether and landed on Shopify's own sign-in page.
+ * The header's "Order Look Up" has always pointed at the real page; reading
+ * both from `navigation` is what keeps them from drifting apart again.
+ */
+const ORDER_LOOKUP_URL =
+  navigation.find((item) => item.panel === 'order')?.url ?? '/apps/trackingmore';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -122,7 +142,7 @@ export function Footer({
             </FooterColumn>
 
             <FooterColumn title="Support">
-              <FooterLink to="/account/orders">Order lookup</FooterLink>
+              <FooterLink to={ORDER_LOOKUP_URL}>Order lookup</FooterLink>
               <a
                 href={`mailto:${support.email}`}
                 className="text-[13px] leading-[1.5] text-ink no-underline transition-opacity duration-300 hover:text-ink hover:no-underline lg:hover:opacity-50"
