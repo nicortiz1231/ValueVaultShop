@@ -1,25 +1,38 @@
 # Going live
 
-The storefront is built and runs against Shopify's `mock.shop` demo catalogue,
-which is why the products currently look like apparel. Nothing below is
+The storefront runs against the real Value Vault catalogue. Nothing below is
 optional-but-nice — these are the steps between here and taking real orders.
 
 ---
 
-## 1. Connect the real store
+## 1. Connect the real store — DONE 2026-08-28
 
-This is the only step that swaps the demo catalogue for Value Vault's actual
-products. Everything else on this list can wait; this one cannot.
+The store is linked and `.env` holds real credentials. For the record, because
+the two channels are easy to confuse:
+
+- **Headless** channel — issues the Storefront API tokens. Was already
+  installed, with a storefront named *Value Vault Headless* whose permissions
+  already included `unauthenticated_read_content`.
+- **Hydrogen** channel — Oxygen hosting, and what `hydrogen link` / `env pull` /
+  `deploy` actually talk to. Installed on 2026-08-28; `link` created a Hydrogen
+  storefront named *Valuevaultshop*.
 
 ```bash
-npx shopify hydrogen link      # pick the Value Vault storefront
+npx shopify hydrogen link      # pick Valuevaultshop
 npx shopify hydrogen env pull  # writes real tokens into .env
 npm run dev
 ```
 
-`hydrogen link` requires the Headless channel on the Shopify store. If it is not
-installed yet: Shopify admin → Sales channels → add **Headless** → create a
-storefront → it issues the Storefront API tokens that `env pull` then fetches.
+`env pull` set `PUBLIC_STOREFRONT_ID`, `PRIVATE_STOREFRONT_API_TOKEN`,
+`PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID`, `PUBLIC_CUSTOMER_ACCOUNT_API_URL` and
+`SHOP_ID`, and replaced the interim `PUBLIC_STOREFRONT_API_TOKEN` that had been
+read out of the live Liquid theme. That old token lacked the content scope,
+which is why every page load used to log twelve `Access denied for menu field`
+errors from the `Header`, `Footer`, `Page` and `redirects` queries. Those are
+gone.
+
+It also overwrote `SESSION_SECRET`. Nothing depended on the old value, but note
+that `env pull` does that — back `.env` up before running it again.
 
 `.env` is gitignored. This repository is public, so never commit it — if a token
 does get pushed, rotate it in the Headless channel rather than just deleting the
@@ -29,7 +42,8 @@ commit.
 
 `app/lib/store-config.ts` drives the Shop menu, the /collections page and every
 category page from this list. All five were checked against the live Liquid
-store on 2026-08-27 and every one resolves:
+store on 2026-08-27, and re-confirmed against the linked Storefront API on
+2026-08-28 — `/collections/home-accessories` returns all fourteen products:
 
 | Handle | Shown as | Products on the live store |
 | --- | --- | --- |
@@ -39,10 +53,8 @@ store on 2026-08-27 and every one resolves:
 | `pet-accessories` | Pet Accessories | 9 |
 | `kids-babies` | Kids & Babies | 6 |
 
-So `/collections/home-accessories` will show the same fourteen products the
-live site shows the moment step 1 is done. Until then it 404s, because
-`mock.shop` has no such collection — that 404 is the storefront not being
-linked yet, not a broken route.
+These are the same records the Liquid site serves — one store, two front
+doors. A price changed in admin shows up on both.
 
 ## 3. Turn on filters in Search & Discovery
 
@@ -60,6 +72,78 @@ Two knock-on effects worth knowing:
   Metafields → Product options if you want them.
 - Nothing needs a code change to add a facet. A new filter switched on in
   admin appears in the drawer on the next page load.
+
+---
+
+## 4. Search covers products — articles and pages are opt-in
+
+Search works against the live catalogue as-is: the header field and `/search`
+both query Shopify directly, so whatever is in the store is findable the
+moment it is published. Nothing is hardcoded and nothing needs a code change
+when the catalogue changes.
+
+Blog articles and pages were the one exception. Shopify puts `Article` and
+`Page` behind the **`unauthenticated_read_content`** access scope, and asking
+for a field the token cannot read fails the *entire* query rather than dropping
+that one field — so a search that should have returned twenty products returned
+an error instead.
+
+Both fields are therefore requested conditionally, behind `SEARCH_CONTENT` in
+`app/lib/search.ts`. **It is now `true`** — the Headless storefront's token
+carries the scope, so article and page hits appear in the header dropdown and
+on `/search`.
+
+Only turn it back off if that scope is ever revoked. Having it on without the
+scope is what breaks search, so the two go together.
+
+---
+
+## 5. Customer accounts — the person icon
+
+The header's person icon drops the same card the live Liquid site does:
+**Sign in with shop**, an OR divider, an email field with an arrow, the
+marketing checkbox, and Orders / Profile tiles.
+
+Where it differs is *where* the sign-in happens, and it has to. Shopify owns
+customer identity on a headless storefront: the in-page Shop popup belongs to
+`shop-js`, a Liquid theme embed with no way to hand a session back to a
+Hydrogen route, and the Customer Account API only issues one through its OAuth
+flow. So the button hands off — `/account/login` redirects into
+`customerAccount.login()` and lands on Shopify's own page, which leads with
+Shop and offers the emailed code beside it. A shopper still signs in with
+Shop; they do it one navigation away. The email field is not decorative
+either: it forwards the address as `login_hint`, which that page reads to
+prefill it.
+
+**"Email me with news and offers" is not wired to anything yet.** Shopify's
+OAuth login takes no marketing-consent parameter, so the checkbox cannot ride
+along with `login_hint`, and this storefront has no subscriber list of its own
+— the footer's newsletter form is unwired for the same reason. Connect both to
+the same destination at once rather than collecting an opt-in here and
+dropping it.
+
+**The two environment variables this needs are now set.** `env pull` wrote
+`PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID` and `PUBLIC_CUSTOMER_ACCOUNT_API_URL`
+into `.env` on 2026-08-28.
+
+`/account/login` still returns 400 on localhost, and that is correct — it is
+this app's own message saying OAuth needs a tunnel. See below.
+
+**Testing it locally needs a tunnel.** Shopify's OAuth will not redirect back
+to `localhost`, so:
+
+```bash
+npm run dev -- --customer-account-push
+```
+
+then open the `https://*.tryhydrogen.dev` URL the terminal prints instead of
+localhost. The flag registers that URL as a callback for you. Hydrogen says as
+much if you try it on localhost.
+
+For production, the deployed domain has to be allow-listed in Shopify admin →
+**Customer accounts** → Customer Account API → Application setup: callback URI
+`https://<domain>/account/authorize`, plus the JavaScript origin and logout
+URI for the same domain.
 
 ---
 
@@ -125,11 +209,15 @@ is no rush and no downtime.
 
 ## Before flipping the domain
 
-- [ ] Real products and collections appear on the homepage
-- [ ] `/collections/home-accessories` lists all 14 products
+- [x] Real products and collections appear on the homepage
+- [x] `/collections/home-accessories` lists all 14 products
 - [ ] Filter, sort and Load More all work on a category page
 - [ ] A test order completes end to end through Shopify checkout
 - [ ] Cart drawer, quantity steppers and remove all behave on a phone
 - [ ] Policy pages render and say the same thing as `store-config.ts`
 - [ ] Support email in the footer is monitored and replies land
-- [ ] `npm run build` passes
+- [ ] Header search suggests real products, and Enter reaches `/search`
+- [ ] Person icon signs in end to end, and Orders lists a real order
+- [x] `npm run build` passes (2026-08-28)
+- [ ] Payouts un-paused — admin flagged "payouts paused due to insufficient
+      funds" on 2026-08-28; the store cannot be paid until that is resolved

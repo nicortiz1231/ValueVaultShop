@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import {Link} from 'react-router';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'accent';
@@ -58,20 +58,49 @@ function classes(
  */
 function useMagnetic<T extends HTMLElement>() {
   const ref = useRef<T>(null);
+  // Read once on mount instead of on every mouse event. Building a
+  // MediaQueryList is not free, and this ran twice per event, on an event
+  // that fires as fast as the pointer moves.
+  const allowed = useRef(false);
+  const frame = useRef(0);
+  const point = useRef({x: 0, y: 0});
+
+  useEffect(() => {
+    allowed.current =
+      !window.matchMedia('(pointer: coarse)').matches &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return () => {
+      if (frame.current) cancelAnimationFrame(frame.current);
+    };
+  }, []);
 
   const onMouseMove = (e: React.MouseEvent<T>) => {
-    const node = ref.current;
-    if (!node) return;
-    if (window.matchMedia('(pointer: coarse)').matches) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!allowed.current || !ref.current) return;
+    point.current.x = e.clientX;
+    point.current.y = e.clientY;
 
-    const rect = node.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    node.style.transform = `translate(${x * 0.18}px, ${y * 0.35}px)`;
+    // The event can fire several times between two paints, and each pass
+    // measured the button and then wrote to it -- a layout read against a
+    // style write the browser had not flushed yet. Coalescing to one update
+    // per frame leaves at most one measurement per painted frame, which is
+    // the most that can ever be seen anyway.
+    if (frame.current) return;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = 0;
+      const node = ref.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const x = point.current.x - rect.left - rect.width / 2;
+      const y = point.current.y - rect.top - rect.height / 2;
+      node.style.transform = `translate3d(${x * 0.18}px, ${y * 0.35}px, 0)`;
+    });
   };
 
   const onMouseLeave = () => {
+    if (frame.current) {
+      cancelAnimationFrame(frame.current);
+      frame.current = 0;
+    }
     const node = ref.current;
     if (node) node.style.transform = '';
   };

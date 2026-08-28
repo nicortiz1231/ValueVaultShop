@@ -1,14 +1,17 @@
 import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
 import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
 import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
+import {motion, type HTMLMotionProps} from 'framer-motion';
+import NumberFlow from '@number-flow/react';
+import {forwardRef} from 'react';
 import {useVariantUrl} from '~/lib/variants';
+import {cartLineMotion, EASE_SPRING} from '~/lib/motion';
+import {displayLineTotal} from '~/lib/optimistic-pricing';
 import {Link} from 'react-router';
-import {ProductPrice} from './ProductPrice';
+import {AnimatedMoney} from './ui/AnimatedMoney';
+import {MinusIcon, PlusIcon} from './Icons';
 import {useAside} from './Aside';
-import type {
-  CartApiQueryFragment,
-  CartLineFragment,
-} from 'storefrontapi.generated';
+import type {CartApiQueryFragment} from 'storefrontapi.generated';
 
 export type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
@@ -17,17 +20,26 @@ export type CartLine = OptimisticCartLine<CartApiQueryFragment>;
  * It also provides controls to update the quantity or remove the line item.
  * If the line is a parent line that has child components (like warranties or gift wrapping), they are
  * rendered nested below the parent line.
+ *
+ * The line animates in and out. Exit only actually plays for top-level lines,
+ * which `CartMain` wraps in an `<AnimatePresence>`; nested child lines mount
+ * and unmount with their parent.
+ *
+ * The ref has to be forwarded: `AnimatePresence mode="popLayout"` measures a
+ * departing line before pulling it out of the flow, and it can only do that
+ * if it can reach the real `<li>`. Without this the measurement silently
+ * fails and the surviving lines jump to the wrong offset.
  */
-export function CartLineItem({
-  layout,
-  line,
-  childrenMap,
-}: {
-  layout: CartLayout;
-  line: CartLine;
-  childrenMap: LineItemChildrenMap;
-}) {
-  const {id, merchandise} = line;
+export const CartLineItem = forwardRef<
+  HTMLLIElement,
+  {
+    layout: CartLayout;
+    line: CartLine;
+    childrenMap: LineItemChildrenMap;
+    priceLocally: boolean;
+  }
+>(function CartLineItem({layout, line, childrenMap, priceLocally}, ref) {
+  const {id, merchandise, isOptimistic} = line;
   const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
@@ -41,7 +53,16 @@ export function CartLineItem({
   );
 
   return (
-    <li key={id} className="py-4">
+    <motion.li
+      key={id}
+      ref={ref}
+      {...cartLineMotion}
+      // A line the server has not confirmed yet reads as provisional, which
+      // is honest: the price and quantity shown are a local guess until the
+      // Cart API answers.
+      animate={{...cartLineMotion.animate, opacity: isOptimistic ? 0.55 : 1}}
+      className="py-4"
+    >
       <div className="flex gap-4">
         {image && (
           <Link
@@ -84,9 +105,10 @@ export function CartLineItem({
 
           <div className="mt-auto flex items-end justify-between gap-3 pt-3">
             <CartLineQuantity line={line} />
-            <span className="text-[15px] font-semibold text-ink">
-              <ProductPrice price={line?.cost?.totalAmount} />
-            </span>
+            <AnimatedMoney
+              data={displayLineTotal(line, priceLocally)}
+              className="text-[15px] font-semibold text-ink"
+            />
           </div>
         </div>
       </div>
@@ -106,12 +128,29 @@ export function CartLineItem({
                 key={childLine.id}
                 line={childLine}
                 layout={layout}
+                priceLocally={priceLocally}
               />
             ))}
           </ul>
         </div>
       ) : null}
-    </li>
+    </motion.li>
+  );
+});
+
+/**
+ * One end of the quantity stepper. Submits its parent `CartForm`, so it stays
+ * a plain submit button -- the tap scale is the only thing added, and it is
+ * what makes the control feel physical on touch where there is no hover.
+ */
+function StepperButton(props: HTMLMotionProps<'button'>) {
+  return (
+    <motion.button
+      whileTap={{scale: 0.84}}
+      transition={{duration: 0.14, ease: EASE_SPRING}}
+      className="flex h-8 w-8 items-center justify-center text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-35"
+      {...props}
+    />
   );
 }
 
@@ -126,38 +165,38 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
-  const stepper =
-    'flex h-8 w-8 items-center justify-center text-ink-muted transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-35';
-
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center rounded-pill border border-line-strong bg-surface">
         <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-          <button
+          <StepperButton
             aria-label="Decrease quantity"
             disabled={quantity <= 1 || !!isOptimistic}
             name="decrease-quantity"
             value={prevQuantity}
-            className={stepper}
           >
-            &#8722;
-          </button>
+            <MinusIcon className="h-3.5 w-3.5" />
+          </StepperButton>
         </CartLineUpdateButton>
 
-        <span className="min-w-6 text-center text-sm font-semibold tabular-nums text-ink">
-          {quantity}
-        </span>
+        {/* aria-hidden + a live-region-free label: the rolling digits are
+            decorative, the number itself is announced by the buttons. */}
+        <NumberFlow
+          value={quantity}
+          aria-hidden="true"
+          className="min-w-6 text-center text-sm font-semibold text-ink"
+        />
+        <span className="sr-only">Quantity: {quantity}</span>
 
         <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
-          <button
+          <StepperButton
             aria-label="Increase quantity"
             name="increase-quantity"
             value={nextQuantity}
             disabled={!!isOptimistic}
-            className={stepper}
           >
-            &#43;
-          </button>
+            <PlusIcon className="h-3.5 w-3.5" />
+          </StepperButton>
         </CartLineUpdateButton>
       </div>
 
@@ -185,13 +224,15 @@ function CartLineRemoveButton({
       action={CartForm.ACTIONS.LinesRemove}
       inputs={{lineIds}}
     >
-      <button
+      <motion.button
+        whileTap={{scale: 0.94}}
+        transition={{duration: 0.14, ease: EASE_SPRING}}
         disabled={disabled}
         type="submit"
         className="text-[13px] text-ink-soft underline underline-offset-4 transition-colors hover:text-sale disabled:opacity-40"
       >
         Remove
-      </button>
+      </motion.button>
     </CartForm>
   );
 }

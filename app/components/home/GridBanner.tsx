@@ -19,6 +19,11 @@ import {returns, store} from '~/lib/store-config';
  * The three photographs are the storefront's own rather than collection
  * images -- see [gridImages] in `~/lib/site-imagery` for why.
  *
+ * Only the heading links. The reference makes the whole card one target,
+ * photograph included; here the images are deliberately inert, so they also
+ * drop the hover zoom -- a picture that grows under the pointer and then does
+ * nothing when clicked is a worse affordance than one that never moved.
+ *
  * Also ported: the logotype's overhang (-10px, -20px at 600, -30px at 1024,
  * -40px at 1440), its 10/12 column width (9/12 from 1440), 6px-rounded card
  * images (8px from 1024), 12px between image and copy, 4px between title and
@@ -78,31 +83,36 @@ export function GridBanner() {
                 as="li"
                 className="w-[230px] shrink-0 snap-start lg:w-auto"
               >
-                <Link
-                  to={to}
-                  prefetch="intent"
-                  className="group block no-underline hover:no-underline"
-                >
-                  <div className="mb-3 overflow-hidden rounded-[6px] bg-bg-deep lg:rounded-lg">
-                    <div className={`relative w-full ${aspect}`}>
-                      <img
-                        src={image.src}
-                        width={image.width}
-                        height={image.height}
-                        alt={image.alt}
-                        loading="lazy"
-                        decoding="async"
-                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                      />
-                    </div>
+                {/* Outside the link on purpose -- the photograph is
+                    decoration here, not a target. It carries empty alt for
+                    the same reason: the heading beneath already names the
+                    card, so announcing the picture too would just repeat it. */}
+                <div className="mb-3 overflow-hidden rounded-[6px] bg-bg-deep lg:rounded-lg">
+                  <div className={`relative w-full ${aspect}`}>
+                    <img
+                      src={image.src}
+                      width={image.width}
+                      height={image.height}
+                      alt=""
+                      aria-hidden
+                      loading="lazy"
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
                   </div>
-                  <h3 className="mb-1 font-display text-[16px] font-medium leading-[1.2] tracking-[0.1px] text-ink lg:text-[17px] min-[1920px]:text-[20px]">
+                </div>
+                <h3 className="mb-1 font-display text-[16px] font-medium leading-[1.2] tracking-[0.1px] lg:text-[17px] min-[1920px]:text-[20px]">
+                  <Link
+                    to={to}
+                    prefetch="intent"
+                    className="text-ink no-underline transition-opacity duration-300 hover:text-ink hover:no-underline hover:opacity-60"
+                  >
                     {title}
-                  </h3>
-                  <p className="text-[13px] leading-[1.5] text-ink-muted min-[1920px]:text-[14px]">
-                    {body}
-                  </p>
-                </Link>
+                  </Link>
+                </h3>
+                <p className="text-[13px] leading-[1.5] text-ink-muted min-[1920px]:text-[14px]">
+                  {body}
+                </p>
               </Reveal>
             ))}
           </ul>

@@ -1,5 +1,6 @@
 import {Image} from '@shopify/hydrogen';
 import {Link} from 'react-router';
+import {resolveCollectionImage} from '~/lib/collection-images';
 
 type CategoryImage = {
   id?: string | null;
@@ -187,8 +188,7 @@ export function CategoryBlocks({
 
       image:
         featureImages?.bestSelling ??
-        bestSellingCollection?.image ??
-        null,
+        resolveCollectionImage('best-selling', bestSellingCollection?.image),
     },
 
     {
@@ -202,8 +202,7 @@ export function CategoryBlocks({
 
       image:
         featureImages?.trendingNow ??
-        trendingCollection?.image ??
-        null,
+        resolveCollectionImage('trending-now', trendingCollection?.image),
     },
 
     {
@@ -215,9 +214,7 @@ export function CategoryBlocks({
         ? `/collections/${homeCollection.handle}`
         : '/collections/home-accessories',
 
-      image:
-        homeCollection?.image ??
-        null,
+      image: resolveCollectionImage('home-accessories', homeCollection?.image),
     },
 
     {
@@ -229,9 +226,7 @@ export function CategoryBlocks({
         ? `/collections/${kitchenCollection.handle}`
         : '/collections/kitchen-accessories',
 
-      image:
-        kitchenCollection?.image ??
-        null,
+      image: resolveCollectionImage('kitchen-accessories', kitchenCollection?.image),
     },
 
     {
@@ -243,9 +238,7 @@ export function CategoryBlocks({
         ? `/collections/${kidsCollection.handle}`
         : '/collections/kids-babies',
 
-      image:
-        kidsCollection?.image ??
-        null,
+      image: resolveCollectionImage('kids-babies', kidsCollection?.image),
     },
 
     {
@@ -257,9 +250,7 @@ export function CategoryBlocks({
         ? `/collections/${petsCollection.handle}`
         : '/collections/pet-accessories',
 
-      image:
-        petsCollection?.image ??
-        null,
+      image: resolveCollectionImage('pet-accessories', petsCollection?.image),
     },
   ];
 

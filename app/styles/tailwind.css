@@ -77,6 +77,16 @@
   --color-block-sky: #d8e3ec;
   --color-block-sky-deep: #b9cedd;
 
+  /* Shop purple.
+   *
+   * Shopify's, not ours -- the one colour on this storefront that is not
+   * from the palette above. It belongs to the "Sign in with shop" button in
+   * the account panel, which is a Shopify affordance a shopper recognises by
+   * exactly this colour; recolouring it in terracotta would make it read as
+   * our own button and lose that. Do not reach for it anywhere else. */
+  --color-shop: #5a31f4;
+  --color-shop-deep: #4a27d4;
+
   /* Hairlines */
   --color-line: oklch(0.2 0.03 60 / 10%);
   --color-line-strong: oklch(0.2 0.03 60 / 20%);
@@ -102,6 +112,30 @@
 
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* The breakpoints above `lg` that the reference site's own layout is built
+     on -- 1200 / 1440 / 1920 (it calls the last two hd and hhd).
+
+     Two things about these are load-bearing, and both are cascade-ordering
+     traps rather than style choices:
+
+     1. They are named here instead of written inline as `min-[1440px]:`.
+        Tailwind emits all arbitrary min-width variants as one group ahead of
+        the named breakpoints, so `lg:text-[42px]` lands later in the
+        stylesheet than `min-[1440px]:text-[48px]` and silently wins at 1470px
+        -- both match, and the one that should lose does not.
+
+     2. They are declared in rem, not px, even though the reference states
+        them in px. Tailwind orders breakpoints by raw value and does not
+        normalise units, so a px breakpoint sorts ahead of every rem one --
+        including the built-in `lg` (64rem). Written as 90rem, `hd` sorts
+        after `lg` and overrides it as written.
+
+     75rem/90rem/120rem are 1200/1440/1920 at the 16px root font size, which
+     is what the rest of the system already assumes. */
+  --breakpoint-wide: 75rem;
+  --breakpoint-hd: 90rem;
+  --breakpoint-uhd: 120rem;
 }
 
 @layer base {
@@ -133,20 +167,27 @@
     border-radius: 6px;
   }
 
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--color-bg);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-line-strong);
-    border-radius: 999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-ink-soft);
-  }
+  /* The scrollbar is deliberately left unstyled.
+   *
+   * There used to be a `::-webkit-scrollbar` block here -- a 10px track in
+   * the page colour with a hairline thumb. The styling itself was harmless;
+   * asking for it at all was not. The moment a page styles that
+   * pseudo-element, Chrome drops the element out of the operating system's
+   * overlay scrollbar and back to a classic one: permanently visible, and
+   * occupying 10px of layout width the content has to give up, on every
+   * scrollable element on the storefront (that selector was universal, so it
+   * caught the cart drawer too).
+   *
+   * Unstyled, macOS does what the reference site does -- nothing at rest, a
+   * thumb that fades in over the content while a scroll is happening, gone
+   * again shortly after.
+   *
+   * This is also why `scrollbar-width: thin` is not the answer: it is the
+   * standard property rather than the WebKit one, but it opts out of overlay
+   * behaviour in the same way. Leave both alone. Hiding a scrollbar on one
+   * specific container is fine and app.css does it for the category
+   * carousel -- it is the page-level scrollbar that must stay native.
+   */
 
   /* Hides the native cursor in favour of components/CustomCursor.tsx. Gated
      on a class CustomCursor adds to <html> only after its own effect has
@@ -351,12 +392,17 @@
   }
 
   /* Announcement marquee -- ported from the reference site's own keyframe.
-     Each run shifts by its full width plus the 28px gap between runs, so the
-     run behind lands exactly on the position it vacated and the loop never
-     seams. --marquee-duration is set per instance from the measured track
-     width, which is what holds the scroll speed steady across viewports. */
+     Marquee lays the track out as two identical halves, so travelling half the
+     track's own width puts the second half exactly where the first one started
+     and the loop closes on itself. Percent, not the measured pixel shift this
+     used to take: a percentage is resolved against the layout the browser
+     actually performed, so the seam cannot drift away from it when the
+     measurement is stale or a subpixel out.
+
+     Only --marquee-duration is set per instance, from the measured content, so
+     the scroll speed stays steady across viewports and copy lengths. */
   @keyframes marquee {
-    to { transform: translateX(calc(-100% - 1.75rem)); }
+    to { transform: translateX(-50%); }
   }
   .animate-marquee {
     animation: marquee var(--marquee-duration, 10s) linear infinite;
@@ -380,6 +426,60 @@
   .btn-solid:hover {
     background-color: var(--color-block-butter-deep);
     color: var(--color-ink);
+  }
+
+  /* The split banners' buttons: .btn-solid's geometry and type, but
+     pill-shaped and white rather than butter. Inverting to black on hover is
+     what gives them a hover state now that there is no yellow fill to deepen.
+
+     Pure #fff/#000 rather than the theme's `surface` and `ink`. These sit on
+     a 35% black scrim over photography, where ink's warmth reads as a muddy
+     brown rather than as black -- the same reason the announcement bar takes
+     a flat black. Everywhere off a photograph should still use the tokens. */
+  .btn-pill {
+    display: inline-block;
+    padding: 16px 56px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    color: #000000;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    letter-spacing: 0.1px;
+    transition:
+      background-color 0.3s linear,
+      color 0.3s linear;
+  }
+  .btn-pill:hover {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  /* Footer link columns.
+     Below 1024 they are a real accordion -- <details> with a +/- affordance,
+     exactly as the reference does it. Above 1024 that affordance is hidden
+     and the lists are meant to be permanently open, so the disclosure has to
+     stop behaving like one: the heading is not a click target, and a column
+     whose `open` was toggled off still shows its links. That second rule is
+     not belt-and-braces -- collapse a column on a phone, then widen the
+     window, and without it the column arrives on desktop empty. */
+  @media (min-width: 1024px) {
+    .footer-column > summary {
+      pointer-events: none;
+      cursor: default;
+    }
+    /* Two ways to reveal a closed <details>, because engines close it two
+       different ways: Chrome skips rendering via `content-visibility` on the
+       ::details-content pseudo, everything else sets display:none on the
+       children. Both are written; whichever applies wins. */
+    .footer-column:not([open])::details-content {
+      content-visibility: visible;
+      block-size: auto;
+    }
+    .footer-column:not([open]) > *:not(summary) {
+      display: flex;
+    }
   }
 
   /* The reference site's `simple-dropdown`: the panel that drops from a nav

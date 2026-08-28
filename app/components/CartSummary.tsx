@@ -1,9 +1,13 @@
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
+import {motion} from 'framer-motion';
 import {useEffect, useId, useRef, useState} from 'react';
 import {useFetcher} from 'react-router';
+import {AnimatedMoney} from './ui/AnimatedMoney';
 import {ShieldIcon} from './Icons';
+import {EASE_SPRING} from '~/lib/motion';
+import {displaySubtotal} from '~/lib/optimistic-pricing';
 import {returns} from '~/lib/store-config';
 
 type CartSummaryProps = {
@@ -19,6 +23,7 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
   const giftCardInputId = useId();
 
   const isAside = layout === 'aside';
+  const subtotal = displaySubtotal(cart);
 
   return (
     <div
@@ -36,11 +41,7 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
       <dl role="group" className="flex items-baseline justify-between">
         <dt className="text-[15px] font-semibold text-ink">Subtotal</dt>
         <dd className="text-lg font-bold text-ink">
-          {cart?.cost?.subtotalAmount?.amount ? (
-            <Money data={cart?.cost?.subtotalAmount} />
-          ) : (
-            '-'
-          )}
+          {subtotal?.amount ? <AnimatedMoney data={subtotal} /> : '-'}
         </dd>
       </dl>
 
@@ -76,13 +77,15 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
   if (!checkoutUrl) return null;
 
   return (
-    <a
+    <motion.a
       href={checkoutUrl}
       target="_self"
+      whileTap={{scale: 0.98}}
+      transition={{duration: 0.14, ease: EASE_SPRING}}
       className="mt-5 inline-flex h-13 w-full items-center justify-center rounded-pill bg-brand px-6 text-base font-semibold text-bg transition-colors hover:bg-brand-deep"
     >
       Continue to checkout
-    </a>
+    </motion.a>
   );
 }
 

@@ -111,32 +111,30 @@ export function ProductSlider({
           slider track can span the full width including that gutter. */}
       <div className="mx-auto w-full max-w-[1920px]">
         {/*
-         * Tighter section spacing than before.
-         *
-         * Previous:
-         * py-12
-         * lg:py-[60px]
-         * min-[1440px]:py-20
-         * min-[1920px]:py-24
-         *
-         * The reduced spacing makes the homepage sections visually connect
-         * instead of creating a large white interruption between them.
+         * Tighter section spacing than the reference, deliberately: it runs
+         * 48/60/80/96 (`.sp-md`) top and bottom, which on this catalogue left
+         * a large white interruption between shelves. Everything *inside* the
+         * section below matches the reference exactly -- this is the one
+         * dimension that does not.
          */}
-        <div className="py-8 lg:py-10 min-[1440px]:py-12 min-[1920px]:py-14">
+        <div className="py-8 lg:py-10 hd:py-12 uhd:py-14">
           {/* .header-wrp -- stacks under 1024, then title/link on one baseline */}
-          <Reveal className="flex flex-col items-start justify-start gap-y-2 px-4 min-[600px]:px-5 lg:flex-row lg:items-end lg:justify-between lg:gap-y-0 lg:px-8 min-[1200px]:px-10">
-            <h2 className="font-display text-[30px] font-semibold leading-none tracking-[-0.5px] text-ink min-[600px]:text-[36px] lg:text-[42px] min-[1440px]:text-[48px] min-[1920px]:text-[56px]">
+          <Reveal className="flex flex-col items-start justify-start gap-y-2 px-4 min-[600px]:px-5 lg:flex-row lg:items-end lg:justify-between lg:gap-y-0 lg:px-8 wide:px-10">
+            {/* `m-0` cancels reset.css's `h2 { margin-bottom: 1rem }`, which
+                was quietly adding 16px to the header row and pushing the card
+                track that much further from its own title than the reference. */}
+            <h2 className="m-0 font-display text-[30px] font-semibold leading-none tracking-[-0.5px] text-ink min-[600px]:text-[36px] lg:text-[42px] hd:text-[48px] uhd:text-[56px]">
               {title}
             </h2>
 
             <Link
               to={linkTo}
               prefetch="intent"
-              className="relative inline-block pr-4 text-[13px] font-medium leading-[1.5] text-ink no-underline transition-opacity duration-300 hover:text-ink hover:no-underline hover:opacity-50 min-[1920px]:text-[14px]"
+              className="relative inline-block pr-4 text-[13px] font-medium leading-[1.5] text-ink no-underline transition-opacity duration-300 hover:text-ink hover:no-underline hover:opacity-50 uhd:text-[14px]"
             >
               {linkLabel}
 
-              <LinkArrowIcon className="absolute right-1 top-1/2 mt-px h-1.5 w-1.5 -translate-y-1/2 min-[1440px]:h-2 min-[1440px]:w-2" />
+              <LinkArrowIcon className="absolute right-1 top-1/2 mt-px h-1.5 w-1.5 -translate-y-1/2 hd:h-2 hd:w-2" />
             </Link>
           </Reveal>
 
@@ -151,16 +149,18 @@ export function ProductSlider({
                 }
 
                 return (
-                  <div className="group/track relative @container mt-3 min-[600px]:mt-3.5 lg:mt-4 min-[1440px]:mt-5 min-[1920px]:mt-5">
+                  /* .product-slider-wrp -- the reference's own gap between the
+                     section heading and the card row: 16 / 20 / 24 / 28 / 32. */
+                  <div className="group/track relative @container mt-4 min-[600px]:mt-5 lg:mt-6 hd:mt-7 uhd:mt-8">
                     <ul
                       ref={attachTrack}
                       onScroll={syncEdges}
-                      className="flex snap-x snap-mandatory items-stretch overflow-x-auto scroll-smooth px-4 scroll-pl-4 gap-x-2 [scrollbar-width:none] min-[600px]:gap-x-3 min-[600px]:px-5 min-[600px]:scroll-pl-5 lg:gap-x-4 lg:px-8 lg:scroll-pl-8 min-[1200px]:px-10 min-[1200px]:scroll-pl-10 [&::-webkit-scrollbar]:hidden"
+                      className="flex snap-x snap-mandatory items-stretch overflow-x-auto scroll-smooth px-4 scroll-pl-4 gap-x-2 [scrollbar-width:none] min-[600px]:gap-x-3 min-[600px]:px-5 min-[600px]:scroll-pl-5 lg:gap-x-4 lg:px-8 lg:scroll-pl-8 wide:px-10 wide:scroll-pl-10 [&::-webkit-scrollbar]:hidden"
                     >
                       {nodes.map((product) => (
                         <li
                           key={product.id}
-                          className="shrink-0 snap-start w-[calc((100cqw_-_4px)/1.5)] min-[600px]:w-[calc((100cqw_-_18px)/2.5)] lg:w-[calc((100cqw_-_51.6px)/4.225)] min-[1920px]:w-[calc((100cqw_-_59.2px)/4.7)]"
+                          className="shrink-0 snap-start w-[calc((100cqw_-_4px)/1.5)] min-[600px]:w-[calc((100cqw_-_18px)/2.5)] lg:w-[calc((100cqw_-_51.6px)/4.225)] uhd:w-[calc((100cqw_-_59.2px)/4.7)]"
                         >
                           <SliderCard
                             product={product}
@@ -180,7 +180,7 @@ export function ProductSlider({
                       type="button"
                       onClick={() => scrollByCard(-1)}
                       aria-label={`Show previous ${title.toLowerCase()}`}
-                      className={`absolute left-2 top-1/2 z-[1] hidden h-[42px] w-[42px] -translate-y-1/2 items-center justify-center rounded-[4px] border border-line bg-[#ffffffb3] text-ink transition-colors duration-300 hover:bg-surface min-[1440px]:h-12 min-[1440px]:w-12 ${
+                      className={`absolute left-2 top-1/2 z-[1] hidden h-[42px] w-[42px] -translate-y-1/2 items-center justify-center rounded-[4px] border border-line bg-[#ffffffb3] text-ink transition-colors duration-300 hover:bg-surface hd:h-12 hd:w-12 ${
                         atStart
                           ? ''
                           : 'lg:group-hover/track:flex'
@@ -193,7 +193,7 @@ export function ProductSlider({
                       type="button"
                       onClick={() => scrollByCard(1)}
                       aria-label={`Show more ${title.toLowerCase()}`}
-                      className={`absolute right-2 top-1/2 z-[1] hidden h-[42px] w-[42px] -translate-y-1/2 items-center justify-center rounded-[4px] border border-line bg-[#ffffffb3] text-ink transition-colors duration-300 hover:bg-surface min-[1440px]:h-12 min-[1440px]:w-12 ${
+                      className={`absolute right-2 top-1/2 z-[1] hidden h-[42px] w-[42px] -translate-y-1/2 items-center justify-center rounded-[4px] border border-line bg-[#ffffffb3] text-ink transition-colors duration-300 hover:bg-surface hd:h-12 hd:w-12 ${
                         atEnd
                           ? ''
                           : 'lg:group-hover/track:flex'
@@ -364,11 +364,11 @@ function SliderCard({
     >
       {/* .tags-1 -- absolutely placed so the photo runs edge to edge. */}
       {badges.length > 0 && (
-        <div className="absolute left-3 top-3 z-[3] flex flex-wrap items-center justify-start gap-1 lg:left-4 lg:top-4 min-[1440px]:gap-1.5 min-[1920px]:left-6 min-[1920px]:top-6">
+        <div className="absolute left-3 top-3 z-[3] flex flex-wrap items-center justify-start gap-1 lg:left-4 lg:top-4 hd:gap-1.5 uhd:left-6 uhd:top-6">
           {badges.map((badge) => (
             <span
               key={badge}
-              className="rounded-[4px] border border-line bg-surface px-1.5 py-px text-[11px] leading-[1.5] tracking-[0.1px] text-ink min-[1440px]:text-[12px] min-[1920px]:text-[13px]"
+              className="rounded-[4px] border border-line bg-surface px-1.5 py-px text-[11px] leading-[1.5] tracking-[0.1px] text-ink hd:text-[12px] uhd:text-[13px]"
             >
               {badge}
             </span>
@@ -404,8 +404,21 @@ function SliderCard({
         )}
       </div>
 
-      {/* .bottom-con */}
-      <div className="relative z-[2] mt-auto flex w-full shrink-0 flex-wrap items-start justify-start gap-x-2 pt-2.5 lg:items-end lg:px-4 lg:pb-4 lg:pt-0 min-[1920px]:px-6 min-[1920px]:pb-6">
+      {/*
+       * .bottom-con
+       *
+       * Fixed height from 1024 up, which is what sets the card's overall
+       * proportion: the reference's card is a 4:5 image plus a 96px info
+       * block (104px at 1920, where the padding grows to 24). That 96 is not
+       * a number it picked -- it is the height of the two 36px buttons the
+       * reference stacks on the right, plus their 8px gap and the 16px
+       * padding. This card carries one button rather than two, so left to
+       * its content it would come out ~40px shorter and the whole shelf
+       * would sit squat next to the reference. Pinning the height reproduces
+       * the reference's geometry exactly without inventing a second control
+       * the storefront does not have.
+       */}
+      <div className="relative z-[2] mt-auto flex w-full shrink-0 flex-wrap items-start justify-start gap-x-2 pt-2.5 lg:h-24 lg:items-end lg:px-4 lg:pb-4 lg:pt-0 uhd:h-26 uhd:px-6 uhd:pb-6">
         <div className="flex-1">
           {swatches.length > 0 && (
             <div className="relative mb-2 mt-0 flex w-full items-center justify-start gap-x-1">
@@ -436,12 +449,12 @@ function SliderCard({
             </div>
           )}
 
-          <h3 className="self-stretch font-display text-[14px] font-medium leading-[1.2] tracking-[0.1px] text-ink lg:line-clamp-1 lg:group-hover:text-white min-[1920px]:text-[15px]">
+          <h3 className="self-stretch font-display text-[14px] font-medium leading-[1.2] tracking-[0.1px] text-ink lg:line-clamp-1 lg:group-hover:text-white uhd:text-[15px]">
             {product.title}
           </h3>
 
-          <div className="mt-0.5 flex flex-wrap items-start justify-start gap-1 min-[1440px]:mt-1">
-            <span className="text-[13px] font-normal leading-[1.5] text-ink lg:group-hover:text-white min-[1920px]:text-[14px]">
+          <div className="mt-0.5 flex flex-wrap items-start justify-start gap-1 hd:mt-1">
+            <span className="text-[13px] font-normal leading-[1.5] text-ink lg:group-hover:text-white uhd:text-[14px]">
               <Money
                 data={
                   product.priceRange
@@ -472,21 +485,25 @@ function SliderCard({
 
 function SliderSkeleton() {
   return (
-    <div className="@container mt-3 min-[600px]:mt-3.5 lg:mt-4 min-[1440px]:mt-5 min-[1920px]:mt-5">
-      <ul className="flex items-stretch gap-x-2 overflow-hidden px-4 min-[600px]:gap-x-3 min-[600px]:px-5 lg:gap-x-4 lg:px-8 min-[1200px]:px-10">
+    <div className="@container mt-4 min-[600px]:mt-5 lg:mt-6 hd:mt-7 uhd:mt-8">
+      <ul className="flex items-stretch gap-x-2 overflow-hidden px-4 min-[600px]:gap-x-3 min-[600px]:px-5 lg:gap-x-4 lg:px-8 wide:px-10">
         {['a', 'b', 'c', 'd', 'e'].map(
           (key) => (
             <li
               key={key}
-              className="shrink-0 animate-pulse w-[calc((100cqw_-_4px)/1.5)] min-[600px]:w-[calc((100cqw_-_18px)/2.5)] lg:w-[calc((100cqw_-_51.6px)/4.225)] min-[1920px]:w-[calc((100cqw_-_59.2px)/4.7)]"
+              className="shrink-0 animate-pulse w-[calc((100cqw_-_4px)/1.5)] min-[600px]:w-[calc((100cqw_-_18px)/2.5)] lg:w-[calc((100cqw_-_51.6px)/4.225)] uhd:w-[calc((100cqw_-_59.2px)/4.7)]"
             >
               <div className="aspect-[4/5] rounded-[6px] bg-bg-deep lg:rounded-lg" />
 
-              <div className="mt-2.5 h-[22px] w-[50px] rounded-full bg-bg-deep lg:mx-4 lg:h-6" />
+              {/* Same fixed info-block height as the real card, so the row
+                  does not resize the moment the products resolve. */}
+              <div className="lg:flex lg:h-24 lg:flex-col lg:justify-end lg:px-4 lg:pb-4 uhd:h-26 uhd:px-6 uhd:pb-6">
+                <div className="mt-2.5 h-[22px] w-[50px] rounded-full bg-bg-deep lg:mt-0 lg:h-6" />
 
-              <div className="mt-2 h-4 w-4/5 rounded bg-bg-deep lg:mx-4" />
+                <div className="mt-2 h-4 w-4/5 rounded bg-bg-deep" />
 
-              <div className="mt-1 h-4 w-1/3 rounded bg-bg-deep lg:mx-4 lg:mb-4" />
+                <div className="mt-1 h-4 w-1/3 rounded bg-bg-deep" />
+              </div>
             </li>
           ),
         )}

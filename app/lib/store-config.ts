@@ -109,20 +109,22 @@ type NavLink = {title: string; url: string};
  *
  * This is the live valuevaultshop.net header, verbatim -- the Shopify menu
  * is not consulted for it, so what a visitor sees does not depend on which
- * storefront this build happens to be linked to. `panel` marks the one item
- * that opens the "Shop" dropdown; see [shopByMenu] for what is in it.
+ * storefront this build happens to be linked to. `panel` names the dropdown
+ * an item opens: 'shop' is the full-width mega menu (see [shopByMenu] for
+ * what is in it), 'order' the small tracking form.
  */
-export const navigation: (NavLink & {panel?: true})[] = [
+export const navigation: (NavLink & {panel?: 'shop' | 'order'})[] = [
   {title: 'Home', url: '/'},
   // The real site's "Shop" is a disclosure with no destination of its own.
   // Ours points somewhere so that following it by keyboard, or tapping it on
   // a phone, is not a dead end.
-  {title: 'Shop', url: '/collections', panel: true},
+  {title: 'Shop', url: '/collections', panel: 'shop'},
   {title: 'About Us', url: '/pages/about-us'},
   {title: 'Contact Us', url: '/pages/contact'},
   // A Shopify app proxy on the live site. Hydrogen has no proxy routes, so
-  // this needs a real destination before launch.
-  {title: 'Order Look Up', url: '/apps/trackingmore'},
+  // this needs a real destination before launch -- which is also why its
+  // panel cannot return a real shipment status. See OrderLookupMenu.
+  {title: 'Order Look Up', url: '/apps/trackingmore', panel: 'order'},
 ];
 
 /**

@@ -7,6 +7,7 @@ import {
   type RegularSearchReturn,
   type PredictiveSearchReturn,
   getEmptyPredictiveSearchResult,
+  SEARCH_CONTENT,
 } from '~/lib/search';
 import type {
   RegularSearchQuery,
@@ -182,12 +183,13 @@ export const SEARCH_QUERY = `#graphql
     $last: Int
     $term: String!
     $startCursor: String
+    $includeContent: Boolean!
   ) @inContext(country: $country, language: $language) {
     articles: search(
       query: $term,
       types: [ARTICLE],
       first: $first,
-    ) {
+    ) @include(if: $includeContent) {
       nodes {
         ...on Article {
           ...SearchArticle
@@ -198,7 +200,7 @@ export const SEARCH_QUERY = `#graphql
       query: $term,
       types: [PAGE],
       first: $first,
-    ) {
+    ) @include(if: $includeContent) {
       nodes {
         ...on Page {
           ...SearchPage
@@ -252,15 +254,17 @@ async function regularSearch({
     ...items
   }: {errors?: Array<{message: string}>} & RegularSearchQuery =
     await storefront.query(SEARCH_QUERY, {
-      variables: {...variables, term},
+      variables: {...variables, term, includeContent: SEARCH_CONTENT},
     });
 
   if (!items) {
     throw new Error('No search data returned from Shopify API');
   }
 
+  // Skipped fields are absent from the response rather than empty, so this
+  // counts what actually came back.
   const total = Object.values(items).reduce(
-    (acc: number, {nodes}: {nodes: Array<unknown>}) => acc + nodes.length,
+    (acc: number, group) => acc + (group?.nodes?.length ?? 0),
     0,
   );
 
@@ -365,6 +369,7 @@ const PREDICTIVE_SEARCH_QUERY = `#graphql
     $limitScope: PredictiveSearchLimitScope!
     $term: String!
     $types: [PredictiveSearchType!]
+    $includeContent: Boolean!
   ) @inContext(country: $country, language: $language) {
     predictiveSearch(
       limit: $limit,
@@ -372,13 +377,13 @@ const PREDICTIVE_SEARCH_QUERY = `#graphql
       query: $term,
       types: $types,
     ) {
-      articles {
+      articles @include(if: $includeContent) {
         ...PredictiveArticle
       }
       collections {
         ...PredictiveCollection
       }
-      pages {
+      pages @include(if: $includeContent) {
         ...PredictivePage
       }
       products {
@@ -425,6 +430,7 @@ async function predictiveSearch({
         limit,
         limitScope: 'EACH',
         term,
+        includeContent: SEARCH_CONTENT,
       },
     });
 
@@ -438,10 +444,15 @@ async function predictiveSearch({
     throw new Error('No predictive search data returned from Shopify API');
   }
 
-  const total = Object.values(items).reduce(
-    (acc: number, item: Array<unknown>) => acc + item.length,
+  // Anything [SEARCH_CONTENT] skipped is missing from the response entirely.
+  // Filling it back in from the empty result means every consumer still sees
+  // all five collections of hits and none of them has to know about the flag.
+  const filled = {...getEmptyPredictiveSearchResult().items, ...items};
+
+  const total = Object.values(filled).reduce(
+    (acc: number, group) => acc + (group?.length ?? 0),
     0,
   );
 
-  return {type, term, result: {items, total}};
+  return {type, term, result: {items: filled, total}};
 }

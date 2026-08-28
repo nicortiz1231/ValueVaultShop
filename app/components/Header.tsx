@@ -10,16 +10,19 @@ import type {
   CartApiQueryFragment,
   MegaMenuBannersQuery,
 } from 'storefrontapi.generated';
+import {AnimatePresence, motion} from 'framer-motion';
+import NumberFlow from '@number-flow/react';
 import {useAside} from '~/components/Aside';
+import {EASE_SPRING} from '~/lib/motion';
 import {MegaMenu} from '~/components/MegaMenu';
-import {navigation, shopByMenu, store} from '~/lib/store-config';
 import {
-  CartIcon,
-  ChevronIcon,
-  MenuIcon,
-  SearchIcon,
-  UserIcon,
-} from './Icons';
+  OrderLookupPanel,
+  OrderTrackForm,
+} from '~/components/OrderLookupMenu';
+import {AccountMenu} from '~/components/AccountMenu';
+import {ExpandingSearch} from '~/components/ui/ExpandingSearch';
+import {navigation, shopByMenu, store} from '~/lib/store-config';
+import {CartIcon, ChevronIcon, MenuIcon, SearchIcon} from './Icons';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -31,8 +34,9 @@ interface HeaderProps {
 
 type Viewport = 'desktop' | 'mobile';
 
-/** Identifies the one nav item that opens a panel. */
+/** The two nav items that open a panel, keyed by `panel` in [navigation]. */
 const SHOP_PANEL_ID = 'shop';
+const ORDER_PANEL_ID = 'order';
 
 /**
  * The wordmark. Set in the display serif rather than a boxed icon +
@@ -70,10 +74,18 @@ export function Logo({
 function useMenuControls() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Set while a panel holds focus. The order panel contains a text field, and
+  // the pointer routinely leaves the header while someone is typing in it --
+  // without this the hover close would pull the field out from under them.
+  const heldOpen = useRef(false);
 
   const openMenu = useCallback((id: string | null) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setOpenMenuId(id);
+  }, []);
+
+  const holdOpen = useCallback((held: boolean) => {
+    heldOpen.current = held;
   }, []);
 
   // Leaving a panel closes on a short grace period rather than immediately:
@@ -82,7 +94,10 @@ function useMenuControls() {
   // down to it.
   const scheduleClose = useCallback(() => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => setOpenMenuId(null), 150);
+    closeTimer.current = setTimeout(() => {
+      if (heldOpen.current) return;
+      setOpenMenuId(null);
+    }, 150);
   }, []);
 
   useEffect(
@@ -97,13 +112,15 @@ function useMenuControls() {
   useEffect(() => {
     if (!openMenuId) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpenMenuId(null);
+      if (event.key !== 'Escape') return;
+      heldOpen.current = false;
+      setOpenMenuId(null);
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [openMenuId]);
 
-  return {openMenuId, openMenu, scheduleClose};
+  return {openMenuId, openMenu, scheduleClose, holdOpen};
 }
 
 export function Header({
@@ -119,7 +136,42 @@ export function Header({
   // entirely (the header is a z-30 sticky, so it is its own stacking context
   // and nothing inside it can paint behind it), and the mega menu outside the
   // absolutely centred nav so it can run the full width of the page.
-  const {openMenuId, openMenu, scheduleClose} = useMenuControls();
+  const {openMenuId, openMenu, scheduleClose, holdOpen} = useMenuControls();
+
+  // The expanding search field lives in the icon cluster, but its state is
+  // owned here so that opening it can put an open dropdown away -- the two
+  // are competing claims on the same row.
+  //
+  // The nav stays visible and in place the whole time. It is absolutely
+  // centred, so it is also the edge the field must stop short of: this ref
+  // is what the field measures itself against rather than growing to a fixed
+  // width and running underneath "Order Look Up".
+  const navRef = useRef<HTMLElement>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+
+  // The search field, the account panel and the nav dropdowns are three
+  // claims on the same row, so opening any one of them puts the others away.
+  const onSearchOpenChange = useCallback(
+    (open: boolean) => {
+      setSearchOpen(open);
+      if (open) {
+        setAccountOpen(false);
+        openMenu(null);
+      }
+    },
+    [openMenu],
+  );
+  const onAccountOpenChange = useCallback(
+    (open: boolean) => {
+      setAccountOpen(open);
+      if (open) {
+        setSearchOpen(false);
+        openMenu(null);
+      }
+    },
+    [openMenu],
+  );
 
   // Pinned beneath the announcement marquee, which sticks at 0 and is 25px
   // tall (30px from 1024). Two stacked sticky elements only stay stacked if
@@ -147,12 +199,22 @@ export function Header({
 
             <HeaderMenu
               viewport="desktop"
+              navRef={navRef}
               openMenuId={openMenuId}
               onOpenMenu={openMenu}
               onScheduleClose={scheduleClose}
+              onHoldOpen={holdOpen}
             />
 
-            <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+            <HeaderCtas
+              isLoggedIn={isLoggedIn}
+              cart={cart}
+              searchOpen={searchOpen}
+              onSearchOpenChange={onSearchOpenChange}
+              searchBoundaryRef={navRef}
+              accountOpen={accountOpen}
+              onAccountOpenChange={onAccountOpenChange}
+            />
           </div>
         </div>
 
@@ -166,35 +228,48 @@ export function Header({
 
       {/* The reference dims the whole page behind an open dropdown (black at
           70%) and treats the dim as the close affordance -- reaching it with
-          the pointer puts the menu away. */}
+          the pointer puts the menu away.
+
+          Only the mega menu gets it. The order panel is a small form hanging
+          off its own nav item, and dimming the page behind it would both
+          overstate it and make the dim a trapdoor: the pointer drifting off
+          the panel mid-typing would land on the dim and close the field. */}
       <div
         aria-hidden
         onMouseEnter={() => openMenu(null)}
         className={[
           'fixed inset-0 z-20 bg-black/70 transition-opacity duration-200',
-          openMenuId ? 'visible opacity-100' : 'invisible opacity-0',
+          openMenuId === SHOP_PANEL_ID
+            ? 'visible opacity-100'
+            : 'invisible opacity-0',
         ].join(' ')}
       />
     </>
   );
 }
 
-/** The one nav item that opens a panel. */
-function isPanelItem(item: (typeof navigation)[number]) {
-  return item.panel === true;
+/** The panel a nav item opens, or null if it just navigates. */
+function panelOf(item: (typeof navigation)[number]) {
+  return item.panel ?? null;
 }
 
 export function HeaderMenu({
   viewport,
+  navRef,
   openMenuId = null,
   onOpenMenu,
   onScheduleClose,
+  onHoldOpen,
 }: {
   viewport: Viewport;
+  /** Desktop only -- lets the header measure the nav's right edge. */
+  navRef?: React.RefObject<HTMLElement>;
   /** Desktop only -- the id of the item whose dropdown is showing. */
   openMenuId?: string | null;
   onOpenMenu?: (id: string | null) => void;
   onScheduleClose?: () => void;
+  /** Desktop only -- keeps a panel open while its form has focus. */
+  onHoldOpen?: (held: boolean) => void;
 }) {
   const {close} = useAside();
 
@@ -216,9 +291,15 @@ export function HeaderMenu({
               {item.title}
             </NavLink>
 
-            {/* The dropdown has no room to be a dropdown here, so it flattens
-                into its groups the way the reference's mobile submenu does. */}
-            {isPanelItem(item) &&
+            {/* The dropdowns have no room to be dropdowns here, so they
+                flatten inline the way the reference's mobile submenu does. */}
+            {panelOf(item) === ORDER_PANEL_ID && (
+              <div className="mt-3">
+                <OrderTrackForm idPrefix="mobile" onNavigate={close} />
+              </div>
+            )}
+
+            {panelOf(item) === SHOP_PANEL_ID &&
               shopByMenu.groups.map((group) => (
                 <div key={group.title} className="mt-3">
                   <p className="text-[11px] leading-[1.5] tracking-[0.1px] text-ink-soft">
@@ -250,6 +331,7 @@ export function HeaderMenu({
   // and the icon cluster on either side happen to measure.
   return (
     <nav
+      ref={navRef}
       className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block"
       role="navigation"
       aria-label="Main"
@@ -266,22 +348,27 @@ export function HeaderMenu({
           hd-colgap-28. */}
       <ul className="flex items-center justify-center gap-6 min-[1440px]:gap-7">
         {navigation.map((item) => {
-          const hasPanel = isPanelItem(item);
-          const id = hasPanel ? SHOP_PANEL_ID : item.url;
-          const isOpen = hasPanel && openMenuId === SHOP_PANEL_ID;
-          // With the panel open the pointer may have moved off the nav and
-          // into the panel itself, which is not a descendant of it -- so the
-          // open item stays highlighted once hover has gone.
-          const highlighted = hoveredId ?? (openMenuId ? SHOP_PANEL_ID : null);
+          const panel = panelOf(item);
+          const id = panel ?? item.url;
+          const isOpen = panel !== null && openMenuId === panel;
+          // With a panel open the pointer may have moved off the nav and into
+          // the panel itself -- which for the mega menu is not a descendant of
+          // it -- so the open item stays highlighted once hover has gone.
+          const highlighted = hoveredId ?? openMenuId;
           const enter = () => {
             setHoveredId(id);
-            onOpenMenu?.(hasPanel ? SHOP_PANEL_ID : null);
+            onOpenMenu?.(panel);
           };
 
           return (
             <li
               key={item.url}
-              className="relative"
+              // `mb-0` is load-bearing: the bare `li { margin-bottom: 0.5rem }`
+              // in reset.css would otherwise make this flex line 8px taller
+              // than the links inside it, and since the nav is centred as a
+              // box, that phantom margin lifts the labels 4px above the
+              // header's centre -- out of line with the wordmark and search.
+              className="relative mb-0"
               onMouseEnter={enter}
               onFocus={enter}
             >
@@ -309,8 +396,9 @@ export function HeaderMenu({
               >
                 {item.title}
                 {/* The caret the live site puts beside "Shop", flipping when
-                    the panel is open as the reference's does. */}
-                {hasPanel && (
+                    the panel is open as the reference's does. Anything that
+                    opens a panel earns one. */}
+                {panel !== null && (
                   <ChevronIcon
                     className={[
                       'h-3 w-3 shrink-0 transition-transform duration-200',
@@ -319,6 +407,22 @@ export function HeaderMenu({
                   />
                 )}
               </NavLink>
+
+              {/* Unlike the mega menu this one is small enough to hang off its
+                  own item, so it lives inside the nav -- which also means the
+                  pointer never leaves the nav on the way into it. */}
+              {panel === ORDER_PANEL_ID && (
+                <OrderLookupPanel
+                  open={isOpen}
+                  onEnter={() => onOpenMenu?.(ORDER_PANEL_ID)}
+                  onLeave={() => onScheduleClose?.()}
+                  onFocusChange={(held) => onHoldOpen?.(held)}
+                  onNavigate={() => {
+                    onHoldOpen?.(false);
+                    onOpenMenu?.(null);
+                  }}
+                />
+              )}
             </li>
           );
         })}
@@ -330,43 +434,54 @@ export function HeaderMenu({
 function HeaderCtas({
   isLoggedIn,
   cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+  searchOpen,
+  onSearchOpenChange,
+  searchBoundaryRef,
+  accountOpen,
+  onAccountOpenChange,
+}: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & {
+  searchOpen: boolean;
+  onSearchOpenChange: (open: boolean) => void;
+  searchBoundaryRef?: React.RefObject<HTMLElement>;
+  accountOpen: boolean;
+  onAccountOpenChange: (open: boolean) => void;
+}) {
   const {open} = useAside();
   const iconBtn =
     'rounded-full p-1.5 text-ink transition-colors hover:bg-ink/5';
 
   return (
     <nav className="ml-auto flex items-center" role="navigation">
+      {/* Two ways into the same search. The field can only grow where
+          there is room for it to grow, and below 1024 there is none --
+          the wordmark and the icons already fill the row -- so the phone
+          keeps the drawer it always had. */}
       <button
         type="button"
         onClick={() => open('search')}
-        className={iconBtn}
+        className={`${iconBtn} lg:hidden`}
         aria-label="Search"
       >
         <SearchIcon className="h-6 w-6 shrink-0" />
       </button>
 
-      <NavLink
-        to="/account"
-        prefetch="intent"
-        className={`hidden sm:block ${iconBtn}`}
-      >
-        <Suspense fallback={<UserIcon className="h-6 w-6 shrink-0" />}>
-          <Await
-            resolve={isLoggedIn}
-            errorElement={<UserIcon className="h-6 w-6 shrink-0" />}
-          >
-            {(loggedIn) => (
-              <>
-                <UserIcon className="h-6 w-6 shrink-0" />
-                <span className="sr-only">
-                  {loggedIn ? 'Account' : 'Sign in'}
-                </span>
-              </>
-            )}
-          </Await>
-        </Suspense>
-      </NavLink>
+      <ExpandingSearch
+        open={searchOpen}
+        onOpenChange={onSearchOpenChange}
+        boundaryRef={searchBoundaryRef}
+        className="hidden lg:block"
+      />
+
+      {/* Was a link straight to /account, which for a signed-out visitor
+          bounced to /account/orders and put an error page in front of them.
+          It opens the sign-in panel instead -- the same prompt the live site
+          gives -- and only the panel's own links reach into the account. */}
+      <AccountMenu
+        isLoggedIn={isLoggedIn}
+        open={accountOpen}
+        onOpenChange={onAccountOpenChange}
+        className="hidden sm:block"
+      />
 
       <CartToggle cart={cart} />
     </nav>
@@ -393,11 +508,24 @@ function CartBadge({count}: {count: number}) {
       aria-label={`Cart, ${count} ${count === 1 ? 'item' : 'items'}`}
     >
       <CartIcon className="h-6 w-6 shrink-0" />
-      {count > 0 && (
-        <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold leading-none text-bg">
-          {count}
-        </span>
-      )}
+      {/* The badge is the only confirmation a shopper gets when they add from
+          a product card without opening the drawer, so it earns a real
+          entrance: it pops in on the spring curve, and the digits roll rather
+          than cut on every subsequent change. */}
+      <AnimatePresence initial={false}>
+        {count > 0 && (
+          <motion.span
+            key="cart-count"
+            initial={{scale: 0.2, opacity: 0}}
+            animate={{scale: 1, opacity: 1}}
+            exit={{scale: 0.2, opacity: 0}}
+            transition={{duration: 0.26, ease: EASE_SPRING}}
+            className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[11px] font-bold leading-none text-bg"
+          >
+            <NumberFlow value={count} aria-hidden="true" />
+          </motion.span>
+        )}
+      </AnimatePresence>
     </button>
   );
 }

@@ -6,7 +6,7 @@ import {Container} from '~/components/ui/Container';
 import {ArrowIcon} from '~/components/Icons';
 import {categories, store} from '~/lib/store-config';
 import {
-  collectionFallbackImage,
+  resolveCollectionImage,
   type CollectionImage,
 } from '~/lib/collection-images';
 
@@ -52,9 +52,10 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
     // is always preferred over it.
     tiles: categories.map((category) => ({
       ...category,
-      image:
-        images[category.handle]?.image ??
-        collectionFallbackImage(category.handle),
+      image: resolveCollectionImage(
+        category.handle,
+        images[category.handle]?.image,
+      ),
     })),
   };
 }

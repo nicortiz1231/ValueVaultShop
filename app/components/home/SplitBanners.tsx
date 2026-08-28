@@ -1,6 +1,7 @@
 import {Link} from 'react-router';
 import {Image} from '@shopify/hydrogen';
 import type {HomeCollectionFragment} from 'storefrontapi.generated';
+import {resolveCollectionImage} from '~/lib/collection-images';
 
 /**
  * The reference site's `half_banner_with_sticky_text` section -- the split
@@ -14,6 +15,17 @@ import type {HomeCollectionFragment} from 'storefrontapi.generated';
  * The stick offset is our own sticky chrome rather than the reference's 104px
  * -- announcement marquee plus header, so 25+53 and 30+53. Copying their
  * number would leave the text hanging below where it should catch.
+ *
+ * The buttons are white `.btn-pill`s rather than the butter `.btn-solid` the
+ * rest of the site uses -- against these two photographs the yellow was the
+ * loudest thing in the section.
+ *
+ * Either half can land on a collection with no image set in admin -- Trending
+ * Now is one -- and with nothing behind the scrim that tile rendered as a flat
+ * grey panel. It falls back to `~/lib/collection-images` for those, the same
+ * stand-in the collections index and the homepage category row use, so one
+ * collection never appears two different ways. Shopify's own image is always
+ * preferred, so setting one in admin silently takes over here.
  */
 export function SplitBanners({
   collections,
@@ -26,12 +38,14 @@ export function SplitBanners({
   const blocks = [
     {
       collection: first,
+      image: resolveCollectionImage(first.handle, first.image),
       title: 'Made To Last',
       blurb: 'buy it once. use it for years. that is the whole idea.',
       cta: `Shop ${first.title}`,
     },
     {
       collection: second,
+      image: resolveCollectionImage(second.handle, second.image),
       title: 'Everyday Basics',
       blurb: 'the unglamorous things you reach for without thinking.',
       cta: `Shop ${second.title}`,
@@ -41,7 +55,7 @@ export function SplitBanners({
   return (
     <section className="bg-bg">
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-        {blocks.map(({collection, title, blurb, cta}) => (
+        {blocks.map(({collection, image, title, blurb, cta}) => (
           <Link
             key={collection.id}
             to={`/collections/${collection.handle}`}
@@ -50,11 +64,11 @@ export function SplitBanners({
             className="group relative block overflow-hidden bg-bg-deep no-underline hover:no-underline"
           >
             <div className="relative aspect-[1/1.14675] w-full overflow-hidden">
-              {collection.image ? (
+              {image ? (
                 <Image
-                  data={collection.image}
+                  data={image}
                   sizes="(min-width: 1024px) 50vw, 100vw"
-                  alt={collection.image.altText || collection.title}
+                  alt={image.altText || collection.title}
                   className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                 />
               ) : null}
@@ -70,7 +84,7 @@ export function SplitBanners({
                   {blurb}
                 </p>
               </div>
-              <span className="btn-solid w-full text-center">{cta}</span>
+              <span className="btn-pill w-full text-center">{cta}</span>
             </div>
           </Link>
         ))}

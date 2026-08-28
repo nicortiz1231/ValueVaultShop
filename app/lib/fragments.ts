@@ -272,22 +272,6 @@ export const FOOTER_QUERY = `#graphql
     menu(handle: $footerMenuHandle) {
       ...Menu
     }
-    # The reference site's footer carries a pair of lifestyle photos beside
-    # its link columns. Fetched here rather than in a separate request --
-    # the footer is already deferred, so this rides along for free.
-    collections(first: 2, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        id
-        title
-        image {
-          id
-          url
-          altText
-          width
-          height
-        }
-      }
-    }
   }
   ${MENU_FRAGMENT}
 ` as const;

@@ -137,7 +137,7 @@ export default function ContactPage() {
         </aside>
 
         <div>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="max-w-none">
             <div className="grid gap-7 sm:grid-cols-2">
               <Field label="Name" required>
                 <input
@@ -145,7 +145,7 @@ export default function ContactPage() {
                   type="text"
                   name="name"
                   autoComplete="name"
-                  className="w-full border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+                  className="w-full appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
                   placeholder="Your name"
                 />
               </Field>
@@ -156,7 +156,7 @@ export default function ContactPage() {
                   type="email"
                   name="email"
                   autoComplete="email"
-                  className="w-full border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+                  className="w-full appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
                   placeholder="you@example.com"
                 />
               </Field>
@@ -167,7 +167,7 @@ export default function ContactPage() {
                 <input
                   type="text"
                   name="orderNumber"
-                  className="w-full border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+                  className="w-full appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
                   placeholder="Optional"
                 />
               </Field>
@@ -179,7 +179,7 @@ export default function ContactPage() {
                   required
                   name="message"
                   rows={6}
-                  className="w-full resize-none border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] leading-7 text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
+                  className="w-full resize-none appearance-none rounded-none m-0 border-0 border-b border-line-strong bg-transparent px-0 py-3 text-[15px] leading-7 text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink"
                   placeholder="How can we help?"
                 />
               </Field>
@@ -263,7 +263,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="block text-[12px] font-medium text-ink">
+      <span className="mb-1 block text-[12px] font-medium text-ink">
         {label}
         {required && <span aria-hidden="true"> *</span>}
       </span>

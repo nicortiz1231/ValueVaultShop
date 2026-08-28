@@ -1,10 +1,13 @@
 import {useOptimisticCart} from '@shopify/hydrogen';
+import {AnimatePresence, motion} from 'framer-motion';
 import {Link} from 'react-router';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
 import {CartIcon} from './Icons';
+import {EASE_OUT_QUART} from '~/lib/motion';
+import {canPriceLocally} from '~/lib/optimistic-pricing';
 import {returns} from '~/lib/store-config';
 
 export type CartLayout = 'page' | 'aside';
@@ -47,6 +50,9 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
   const isAside = layout === 'aside';
+  // Computed once here rather than per line: the guards it applies are
+  // properties of the whole cart, not of any single line.
+  const priceLocally = canPriceLocally(cart);
 
   if (!hasLines) {
     return <CartEmpty layout={layout} />;
@@ -73,20 +79,31 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
             : 'divide-y divide-line border-y border-line'
         }
       >
-        {(cart?.lines?.nodes ?? []).map((line) => {
-          // Child lines (warranties, gift wrap) render nested under their parent.
-          if ('parentRelationship' in line && line.parentRelationship?.parent) {
-            return null;
-          }
-          return (
-            <CartLineItem
-              key={line.id}
-              line={line}
-              layout={layout}
-              childrenMap={childrenMap}
-            />
-          );
-        })}
+        {/* `popLayout` pulls a removed line out of the flow before it has
+            finished fading, so the lines beneath it close the gap in the same
+            beat instead of jumping once the exit ends. `initial={false}`
+            keeps the list from animating on first paint -- a cart that
+            cascades in every time the drawer opens gets old fast. */}
+        <AnimatePresence initial={false} mode="popLayout">
+          {(cart?.lines?.nodes ?? []).map((line) => {
+            // Child lines (warranties, gift wrap) render nested under their parent.
+            if (
+              'parentRelationship' in line &&
+              line.parentRelationship?.parent
+            ) {
+              return null;
+            }
+            return (
+              <CartLineItem
+                key={line.id}
+                line={line}
+                layout={layout}
+                childrenMap={childrenMap}
+                priceLocally={priceLocally}
+              />
+            );
+          })}
+        </AnimatePresence>
       </ul>
 
       {cartHasItems && <CartSummary cart={cart} layout={layout} />}
@@ -98,7 +115,12 @@ function CartEmpty({layout}: {layout?: CartMainProps['layout']}) {
   const {close} = useAside();
 
   return (
-    <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+    <motion.div
+      initial={{opacity: 0, y: 8}}
+      animate={{opacity: 1, y: 0}}
+      transition={{duration: 0.3, ease: EASE_OUT_QUART}}
+      className="flex flex-col items-center justify-center px-6 py-16 text-center"
+    >
       <span className="flex h-14 w-14 items-center justify-center rounded-full bg-bg-deep text-ink-soft">
         <CartIcon className="h-7 w-7" />
       </span>
@@ -115,6 +137,6 @@ function CartEmpty({layout}: {layout?: CartMainProps['layout']}) {
       >
         Start shopping
       </Link>
-    </div>
+    </motion.div>
   );
 }

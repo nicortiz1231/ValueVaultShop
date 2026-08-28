@@ -1,6 +1,5 @@
 import {Suspense} from 'react';
 import {Await, Link, NavLink} from 'react-router';
-import {Image} from '@shopify/hydrogen';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import {categories, social, store, support} from '~/lib/store-config';
 
@@ -25,16 +24,29 @@ const FALLBACK_POLICY_LINKS = [
  *
  *   top row     headline at 6/12 (5/12 from 1440), then a right column
  *               pushed one column over, capped at 450 / 520 / 640px and
- *               pinned right, holding the signup, socials and (on mobile
- *               only) the photo pair. 36px of padding, 48 / 60 / 72 up.
- *   bottom row  link columns at 50% width (40% from 1440) in a 3-up grid --
- *               which is why a fourth column wraps under the first -- with
- *               the photo pair beside them and the wordmark washed pale
- *               behind, hung off the bottom-left corner.
- *   bottom bar  hairline, 16px, copyright and two policy links.
+ *               pinned right, holding the signup and socials, centred
+ *               against the headline rather than sitting at its first line.
+ *               36px of padding, 48 / 60 / 72 up.
+ *   bottom row  link columns in a 3-up grid across the full content width,
+ *               each column's contents centred in its own cell, with the
+ *               wordmark washed pale behind, hung off the bottom-left
+ *               corner.
+ *   bottom bar  hairline, 16px, copyright and the policy links.
  *
  * Below 1024 the link columns collapse into accordions and go full-bleed so
  * their hairlines run edge to edge, exactly as the reference does it.
+ *
+ * Two deliberate departures from the reference:
+ *
+ *  - It hangs a pair of lifestyle photos beside these columns, and stacks
+ *    them under the signup on mobile. We do not carry them, which is why the
+ *    columns run the full width here rather than the reference's 50% (40%
+ *    from 1440) -- that width exists to leave the photos room, and without
+ *    them it packed three columns into the middle of an empty row.
+ *  - It carries `Your Privacy Choices` as a fourth headed column. It has no
+ *    links under it, so in the grid it read as a bold orphan floating below
+ *    the other three. It sits in the bottom bar with the rest of the fine
+ *    print instead, which is where a privacy control is looked for anyway.
  *
  * Vertical padding runs one step past the reference's (60/72/88 against its
  * 48/60/72). Its footer stands ~80px taller than a like-for-like port of ours
@@ -51,16 +63,16 @@ export function Footer({
     <footer className="relative mt-auto overflow-hidden bg-surface">
       <div className="mx-auto w-full max-w-[1920px] px-4 min-[600px]:px-5 lg:px-8 min-[1200px]:px-10">
         {/* .row.top-content */}
-        <div className="relative -mx-1 flex flex-wrap py-9 min-[600px]:-mx-1.5 lg:py-[60px] min-[1440px]:-mx-2 min-[1440px]:py-[72px] min-[1920px]:py-[88px]">
-          <div className="mb-4 w-full px-1 min-[600px]:px-1.5 lg:mb-0 lg:w-6/12 min-[1440px]:w-5/12 min-[1440px]:px-2">
+        <div className="relative -mx-1 flex flex-wrap py-9 min-[600px]:-mx-1.5 lg:items-center lg:py-[60px] min-[1440px]:-mx-2 min-[1440px]:py-[72px] min-[1920px]:py-[88px]">
+          <div className="mb-4 w-full px-1 min-[600px]:px-1.5 lg:relative lg:left-12 lg:mb-0 lg:w-5/12 min-[1440px]:left-16 min-[1440px]:px-2">
             <p className="font-display text-[30px] font-semibold leading-none tracking-[-0.5px] text-ink min-[600px]:text-[36px] lg:text-[42px] min-[1440px]:text-[48px] min-[1920px]:text-[56px]">
               First look at new arrivals, real discounts, and the things worth
               knowing about, straight to your inbox.
             </p>
           </div>
 
-          <div className="w-full px-1 min-[600px]:px-1.5 lg:ml-[8.3333%] lg:w-5/12 min-[1440px]:w-6/12 min-[1440px]:px-2">
-            <div className="lg:ml-auto lg:max-w-[450px] min-[1440px]:max-w-[520px] min-[1920px]:max-w-[640px]">
+          <div className="w-full px-1 min-[600px]:px-1.5 lg:w-7/12 min-[1440px]:px-2">
+            <div className="lg:mx-auto lg:max-w-[450px] min-[1440px]:max-w-[520px] min-[1920px]:max-w-[640px]">
               <NewsletterForm />
 
               {social.length > 0 && (
@@ -84,24 +96,14 @@ export function Footer({
                   </div>
                 </div>
               )}
-
-              {/* Mobile placement of the photo pair; above 1024 the same two
-                  images move down beside the link columns. */}
-              <div className="mt-6 grid grid-cols-2 gap-x-2 lg:hidden">
-                <Suspense fallback={null}>
-                  <Await resolve={footerPromise} errorElement={null}>
-                    {(footer) => <FooterPhotos footer={footer} />}
-                  </Await>
-                </Suspense>
-              </div>
             </div>
           </div>
         </div>
 
         {/* .bottom-content -- full-bleed below 1024 so the accordion
             hairlines run to the edges. */}
-        <div className="relative -mx-4 min-[600px]:-mx-5 lg:mx-0 lg:flex lg:justify-between lg:border-t lg:border-line lg:py-[60px] min-[1440px]:py-[72px] min-[1920px]:py-[88px]">
-          <div className="lg:z-[2] lg:grid lg:w-1/2 lg:grid-cols-3 lg:gap-x-4 min-[1440px]:w-[40%]">
+        <div className="relative -mx-4 min-[600px]:-mx-5 lg:mx-0 lg:flex lg:justify-center lg:border-t lg:border-line lg:py-[60px] min-[1440px]:py-[72px] min-[1920px]:py-[88px]">
+          <div className="lg:z-[2] lg:grid lg:w-full lg:grid-cols-3 lg:gap-x-8">
             <FooterColumn title="About">
               <FooterLink to="/pages/about-us">Our story</FooterLink>
               <FooterLink to="/pages/contact">Contact us</FooterLink>
@@ -145,18 +147,6 @@ export function Footer({
                 </Await>
               </Suspense>
             </FooterColumn>
-
-            {/* The reference's fourth column carries a heading and no links,
-                which is what pushes it onto a second row of the 3-up grid. */}
-            <FooterColumn title="Your Privacy Choices" />
-          </div>
-
-          <div className="hidden lg:flex lg:w-[41.6667%] lg:max-w-[450px] lg:justify-start lg:gap-x-3 min-[1440px]:max-w-[520px] min-[1920px]:max-w-[640px]">
-            <Suspense fallback={null}>
-              <Await resolve={footerPromise} errorElement={null}>
-                {(footer) => <FooterPhotos footer={footer} desktop />}
-              </Await>
-            </Suspense>
           </div>
 
           {/* Wordmark washed pale behind the columns, hung off the bottom-left
@@ -177,8 +167,11 @@ export function Footer({
           </p>
           <div className="flex">
             <BottomLink to="/policies/privacy-policy">Privacy Policy</BottomLink>
-            <BottomLink to="/policies/terms-of-service" last>
+            <BottomLink to="/policies/terms-of-service">
               Terms &amp; Conditions
+            </BottomLink>
+            <BottomLink to="/policies/privacy-policy" last>
+              Your Privacy Choices
             </BottomLink>
           </div>
         </div>
@@ -221,40 +214,6 @@ function NewsletterForm() {
         Submit
       </button>
     </form>
-  );
-}
-
-/** The photo pair, 8px-rounded, that the reference runs beside its columns. */
-function FooterPhotos({
-  footer,
-  desktop = false,
-}: {
-  footer: FooterQuery | null;
-  desktop?: boolean;
-}) {
-  const nodes = (footer?.collections?.nodes ?? []).filter((node) => node.image);
-  if (!nodes.length) return null;
-
-  return (
-    <>
-      {nodes.slice(0, 2).map((node) => (
-        <div
-          key={node.id}
-          className={
-            desktop ? 'lg:w-[215px] min-[1440px]:w-1/2' : 'w-full'
-          }
-        >
-          <div className="aspect-square w-full overflow-hidden rounded-lg bg-bg-deep">
-            <Image
-              data={node.image!}
-              sizes="(min-width: 1024px) 215px, 45vw"
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          </div>
-        </div>
-      ))}
-    </>
   );
 }
 
@@ -325,9 +284,12 @@ function FooterColumn({
   return (
     <details
       open
-      className="group border-t border-line pb-1 lg:border-t-0 lg:pb-0"
+      className="footer-column group border-t border-line pb-1 lg:border-t-0 lg:pb-0"
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between px-4 pb-2 pt-4 min-[600px]:px-5 lg:px-0 lg:pb-0 lg:pt-0 [&::-webkit-details-marker]:hidden">
+      {/* justify-between spaces the heading off the accordion's +/- icon on
+          mobile; above 1024 that icon is gone, so the heading centres over
+          its own links instead. */}
+      <summary className="flex cursor-pointer list-none items-center justify-between px-4 pb-2 pt-4 min-[600px]:px-5 lg:justify-center lg:px-0 lg:pb-0 lg:pt-0 [&::-webkit-details-marker]:hidden">
         <span className="text-[14px] font-medium leading-[1.5] text-ink">
           {title}
         </span>
@@ -336,7 +298,7 @@ function FooterColumn({
         </span>
       </summary>
       {children ? (
-        <nav className="flex flex-col gap-y-2 px-4 pb-3 min-[600px]:px-5 lg:px-0 lg:pb-0 lg:pt-3 min-[1440px]:gap-y-2.5">
+        <nav className="flex flex-col gap-y-2 px-4 pb-3 min-[600px]:px-5 lg:items-center lg:px-0 lg:pb-0 lg:pt-3 min-[1440px]:gap-y-2.5">
           {children}
         </nav>
       ) : null}

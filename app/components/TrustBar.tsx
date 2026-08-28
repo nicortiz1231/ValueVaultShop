@@ -13,6 +13,12 @@ import {returns, shipping} from '~/lib/store-config';
  * page. The header sticks to this bar's height, not to 0 -- see Header.
  * 70px/sec is its effective speed: its three messages total ~700px and it
  * hard-codes a 10s cycle.
+ *
+ * The bar is pure black on purpose, and is the one place on the site that is.
+ * Everything else reads dark through `ink`, the warm near-black in the theme
+ * -- deliberately never #000, see the token. This band is asked to be flat
+ * black regardless, so it takes `bg-black` directly rather than dragging the
+ * token off its value and repainting every other surface with it.
  */
 export function TrustBar() {
   const messages = [
@@ -29,7 +35,7 @@ export function TrustBar() {
     <Marquee
       gap={28}
       speed={70}
-      className="sticky top-0 z-40 h-[25px] bg-ink lg:h-announce"
+      className="sticky top-0 z-40 h-[25px] bg-black lg:h-announce"
     >
       {messages.map((message) => (
         <span

@@ -14,7 +14,9 @@
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
+    "@number-flow/react": "^0.6.2",
     "@shopify/hydrogen": "2026.4.5",
+    "framer-motion": "^13.1.1",
     "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
     "isbot": "^5.1.22",
@@ -64,5 +66,5 @@
   "browserslist": [
     "defaults"
   ],
-  "description": "Value Vault \u2014 Shopify Hydrogen storefront"
+  "description": "Value Vault — Shopify Hydrogen storefront"
 }

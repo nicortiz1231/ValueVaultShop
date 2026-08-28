@@ -99,6 +99,28 @@ export function UserIcon({className}: IconProps) {
   );
 }
 
+/** The parcel on the account panel's "Orders" tile. */
+export function BoxIcon({className}: IconProps) {
+  return (
+    <Svg className={className}>
+      <path d="M4 8.5 12 5l8 3.5v7L12 19l-8-3.5z" />
+      <path d="M4 8.5 12 12l8-3.5" />
+      <path d="M12 12v7" />
+    </Svg>
+  );
+}
+
+/** The circled figure on the account panel's "Profile" tile. */
+export function UserCircleIcon({className}: IconProps) {
+  return (
+    <Svg className={className}>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="10" r="2.6" />
+      <path d="M6.8 18.2a5.6 5.6 0 0 1 10.4 0" />
+    </Svg>
+  );
+}
+
 export function MenuIcon({className}: IconProps) {
   return (
     <Svg className={className}>

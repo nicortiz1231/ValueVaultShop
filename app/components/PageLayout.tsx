@@ -1,4 +1,5 @@
 import {Await, Link} from 'react-router';
+import {MotionConfig} from 'framer-motion';
 import {Suspense, useId} from 'react';
 import type {
   CartApiQueryFragment,
@@ -37,26 +38,32 @@ export function PageLayout({
   publicStoreDomain,
 }: PageLayoutProps) {
   return (
-    <Aside.Provider>
-      <CartAside cart={cart} />
-      <SearchAside />
-      <MobileMenuAside />
-      <TrustBar />
-      {header && (
-        <Header
+    // `reducedMotion="user"` makes every Framer transition below honour the
+    // OS setting without each component having to ask. Transforms and
+    // opacity are dropped; layout still settles instantly, so nothing
+    // disappears for a visitor who has asked for less movement.
+    <MotionConfig reducedMotion="user">
+      <Aside.Provider>
+        <CartAside cart={cart} />
+        <SearchAside />
+        <MobileMenuAside />
+        <TrustBar />
+        {header && (
+          <Header
+            header={header}
+            cart={cart}
+            isLoggedIn={isLoggedIn}
+            megaMenu={megaMenu}
+          />
+        )}
+        <main className="flex min-h-[50vh] flex-col">{children}</main>
+        <Footer
+          footer={footer}
           header={header}
-          cart={cart}
-          isLoggedIn={isLoggedIn}
-          megaMenu={megaMenu}
+          publicStoreDomain={publicStoreDomain}
         />
-      )}
-      <main className="flex min-h-[50vh] flex-col">{children}</main>
-      <Footer
-        footer={footer}
-        header={header}
-        publicStoreDomain={publicStoreDomain}
-      />
-    </Aside.Provider>
+      </Aside.Provider>
+    </MotionConfig>
   );
 }
 
