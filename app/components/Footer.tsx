@@ -104,7 +104,7 @@ export function Footer({
           <div className="lg:z-[2] lg:grid lg:w-1/2 lg:grid-cols-3 lg:gap-x-4 min-[1440px]:w-[40%]">
             <FooterColumn title="About">
               <FooterLink to="/pages/about-us">Our story</FooterLink>
-              <FooterLink to="/pages/contact-us">Contact us</FooterLink>
+              <FooterLink to="/pages/contact">Contact us</FooterLink>
             </FooterColumn>
 
             <FooterColumn title="Shop">

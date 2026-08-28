@@ -8,8 +8,8 @@
  * search, blog, and the account/order-lookup routes.
  *
  * The old bare `aside` and `img` element selectors were removed deliberately --
- * `aside main { margin: 1rem }` leaked into the new drawer and `img { border-radius }`
- * fought the product cards.
+ * `aside main { margin: 1rem }` leaked into the new drawer and
+ * `img { border-radius }` fought the product cards.
  *
  * When one of the sections below gets its Tailwind pass, delete its block here
  * too. The goal is for this file to end up empty.
@@ -20,201 +20,385 @@
  * on a link sitewide. Keeping this layered avoids the same trap here.
  */
 
-@layer base {
-:root {
-  --header-height: 4.5rem;
-  --grid-item-width: 355px;
+ @layer base {
+  :root {
+    --header-height: 4.5rem;
+    --grid-item-width: 355px;
 
-  /* Retargeted at Midnight & Citrus so the remaining legacy rules stay dark
-     rather than the scaffold's original black-on-white. */
-  /* Retargeted at the light "Kaleidoscope" palette -- these two names are
-     inherited from the original scaffold and used by legacy rules below
-     (order-search-input) that predate the design system's
-     own tokens. */
-  --color-dark: #241c15;
-  --color-light: #ffffff;
-}
+    /*
+     * Retargeted at the light "Kaleidoscope" palette -- these two names are
+     * inherited from the original scaffold and used by legacy rules below
+     * (order-search-input) that predate the design system's own tokens.
+     */
+    --color-dark: #241c15;
+    --color-light: #ffffff;
+  }
 
-/*
-* --------------------------------------------------
-* components/Cart -- discount + gift card rows
-* --------------------------------------------------
-*/
-.cart-discount {
-  align-items: center;
-  display: flex;
-  margin-top: 0.25rem;
-}
+  /**
+   * --------------------------------------------------
+   * components/Cart -- discount + gift card rows
+   * --------------------------------------------------
+   */
 
-/*
-/*
-* --------------------------------------------------
-* components/Search
-* --------------------------------------------------
-*/
-.predictive-search {
-  height: calc(100vh - var(--header-height) - 40px);
-  overflow-y: auto;
-}
+  .cart-discount {
+    align-items: center;
+    display: flex;
+    margin-top: 0.25rem;
+  }
 
-.predictive-search-form {
-  background: var(--color-light);
-  position: sticky;
-  top: 0;
-}
+  /**
+   * --------------------------------------------------
+   * components/Search
+   * --------------------------------------------------
+   */
 
-.predictive-search-result {
-  margin-bottom: 2rem;
-}
+  .predictive-search {
+    height: calc(100vh - var(--header-height) - 40px);
+    overflow-y: auto;
+  }
 
-.predictive-search-result h5 {
-  text-transform: uppercase;
-}
+  .predictive-search-form {
+    background: var(--color-light);
+    position: sticky;
+    top: 0;
+  }
 
-.predictive-search-result-item {
-  margin-bottom: 0.5rem;
-}
+  .predictive-search-result {
+    margin-bottom: 2rem;
+  }
 
-.predictive-search-result-item a {
-  align-items: center;
-  display: flex;
-}
+  .predictive-search-result h5 {
+    text-transform: uppercase;
+  }
 
-.predictive-search-result-item a img {
-  margin-right: 0.75rem;
-  height: 100%;
-}
+  .predictive-search-result-item {
+    margin-bottom: 0.5rem;
+  }
 
-.search-result {
-  margin-bottom: 1.5rem;
-}
+  .predictive-search-result-item a {
+    align-items: center;
+    display: flex;
+  }
 
-.search-results-item {
-  margin-bottom: 0.5rem;
-}
+  .predictive-search-result-item a img {
+    margin-right: 0.75rem;
+    height: 100%;
+  }
 
-.search-results-item a {
-  display: flex;
-  flex: row;
-  align-items: center;
-  gap: 1rem;
-}
+  .search-result {
+    margin-bottom: 1.5rem;
+  }
 
-/*
-* --------------------------------------------------
-* routes/blog._index.tsx
-* --------------------------------------------------
-*/
-.blog-grid {
-  display: grid;
-  grid-gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(var(--grid-item-width), 1fr));
-  margin-bottom: 2rem;
-}
+  .search-results-item {
+    margin-bottom: 0.5rem;
+  }
 
-.blog-article-image {
-  aspect-ratio: 3/2;
-  display: block;
-}
+  .search-results-item a {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+  }
 
-.blog-article-image img {
-  height: 100%;
-}
+  /**
+   * --------------------------------------------------
+   * routes/blog._index.tsx
+   * --------------------------------------------------
+   */
 
-/*
-* --------------------------------------------------
-* routes/blog.$articlehandle.tsx
-* --------------------------------------------------
-*/
-.article img {
-  height: auto;
-  width: 100%;
-}
+  .blog-grid {
+    display: grid;
+    grid-gap: 1.5rem;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(var(--grid-item-width), 1fr)
+    );
+    margin-bottom: 2rem;
+  }
 
-/*
-* --------------------------------------------------
-* routes/account
-* --------------------------------------------------
-*/
+  .blog-article-image {
+    aspect-ratio: 3 / 2;
+    display: block;
+  }
 
-.account-logout {
-  display: inline-block;
-}
+  .blog-article-image img {
+    height: 100%;
+  }
 
-/*
-* --------------------------------------------------
-* Order Search Form - Minimal & Responsive
-* --------------------------------------------------
-*/
-.order-search-form {
-  margin-bottom: 1.5rem;
-}
+  /**
+   * --------------------------------------------------
+   * routes/blog.$articlehandle.tsx
+   * --------------------------------------------------
+   */
 
-.order-search-fieldset {
-  border: 1px solid var(--color-line, oklch(0.2 0.03 60 / 10%));
-  border-radius: 12px;
-  padding: 1.25rem;
-  color: var(--color-ink, #241c15);
-}
+  .article img {
+    height: auto;
+    width: 100%;
+  }
 
-.order-search-legend {
-  font-weight: 700;
-  padding: 0 0.5rem;
-  color: var(--color-ink, #241c15);
-}
+  /**
+   * --------------------------------------------------
+   * routes/account
+   * --------------------------------------------------
+   */
 
-.order-search-active {
-  font-weight: normal;
-  opacity: 0.6;
-  margin-left: 0.5rem;
-  color: var(--color-ink-muted, #6b5d4f);
-}
+  .account-logout {
+    display: inline-block;
+  }
 
-.order-search-inputs {
-  display: grid;
-  gap: 1rem;
-  margin: 0.25rem 0 1rem;
-  grid-template-columns: 1fr;
-}
+  /**
+   * --------------------------------------------------
+   * Order Search Form - Minimal & Responsive
+   * --------------------------------------------------
+   */
 
-@media (min-width: 640px) {
+  .order-search-form {
+    margin-bottom: 1.5rem;
+  }
+
+  .order-search-fieldset {
+    border: 1px solid var(--color-line, oklch(0.2 0.03 60 / 10%));
+    border-radius: 12px;
+    padding: 1.25rem;
+    color: var(--color-ink, #241c15);
+  }
+
+  .order-search-legend {
+    font-weight: 700;
+    padding: 0 0.5rem;
+    color: var(--color-ink, #241c15);
+  }
+
+  .order-search-active {
+    font-weight: normal;
+    opacity: 0.6;
+    margin-left: 0.5rem;
+    color: var(--color-ink-muted, #6b5d4f);
+  }
+
   .order-search-inputs {
-    grid-template-columns: 1fr 1fr;
+    display: grid;
+    gap: 1rem;
+    margin: 0.25rem 0 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .order-search-inputs {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .order-search-input {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid(
+      var(--color-line-strong, oklch(0.2 0.03 60 / 20%))
+    );
+    border-radius: 999px;
+    font-size: 1rem;
+    background: var(--color-surface, #ffffff);
+    color: var(--color-ink, #241c15);
+  }
+
+  .order-search-input::placeholder {
+    color: var(--color-ink-soft, #a3937f);
+  }
+
+  .order-search-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .order-search-buttons button {
+    border-radius: 999px;
+    padding: 0.6rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    background: var(--color-brand, #c1502e);
+    color: var(--color-bg, #ffffff);
+    border: none;
+    cursor: pointer;
+  }
+
+  .order-search-buttons button:hover {
+    background: var(--color-brand-deep, #9e3f23);
   }
 }
 
-.order-search-input {
+/**
+ * --------------------------------------------------
+ * HOME CATEGORY CAROUSEL
+ * --------------------------------------------------
+ *
+ * Continuous marquee used by components/home/CategoryBlocks.tsx.
+ * The component renders the category set twice, allowing the row to travel
+ * exactly one set-width before restarting with no visible jump.
+ *
+ * Important: the carousel continues moving even while hovering over cards.
+ */
+
+.category-carousel {
   width: 100%;
-  padding: 0.65rem 0.85rem;
-  border: 1px solid var(--color-line-strong, oklch(0.2 0.03 60 / 20%));
-  border-radius: 999px;
-  font-size: 1rem;
-  background: var(--color-surface, #ffffff);
-  color: var(--color-ink, #241c15);
+  overflow: hidden;
+  padding: 10px 0 16px;
+  background: var(--color-bg, #ffffff);
 }
 
-.order-search-input::placeholder {
-  color: var(--color-ink-soft, #a3937f);
+.category-carousel__viewport {
+  width: 100%;
+  overflow: hidden;
 }
 
-.order-search-buttons {
+.category-carousel__track {
   display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  width: max-content;
+  gap: 10px;
+  padding: 0 10px;
+  animation: category-carousel-scroll 60s linear infinite;
+  will-change: transform;
 }
 
-.order-search-buttons button {
-  border-radius: 999px;
-  padding: 0.6rem 1.25rem;
+.category-carousel__item {
+  flex: 0 0 auto;
+  width: clamp(250px, 16.05vw, 330px);
+  height: clamp(330px, 19.2vw, 410px);
+}
+
+.category-carousel__link {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 11px;
+  background: #eeeae5;
+}
+
+.category-carousel__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.category-carousel__link:hover .category-carousel__image {
+  transform: scale(1.035);
+}
+
+.category-carousel__placeholder {
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(36, 28, 21, 0.05),
+      rgba(36, 28, 21, 0.12)
+    );
+}
+
+.category-carousel__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(20, 16, 13, 0.62) 0%,
+    rgba(20, 16, 13, 0.15) 31%,
+    rgba(20, 16, 13, 0) 55%
+  );
+}
+
+.category-carousel__label {
+  position: absolute;
+  left: 29px;
+  bottom: 26px;
+  z-index: 2;
+  color: #ffffff;
+  font-size: 18px;
   font-weight: 600;
-  font-size: 0.875rem;
-  background: var(--color-brand, #c1502e);
-  color: var(--color-bg, #ffffff);
-  border: none;
-  cursor: pointer;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.15);
 }
 
-.order-search-buttons button:hover {
-  background: var(--color-brand-deep, #9e3f23);
+@keyframes category-carousel-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(-50% - 5px), 0, 0);
+  }
 }
+
+@media (max-width: 1024px) {
+  .category-carousel__track {
+    animation-duration: 50s;
+  }
+
+  .category-carousel__item {
+    width: clamp(230px, 31vw, 300px);
+    height: clamp(310px, 39vw, 380px);
+  }
+
+  .category-carousel__label {
+    left: 22px;
+    bottom: 22px;
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 640px) {
+  .category-carousel {
+    padding: 8px 0 12px;
+  }
+
+  .category-carousel__track {
+    gap: 8px;
+    padding: 0 8px;
+    animation-duration: 42s;
+  }
+
+  .category-carousel__item {
+    width: 72vw;
+    min-width: 240px;
+    max-width: 290px;
+    height: 92vw;
+    min-height: 320px;
+    max-height: 380px;
+  }
+
+  .category-carousel__label {
+    left: 20px;
+    bottom: 20px;
+    font-size: 16px;
+  }
+
+  @keyframes category-carousel-scroll {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+
+    to {
+      transform: translate3d(calc(-50% - 4px), 0, 0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-carousel__viewport {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .category-carousel__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-carousel__track {
+    animation: none;
+  }
 }
