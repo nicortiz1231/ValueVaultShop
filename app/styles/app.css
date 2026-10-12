@@ -234,7 +234,9 @@
  *
  * Continuous marquee used by components/home/CategoryBlocks.tsx.
  * The component renders the category set twice, allowing the row to travel
- * exactly one set-width before restarting with no visible jump.
+ * exactly one set-width before restarting with no visible jump. Motion is
+ * driven from JS (useMarquee) so the row can also be dragged, swiped and
+ * trackpad-scrolled, and keeps going in the direction it was last pushed.
  *
  * Important: the carousel continues moving even while hovering over cards.
  */
@@ -249,6 +251,15 @@
 .category-carousel__viewport {
   width: 100%;
   overflow: hidden;
+  /* Horizontal gestures belong to the carousel; vertical ones still scroll the page. */
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.category-carousel__viewport.is-dragging {
+  cursor: grabbing;
 }
 
 .category-carousel__track {
@@ -256,7 +267,6 @@
   width: max-content;
   gap: 10px;
   padding: 0 10px;
-  animation: category-carousel-scroll 60s linear infinite;
   will-change: transform;
 }
 
@@ -324,21 +334,7 @@
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes category-carousel-scroll {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-
-  to {
-    transform: translate3d(calc(-50% - 5px), 0, 0);
-  }
-}
-
 @media (max-width: 1024px) {
-  .category-carousel__track {
-    animation-duration: 50s;
-  }
-
   .category-carousel__item {
     width: clamp(230px, 31vw, 300px);
     height: clamp(310px, 39vw, 380px);
@@ -359,7 +355,6 @@
   .category-carousel__track {
     gap: 8px;
     padding: 0 8px;
-    animation-duration: 42s;
   }
 
   .category-carousel__item {
@@ -375,30 +370,5 @@
     left: 20px;
     bottom: 20px;
     font-size: 16px;
-  }
-
-  @keyframes category-carousel-scroll {
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-
-    to {
-      transform: translate3d(calc(-50% - 4px), 0, 0);
-    }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .category-carousel__viewport {
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .category-carousel__viewport::-webkit-scrollbar {
-    display: none;
-  }
-
-  .category-carousel__track {
-    animation: none;
   }
 }
